@@ -177,7 +177,7 @@ void createCorridors(int roomArr[][]) {
     // rooms 1–2, . . . until you’ve connected room n with rooms 1–(n − 1). ex connect room 9 with rooms 1 thru 8
     
 
-    // Find the closest room in the already connected set using Euclidean distance (pythagorean theorem) to its centroid
+    // Find the closest room in the already connected set using Euclidean distance (pythagorean theorem) to its centroid (row/2, col/2)
 
     // carve a path to it by changing rock to corridor
     
