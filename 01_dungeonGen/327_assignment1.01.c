@@ -66,7 +66,7 @@ void printDungeon() {
             if (dungeon[row][col] == NULL)
                 printf(" ");
 
-            // else just print the dungeon value
+                // else just print the dungeon value
             else
                 printf("%c", dungeon[row][col]);
         }
@@ -148,7 +148,7 @@ void createRooms() {
 //height up and down (col), length left and right (row)
 bool legality(int startRow, int startCol, int endRow, int endCol) {
     int i, j;
-    
+
     for (i = startRow - 1; i < endRow + 1; i++) {
         for (j = startCol - 1; j < endCol + 1; j++) {
             if (dungeon[i][j] == '.')
@@ -169,10 +169,10 @@ int randomRange(int lower, int upper) {
 
 //structure for room
 struct room {
-    int xstart;
-    int ystart;
-    int rows;
-    int cols;
+    int xstart; //top left row
+    int ystart; //top left col
+    int rows; //size vertically
+    int cols; //size horizontally
 };
 
 // corridor maker - connects rooms and has twists to make it FuNkY
@@ -180,32 +180,34 @@ struct room {
 void createCorridors(int* rooms, int num) {
     // corridors can't extend into rooms
 
-    int i;
+    int i, currentRoom = 0;
     struct room closest;
-    
-    closest.xstart = *rooms[num];
-    closest.ystart = *rooms[num];
-    closest.rows = *rooms[];
-    closest.cols = *rooms[];
-    int distance = 10000.0; // 10000 is just a random number to make sure they're close enough
+
+    //prob have to put this in forloop
+    closest.xstart = rooms[4 * currentRoom];
+    closest.ystart = rooms[4 * currentRoom + 1];
+    closest.rows = rooms[4 * currentRoom + 2];
+    closest.cols = rooms[4 * currentRoom + 3];
+
+    int distance = 10000.0; //10000 is just a random number to make sure they're close enough
 
     // finds the closest room that is already connected
     for(i = 0; i < num; i++){
-        int x = abs(*rooms[num].x - *rooms[i].x);
-        int y = abs(*rooms[num].x - *rooms[i].y);
+        int x = abs(rooms[num].xstart - rooms[i].xstart);
+        int y = abs(rooms[num].ystart - rooms[i].ystart);
 
         // Find the closest room in the already connected set using Euclidean distance (pythagorean theorem) to its centroid (row/2, col/2)
         // distance between two rooms and sets a new closest point when there's a small distance
         if(sqrt(x * x + y * y) < distance) {
             distance = sqrt(x * x + y * y);
-            closest.x = *rooms[i].x;
-            closest.y = *rooms[i].y;
+            closest.xstart = rooms[i].xstart;
+            closest.ystart = rooms[i].xstart;
         }
-
     }
+
     // After placing rooms, move through the room array of n rooms, connecting room 1 with room 2, then room 3 with
     // rooms 1–2, . . . until you’ve connected room n with rooms 1–(n − 1). ex connect room 9 with rooms 1 thru 8
-    
+
 
 
 
@@ -220,10 +222,12 @@ void createCorridors(int* rooms, int num) {
 void staircase() {
     int stairs, i, row, col;
     bool isFloor = false;
+
     // randomly generate num between 1 and 3 and then place 1-3 of each staircase in a room
     // up stairs '<'
     stairs = (rand() % 4) + 1;
     for (i = 0; i < stairs; i++) {
+
         // pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
         while (!isFloor) {
             col = (rand() % 79) + 1;
@@ -241,6 +245,7 @@ void staircase() {
     // down stairs '>'
     stairs = (rand() % 4) + 1;
     for (i = 0; i < stairs; i++) {
+
         // pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
         while (!isFloor) {
             col = (rand() % 79) + 1;
