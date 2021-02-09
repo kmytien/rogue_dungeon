@@ -44,8 +44,7 @@ int main(int argc, char* argv[]) {
     initDungeon();
 
     // populate dungeon - generating dungeon
-    createRooms();
-    createCorridors();
+    createRooms(); // calls createCorridors
     staircase();
 
     // print dungeon
@@ -61,8 +60,8 @@ void printDungeon() {
     // 80 units horizontally length and 21 vertically width if we leave out 3 lines for text
     for (row = 0; row < WORLD_LENGTH; row++) {
         for(col = 0; col < WORLD_WIDTH; col++) {
-            // if space is null or R then its a ROCK
-            if (dungeon[row][col] == 'R' || dungeon[row][col] == NULL)
+            // if space is null/ not filled then it is rock
+            if (dungeon[row][col] == NULL)
                 printf(" ");
 
                 // else just print the dungeon value
@@ -84,7 +83,7 @@ void initDungeon() {
         for (col = 0; col < WORLD_WIDTH; col++) {
             // if a border edge then set as rock
             if (row == 0 || row == WORLD_WIDTH - 1 || col == 0 || col == WORLD_LENGTH - 1)
-                dungeon[row][col] = 'R';
+                dungeon[row][col] = ' ';
         }
     }
 }
@@ -133,13 +132,15 @@ void createRooms() {
             }
         }
 
-        //what do we have to do with the array of rooms?
+        //what do we have to do with the array of rooms? 
+        // im assuming it has the information of the locations of the rooms that we can use
+        // to create corridors -hl
 
         currentRooms++;
     } while (currentRooms < maxRooms);
 
     //create rooms then corridors
-    createCorridors();
+    createCorridors(roomArr);
 }
 
 //checks if placement of room is legal
@@ -166,11 +167,21 @@ int randomRange(int lower, int upper) {
     return num = (rand() % (upper - lower + 1)) + lower;
 }
 
-// corridor maker - connects rooms and has twists to make FuNkY
+// corridor maker - connects rooms and has twists to make it FuNkY
 // corridors are represented by '#'
-// MK today i learned corridors are hallways
-void createCorridors() {
+// MK today i learned corridors are hallways 
+void createCorridors(int roomArr[][]) {
     // corridors can't extend into rooms
+    
+    // After placing rooms, move through the room array of n rooms, connecting room 1 with room 2, then room 3 with 
+    // rooms 1–2, . . . until you’ve connected room n with rooms 1–(n − 1). ex connect room 9 with rooms 1 thru 8
+    
+
+    // Find the closest room in the already connected set using Euclidean distance (pythagorean theorem) to its centroid
+
+    // carve a path to it by changing rock to corridor
+    
+    // If you get that working, then add some random changes of direction in there to make it look a little more exciting.
 }
 
 
@@ -178,39 +189,39 @@ void createCorridors() {
 // up staircase with '<' and down staircase with '>'
 void staircase() {
     int stairs, i, row, col;
-    bool isPeriod = false;
+    bool isFloor = false;
     // randomly generate num between 1 and 3 and then place 1-3 of each staircase in a room
     // up stairs '<'
     stairs = (rand() % 4) + 1;
     for (i = 0; i < stairs; i++) {
         // pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
-        while (!isPeriod) {
+        while (!isFloor) {
             col = (rand() % 79) + 1;
             row = (rand() % 20) + 1;
 
             if (dungeon[row][col] == '.') {
                 dungeon[row][col] = '<';
-                isPeriod = true;
+                isFloor = true;
             }
         }
 
-        isPeriod = false;
+        isFloor = false;
     }
 
     // down stairs '>'
     stairs = (rand() % 4) + 1;
     for (i = 0; i < stairs; i++) {
         // pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
-        while (!isPeriod) {
+        while (!isFloor) {
             col = (rand() % 79) + 1;
             row = (rand() % 20) + 1;
 
             if (dungeon[row][col] == '.') {
                 dungeon[row][col] = '>';
-                isPeriod = true;
+                isFloor = true;
             }
         }
 
-        isPeriod = false;
+        isFloor = false;
     }
 }
