@@ -4,19 +4,20 @@
 #include <stdbool.h>
 //#include <unistd.h>
 #include <time.h>
+#include <math.h>
 
-#define WORLD_LENGTH 21
-#define WORLD_WIDTH 80
+#define WORLD_ROW 21
+#define WORLD_COL 80
 
 void printDungeon();
 void initDungeon();
 void createRooms();
-void createCorridors();
+void createCorridors(int*, int);
 void staircase();
 int randomRange(int, int);
 bool legality(int, int, int, int);
 
-char dungeon[WORLD_WIDTH][WORLD_LENGTH];
+char dungeon[WORLD_ROW][WORLD_COL];
 
 /**
 RULES FOR THE DUNGEON MAP
@@ -58,16 +59,18 @@ void printDungeon() {
 
     // we can just go thru the whole grid and printf("%c", dungeon[row][col]) since its a 2D array of chars
     // 80 units horizontally length and 21 vertically width if we leave out 3 lines for text
-    for (row = 0; row < WORLD_LENGTH; row++) {
-        for(col = 0; col < WORLD_WIDTH; col++) {
+    for (row = 0; row < WORLD_ROW; row++) {
+        for(col = 0; col < WORLD_COL; col++) {
+
             // if space is null/ not filled then it is rock
             if (dungeon[row][col] == NULL)
                 printf(" ");
 
-                // else just print the dungeon value
+            // else just print the dungeon value
             else
                 printf("%c", dungeon[row][col]);
         }
+
         printf("\n");
     }
 }
@@ -79,10 +82,10 @@ void initDungeon() {
     // make outside edges rock, all else remains null
     int row, col;
 
-    for (row = 0; row < WORLD_LENGTH; row++) {
-        for (col = 0; col < WORLD_WIDTH; col++) {
+    for (row = 0; row < WORLD_ROW; row++) {
+        for (col = 0; col < WORLD_COL; col++) {
             // if a border edge then set as rock
-            if (row == 0 || row == WORLD_WIDTH - 1 || col == 0 || col == WORLD_LENGTH - 1)
+            if (row == 0 || row == WORLD_ROW - 1 || col == 0 || col == WORLD_COL - 1)
                 dungeon[row][col] = ' ';
         }
     }
@@ -93,63 +96,61 @@ void initDungeon() {
 void createRooms() {
     // rooms can't be in contact with each other/walls of dungeon can't be created by wall of rooms
     // Min/Max Rooms: AT LEAST 6 -> AT MOST 10
-    // Min Room Width (left right) = 4, Max Room Width = 12
-    // Min Room length (up down) = 3, Max Room Length = 9
-
-    //needs at least 6 - 10 rooms with width (4 to 15) and length (3 to 9)
-    //6 rooms + (rand() % 5) - (which is 0, 1, 2, 3, 4)
+    // Min Room Width (left right) = 4, Max Room Width = 12 row
+    // Min Room length (up down) = 3, Max Room Length = 9 col
 
     //malloc is used when we don't know how much memory we should allocate
     //probably best used in this method and also methods that has a randomized number
-    int maxRooms = randomRange(6, 10);//6 + (rand() % 5);
+    int maxRooms = randomRange(6, 10);
 
     //sheaffer mentioned creating array for rooms so im assuming its this
-    int* rooms = (int*)malloc(maxRooms * sizeof(int));
+    int* rooms = (int*) malloc(maxRooms * 4 * sizeof(int));
     int currentRooms = 0;
 
     //keeps adding room until it gets to randomized max num of rooms
     do {
 
-        //-----------I get very confused with length/width and row/col so if anythign is wrong im sorry D: -MK
         //getting random room sizes
-        int rand_width = randomRange(4, 12);
-        int rand_length = randomRange(3, 9);
+        int rand_vertical = randomRange(3, 9); //row
+        int rand_horizontal = randomRange(4, 12); //col
 
         //getting random placement (-2 and +2 so we don't touch the border)
         int row_start = randomRange(2, 19);
         int col_start = randomRange(2, 79);
-
         int i, j;
 
         //legality checks if its legal to place room there
-        if (legality(row_start, col_start, rand_width, rand_length)) {
+        if (legality(row_start, col_start, rand_vertical, rand_horizontal)) {
 
             //adds room to dungeon
-            for (i = row_start; i < row_start + rand_length; i++ ) {
-                for (j = col_start; j < col_start + rand_width; j++) {
+            for (i = row_start; i < row_start + rand_vertical; i++ ) {
+                for (j = col_start; j < col_start + rand_horizontal; j++) {
                     dungeon[i][j] = '.';
                 }
             }
-        }
 
-        //what do we have to do with the array of rooms?
-        // im assuming it has the information of the locations of the rooms that we can use
-        // to create corridors -hl
+            // add to the rooms array
+            //i checked in clion and it didn't create a 2d array but i think this works as well -mk
+            rooms[4 * currentRooms] = row_start;
+            rooms[4 * currentRooms + 1] = col_start;
+            rooms[4 * currentRooms + 2] = rand_vertical;
+            rooms[4 * currentRooms + 3] = rand_horizontal;
+        }
 
         currentRooms++;
     } while (currentRooms < maxRooms);
 
     //create rooms then corridors
-    createCorridors(roomArr);
+    createCorridors(rooms, maxRooms);
 }
 
 //checks if placement of room is legal
-bool legality(int startWidth, int startLength, int endWidth, int endLength) {
+//height up and down (col), length left and right (row)
+bool legality(int startRow, int startCol, int endRow, int endCol) {
     int i, j;
-
-    //starts at
-    for (i = startWidth - 1; i < endWidth + 1; i++) {
-        for (j = startLength - 1; j < endLength + 1; j++) {
+    
+    for (i = startRow - 1; i < endRow + 1; i++) {
+        for (j = startCol - 1; j < endCol + 1; j++) {
             if (dungeon[i][j] == '.')
                 return false;
         }
@@ -163,40 +164,48 @@ int randomRange(int lower, int upper) {
     srand(time(NULL));
     int num;
 
-    //i wasn't sure what the count was for but if it is needed, someone can add it!
     return num = (rand() % (upper - lower + 1)) + lower;
 }
 
+//structure for room
+struct room {
+    int xstart;
+    int ystart;
+    int rows;
+    int cols;
+};
+
 // corridor maker - connects rooms and has twists to make it FuNkY
 // corridors are represented by '#'
-// MK today i learned corridors are hallways
-void createCorridors(int roomArr[][], int num) {
+void createCorridors(int* rooms, int num) {
     // corridors can't extend into rooms
 
     int i;
-    // i watched a two hours lecture on structs and I think this is how they work?? I'm sorry if this is wronggg!
     struct room closest;
-    closest.x = roomArr[num].x;
-    closest.y = roomArr[num].y;
+    
+    closest.xstart = *rooms[num];
+    closest.ystart = *rooms[num];
+    closest.rows = *rooms[];
+    closest.cols = *rooms[];
     int distance = 10000.0; // 10000 is just a random number to make sure they're close enough
 
     // finds the closest room that is already connected
     for(i = 0; i < num; i++){
-        int x = abs(roomArr[num].x - roomArr[i].x);
-        int y = abs(roomArr[num].x - roomArr[i].y);
+        int x = abs(*rooms[num].x - *rooms[i].x);
+        int y = abs(*rooms[num].x - *rooms[i].y);
 
         // Find the closest room in the already connected set using Euclidean distance (pythagorean theorem) to its centroid (row/2, col/2)
         // distance between two rooms and sets a new closest point when there's a small distance
-        if(sqrt(x * x + y * y)) < distance) {
+        if(sqrt(x * x + y * y) < distance) {
             distance = sqrt(x * x + y * y);
-            closest.x = roomArr[i].x;
-            closest.y = roomArr[i].y;
+            closest.x = *rooms[i].x;
+            closest.y = *rooms[i].y;
         }
 
     }
     // After placing rooms, move through the room array of n rooms, connecting room 1 with room 2, then room 3 with
     // rooms 1–2, . . . until you’ve connected room n with rooms 1–(n − 1). ex connect room 9 with rooms 1 thru 8
-
+    
 
 
 
