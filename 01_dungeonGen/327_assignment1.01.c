@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+//#include <string.h>
 #include <stdbool.h>
-#include <unistd.h>
+//#include <unistd.h>
 #include <time.h>
 
 #define WORLD_LENGTH 21
@@ -13,12 +13,13 @@ void initDungeon();
 void createRooms();
 void createCorridors();
 void staircase();
+int randomRange(int, int);
+bool legality(int, int, int, int);
 
 char dungeon[WORLD_WIDTH][WORLD_LENGTH];
 
 /**
 RULES FOR THE DUNGEON MAP
-
 • Dungeon measures 80 units x direction and 21 units y direction
   - he said something about 24 units y direction, accounting for text and everything but idk if we need to include it here o_o
 • at least 6 rooms per dungeon
@@ -61,7 +62,7 @@ void printDungeon() {
     for (row = 0; row < WORLD_LENGTH; row++) {
         for(col = 0; col < WORLD_WIDTH; col++) {
             // if space is null or R then its a ROCK
-            if (dungeon[row][col] == "R" || dungeon[row][col] == NULL)
+            if (dungeon[row][col] == 'R' || dungeon[row][col] == NULL)
                 printf(" ");
 
                 // else just print the dungeon value
@@ -79,11 +80,11 @@ void initDungeon() {
     // make outside edges rock, all else remains null
     int row, col;
 
-    for (row = 0; row = WORLD_LENGTH; row++) {
-        for (col = 0; col = WORLD_WIDTH; col++) {
+    for (row = 0; row < WORLD_LENGTH; row++) {
+        for (col = 0; col < WORLD_WIDTH; col++) {
             // if a border edge then set as rock
-            if (row == 0 || row == 79 || col == 0 || col == 20)
-                dungeon[row][col] = "R";
+            if (row == 0 || row == WORLD_WIDTH - 1 || col == 0 || col == WORLD_LENGTH - 1)
+                dungeon[row][col] = 'R';
         }
     }
 }
@@ -93,24 +94,76 @@ void initDungeon() {
 void createRooms() {
     // rooms can't be in contact with each other/walls of dungeon can't be created by wall of rooms
     // Min/Max Rooms: AT LEAST 6 -> AT MOST 10
-    // Min Room Width = 4, Max Room Width = 15
-    // Min Room length = 3, Max Room Length = 9
-    srand(time(NULL));
+    // Min Room Width (left right) = 4, Max Room Width = 12
+    // Min Room length (up down) = 3, Max Room Length = 9
 
     //needs at least 6 - 10 rooms with width (4 to 15) and length (3 to 9)
     //6 rooms + (rand() % 5) - (which is 0, 1, 2, 3, 4)
-    int maxRooms = 6 + (rand() % 5);
+
+    //malloc is used when we don't know how much memory we should allocate
+    //probably best used in this method and also methods that has a randomized number
+    int maxRooms = randomRange(6, 10);//6 + (rand() % 5);
+
+    //sheaffer mentioned creating array for rooms so im assuming its this
+    int* rooms = (int*)malloc(maxRooms * sizeof(int));
     int currentRooms = 0;
 
-    //should we use malloc here??????? what is malloc :')))))
-
     //keeps adding room until it gets to randomized max num of rooms
-    if (currentRooms < maxRooms) {
-        //createRoom function then currentRooms++?
-    }
+    do {
+
+        //-----------I get very confused with length/width and row/col so if anythign is wrong im sorry D: -MK
+        //getting random room sizes
+        int rand_width = randomRange(4, 12);
+        int rand_length = randomRange(3, 9);
+
+        //getting random placement (-2 and +2 so we don't touch the border)
+        int row_start = randomRange(2, 19);
+        int col_start = randomRange(2, 79);
+
+        int i, j;
+
+        //legality checks if its legal to place room there
+        if (legality(row_start, col_start, rand_width, rand_length)) {
+
+            //adds room to dungeon
+            for (i = row_start; i < row_start + rand_length; i++ ) {
+                for (j = col_start; j < col_start + rand_width; j++) {
+                    dungeon[i][j] = '.';
+                }
+            }
+        }
+
+        //what do we have to do with the array of rooms?
+
+        currentRooms++;
+    } while (currentRooms < maxRooms);
 
     //create rooms then corridors
     createCorridors();
+}
+
+//checks if placement of room is legal
+bool legality(int startWidth, int startLength, int endWidth, int endLength) {
+    int i, j;
+
+    //starts at
+    for (i = startWidth - 1; i < endWidth + 1; i++) {
+        for (j = startLength - 1; j < endLength + 1; j++) {
+            if (dungeon[i][j] == '.')
+                return false;
+        }
+    }
+
+    return true;
+}
+
+//produces random range based on numbers
+int randomRange(int lower, int upper) {
+    srand(time(NULL));
+    int num;
+
+    //i wasn't sure what the count was for but if it is needed, someone can add it!
+    return num = (rand() % (upper - lower + 1)) + lower;
 }
 
 // corridor maker - connects rooms and has twists to make FuNkY
@@ -161,4 +214,3 @@ void staircase() {
         isPeriod = false;
     }
 }
-
