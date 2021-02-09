@@ -132,7 +132,7 @@ void createRooms() {
             }
         }
 
-        //what do we have to do with the array of rooms? 
+        //what do we have to do with the array of rooms?
         // im assuming it has the information of the locations of the rooms that we can use
         // to create corridors -hl
 
@@ -169,18 +169,39 @@ int randomRange(int lower, int upper) {
 
 // corridor maker - connects rooms and has twists to make it FuNkY
 // corridors are represented by '#'
-// MK today i learned corridors are hallways 
-void createCorridors(int roomArr[][]) {
+// MK today i learned corridors are hallways
+void createCorridors(int roomArr[][], int num) {
     // corridors can't extend into rooms
-    
-    // After placing rooms, move through the room array of n rooms, connecting room 1 with room 2, then room 3 with 
-    // rooms 1–2, . . . until you’ve connected room n with rooms 1–(n − 1). ex connect room 9 with rooms 1 thru 8
-    
 
-    // Find the closest room in the already connected set using Euclidean distance (pythagorean theorem) to its centroid (row/2, col/2)
+    int i;
+    // i watched a two hours lecture on structs and I think this is how they work?? I'm sorry if this is wronggg!
+    struct room closest;
+    closest.x = roomArr[num].x;
+    closest.y = roomArr[num].y;
+    int distance = 10000.0; // 10000 is just a random number to make sure they're close enough
+
+    // finds the closest room that is already connected
+    for(i = 0; i < num; i++){
+        int x = abs(roomArr[num].x - roomArr[i].x);
+        int y = abs(roomArr[num].x - roomArr[i].y);
+
+        // Find the closest room in the already connected set using Euclidean distance (pythagorean theorem) to its centroid (row/2, col/2)
+        // distance between two rooms and sets a new closest point when there's a small distance
+        if(sqrt(x * x + y * y)) < distance) {
+            distance = sqrt(x * x + y * y);
+            closest.x = roomArr[i].x;
+            closest.y = roomArr[i].y;
+        }
+
+    }
+    // After placing rooms, move through the room array of n rooms, connecting room 1 with room 2, then room 3 with
+    // rooms 1–2, . . . until you’ve connected room n with rooms 1–(n − 1). ex connect room 9 with rooms 1 thru 8
+
+
+
 
     // carve a path to it by changing rock to corridor
-    
+
     // If you get that working, then add some random changes of direction in there to make it look a little more exciting.
 }
 
