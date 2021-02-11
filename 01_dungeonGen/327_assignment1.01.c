@@ -52,6 +52,9 @@ void printDungeon() {
             else if (dungeon[row][col] == '@')
                 printf(" ");
 
+            else if (dungeon[row][col] == '#')
+                printf("#");
+
             else
                 printf("%c", dungeon[row][col]);
         }
@@ -115,13 +118,22 @@ void createRooms() {
 
             //add to the rooms array
             rooms[4 * currentRooms] = row_start;
-            rooms[4 * currentRooms + 1] = col_start;
-            rooms[4 * currentRooms + 2] = rand_vertical;
-            rooms[4 * currentRooms + 3] = rand_horizontal;
+            rooms[(4 * currentRooms) + 1] = col_start;
+            rooms[(4 * currentRooms) + 2] = rand_vertical;
+            rooms[(4 * currentRooms) + 3] = rand_horizontal;
 
             currentRooms++;
+
         }
     }
+
+    //For testing
+    /**
+    for (int k = 0; k < 4*maxRooms; k++) {
+        printf("%d ", rooms[k]);
+    }
+    printf("\n\n");
+    **/
 
     //create rooms then corridors
     createCorridors(rooms, maxRooms);
@@ -152,77 +164,80 @@ struct room {
 //corridor maker - connects rooms and has twists to make it funky
 //num is the number of rooms made
 void createCorridors(int* rooms, int num) {
-    //corridors can't extend into rooms
 
     int i, currRoom = 0;
     struct room firstRoom;
     struct room secondRoom;
 
-    while (currRoom < num) {
+    for (i = currRoom; currRoom < num; currRoom++) {
         firstRoom.xstart = rooms[4 * currRoom];
-        firstRoom.ystart = rooms[4 * currRoom + 1];
-        firstRoom.rows = rooms[4 * currRoom + 2]; //dont think this is needed
-        firstRoom.cols = rooms[4 * currRoom + 3]; //dont think this is needed
+        firstRoom.ystart = rooms[(4 * currRoom) + 1];
 
-        //int distance = 10000.0;
-        //use euclidean distance to its centroid to find closest room
         //set for secondRoom struct
+        if (i == num - 1) {
+            secondRoom.xstart = rooms[0];
+            secondRoom.ystart = rooms[1];
+        }
 
-        int x, y, lowest = 80; //should I set lowest to 80
-        for (i = currRoom + 1; i < num; i++) {
-            x = abs(firstRoom.xstart - rooms[4 * i]);
-            y = abs(firstRoom.ystart - rooms[4 * i + 1]);
-
-            if (sqrt(x*x + y*y) < lowest) {
-                lowest = sqrt(x*x + y*y);
-
-                //closest room
-                secondRoom.xstart = rooms[4 * i];
-                secondRoom.ystart = rooms[4 * i + 1];
-                secondRoom.rows = rooms[4 * i + 2]; //dont think this is needed
-                secondRoom.cols = rooms[4 * i + 3]; //dont think this is needed
-            }
+        else {
+            secondRoom.xstart = rooms[(4 * currRoom) + 4];
+            secondRoom.ystart = rooms[(4 * currRoom + 1) + 4];
         }
 
         //actually prints it in dungeon
         printCorridors(firstRoom.xstart, firstRoom.ystart, secondRoom.xstart, secondRoom.ystart);
-        currRoom++;
     }
 
     staircase();
-    //After placing rooms, move through the room array of n rooms, connecting room 1 with room 2, then room 3 with
-    //rooms 1–2, . . . until you’ve connected room n with rooms 1–(n − 1). ex connect room 9 with rooms 1 thru 8
-    //carve a path to it by changing rock to corridor
 }
 
 //draws corridors
 void printCorridors(int fX, int fY, int eX, int eY) {
+    //FOR TESTING
+    //printf("%d rowstart\n", fX);
+    //printf("%d rowend\n", eX);
+    //printf("%d colstart\n", fY);
+    //printf("%d colend\n\n", eY);
 
     if (fX < eX) {
         for (int i = fX; i < eX; i++) {
-            if (dungeon[fX][fY] == ' ')
-                dungeon[fX][fY] = '#';
+            if (dungeon[i][fY] == ' ')
+                dungeon[i][fY] = '#';
+        }
+
+        if (fY < eY) {
+            for (int i = fY; i < eY; i++) {
+                if (dungeon[eX][i] == ' ')
+                    dungeon[eX][i] = '#';
+            }
+        }
+
+        else {
+            for (int i = fY; i > eY; i--) {
+                if (dungeon[eX][i] == ' ')
+                    dungeon[eX][i] = '#';
+            }
         }
     }
 
     else {
         for (int i = fX; i > eX; i--) {
-            if (dungeon[fX][fY] == ' ')
-                dungeon[fX][fY] = '#';
+            if (dungeon[i][fY] == ' ')
+                dungeon[i][fY] = '#';
         }
-    }
 
-    if (fY < eY) {
-        for (int i = fY; i < eY; i++) {
-            if (dungeon[fX][fY] == ' ')
-                dungeon[fX][fY] = '#';
+        if (fY < eY) {
+            for (int i = fY; i < eY; i++) {
+                if (dungeon[eX][i] == ' ')
+                    dungeon[eX][i] = '#';
+            }
         }
-    }
 
-    else {
-        for (int i = fY; i > eY; i--) {
-            if (dungeon[fX][fY] == ' ')
-                dungeon[fX][fY] = '#';
+        else {
+            for (int i = fY; i > eY; i--) {
+                if (dungeon[eX][i] == ' ')
+                    dungeon[eX][i] = '#';
+            }
         }
     }
 }
