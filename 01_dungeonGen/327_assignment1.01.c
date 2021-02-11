@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
-#include <math.h>
 
 #define WORLD_ROW 21
 #define WORLD_COL 80
@@ -12,16 +11,16 @@ void initDungeon();
 void createRooms();
 void createCorridors(int*, int);
 void staircase();
-void printCorridors(int, int, int, int);
-int randomRange(int, int);
+void setCorridors(int, int, int, int);
 bool legality(int, int, int, int);
 
 char dungeon[WORLD_ROW][WORLD_COL];
 
 /**
- * Assignment 1.01: Dungeon Generation
+ * CS 327: Assignment 1.01: Dungeon Generation
  * Project by: Sanjana Amatya, MyTien Kien, Haylee Lawrence
  */
+
 int main(int argc, char* argv[]) {
 
     //initialize dungeon
@@ -89,21 +88,20 @@ void createRooms() {
     //x-direction can be 4 to 12 blocks
     //y-direction can be 3 to 9 blocks
 
-    int maxRooms = 6 + (rand() % 5);//randomRange(6, 10);
+    int maxRooms = 6 + (rand() % 5);
     int* rooms = (int*) malloc(maxRooms * 4 * sizeof(int));
     int currentRooms = 0;
 
     //keeps adding room until it gets to randomized max num of rooms
     while(currentRooms < maxRooms) {
-        //srand(time(NULL));
 
         //getting random room sizes
-        int rand_vertical = 3 + (rand() % 7);//randomRange(3, 9); //row
-        int rand_horizontal = 4 + (rand() % 9);//randomRange(4, 12); //col
+        int rand_vertical = 3 + (rand() % 7);
+        int rand_horizontal = 4 + (rand() % 9);
 
         //getting random placement
-        int row_start = 2 + (rand() % 17);//randomRange(2, 19);
-        int col_start = 2 + (rand() % 77);//randomRange(2, 79);
+        int row_start = 2 + (rand() % 17);
+        int col_start = 2 + (rand() % 77);
         int i, j;
 
         //legality checks if its legal to place room there
@@ -123,17 +121,8 @@ void createRooms() {
             rooms[(4 * currentRooms) + 3] = rand_horizontal;
 
             currentRooms++;
-
         }
     }
-
-    //For testing
-    /**
-    for (int k = 0; k < 4*maxRooms; k++) {
-        printf("%d ", rooms[k]);
-    }
-    printf("\n\n");
-    **/
 
     //create rooms then corridors
     createCorridors(rooms, maxRooms);
@@ -161,7 +150,7 @@ struct room {
     int cols; //size horizontally
 };
 
-//corridor maker - connects rooms and has twists to make it funky
+//corridor maker
 //num is the number of rooms made
 void createCorridors(int* rooms, int num) {
 
@@ -174,7 +163,7 @@ void createCorridors(int* rooms, int num) {
         firstRoom.ystart = rooms[(4 * currRoom) + 1];
 
         //set for secondRoom struct
-        if (i == num - 1) {
+        if (currRoom == num - 1) {
             secondRoom.xstart = rooms[0];
             secondRoom.ystart = rooms[1];
         }
@@ -185,26 +174,23 @@ void createCorridors(int* rooms, int num) {
         }
 
         //actually prints it in dungeon
-        printCorridors(firstRoom.xstart, firstRoom.ystart, secondRoom.xstart, secondRoom.ystart);
+        setCorridors(firstRoom.xstart, firstRoom.ystart, secondRoom.xstart, secondRoom.ystart);
     }
 
     staircase();
 }
 
-//draws corridors
-void printCorridors(int fX, int fY, int eX, int eY) {
-    //FOR TESTING
-    //printf("%d rowstart\n", fX);
-    //printf("%d rowend\n", eX);
-    //printf("%d colstart\n", fY);
-    //printf("%d colend\n\n", eY);
+//sets corridors in map
+void setCorridors(int fX, int fY, int eX, int eY) {
 
+    //starting at rows
     if (fX < eX) {
         for (int i = fX; i < eX; i++) {
             if (dungeon[i][fY] == ' ')
                 dungeon[i][fY] = '#';
         }
 
+        //looking at columns
         if (fY < eY) {
             for (int i = fY; i < eY; i++) {
                 if (dungeon[eX][i] == ' ')
@@ -220,12 +206,14 @@ void printCorridors(int fX, int fY, int eX, int eY) {
         }
     }
 
+
     else {
         for (int i = fX; i > eX; i--) {
             if (dungeon[i][fY] == ' ')
                 dungeon[i][fY] = '#';
         }
 
+        //looking at columns
         if (fY < eY) {
             for (int i = fY; i < eY; i++) {
                 if (dungeon[eX][i] == ' ')
