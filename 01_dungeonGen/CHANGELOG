@@ -1,4 +1,5 @@
-02/10/2021: 15:30 MK: Implemented an idea out for making the corridors
+02/10/2021: 18:00 MK HL SA: Bug fixes woooo
+02/10/2021: 13:30 MK: Implemented an idea out for making the corridors
 02/09/2021: 15:00 SA HL MK: Fixed struct() in createCorridors(), finishing up createRoom()
 02/08/2021 17:30 MK: Added some things to createRoom(), created legality() & randomRange(), fixed errors
 02/07/2021 16:00 HL MK: Coded initDungeon(), printDungeon(), and staircase()
