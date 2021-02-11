@@ -20,7 +20,7 @@ char dungeon[WORLD_ROW][WORLD_COL];
 
 /**
  * Assignment 1.01: Dungeon Generation
- * Project by:
+ * Project by: Sanjana Amatya, MyTien Kien, Haylee Lawrence
  */
 int main(int argc, char* argv[]) {
 
@@ -35,18 +35,23 @@ int main(int argc, char* argv[]) {
     printDungeon();
 }
 
-//prints Dungeon - no border set for ease of functionality
+//prints Dungeon
 void printDungeon() {
     int row, col;
 
     for (row = 0; row < WORLD_ROW; row++) {
         for(col = 0; col < WORLD_COL; col++) {
 
-            //if space is null/not filled then it is rock
-            if (dungeon[row][col] == NULL)
+            if (row == 0 || row == WORLD_ROW - 1)
+                printf("-");
+
+            else if (col == 0 || col == WORLD_COL - 1)
+                printf("|");
+
+                //this is immutable
+            else if (dungeon[row][col] == '@')
                 printf(" ");
 
-            //else just print the dungeon value
             else
                 printf("%c", dungeon[row][col]);
         }
@@ -57,13 +62,18 @@ void printDungeon() {
 
 //dungeon initialization function: make border rock, set hardness of every material in every cell
 void initDungeon() {
-    // make outside edges rock, all else remains null
+
+    //make outside edges rock, all else remains null
     int row, col;
 
     for (row = 0; row < WORLD_ROW; row++) {
         for (col = 0; col < WORLD_COL; col++) {
-            // if a border edge then set as rock
-            if (row == 0 || row == WORLD_ROW - 1 || col == 0 || col == WORLD_COL - 1)
+
+            //if border, set as 9 - idk just a random character
+            if (row > WORLD_ROW - 3 || row < 2 || col > WORLD_COL - 3 || col < 2)
+                dungeon[row][col] = '@';
+
+            else
                 dungeon[row][col] = ' ';
         }
     }
@@ -75,7 +85,7 @@ void createRooms() {
     //x-direction can be 4 to 12 blocks
     //y-direction can be 3 to 9 blocks
 
-    int maxRooms = randomRange(6, 10);
+    int maxRooms = 6 + (rand() % 11); //randomRange(6, 10);
     int* rooms = (int*) malloc(maxRooms * 4 * sizeof(int));
     int currentRooms = 0;
 
@@ -83,19 +93,19 @@ void createRooms() {
     while(currentRooms < maxRooms) {
 
         //getting random room sizes
-        int rand_vertical = randomRange(3, 9); //row
-        int rand_horizontal = randomRange(4, 12); //col
+        int rand_vertical = 3 + (rand() % 7);//randomRange(3, 9); //row
+        int rand_horizontal = 4 + (rand() % 9);//randomRange(4, 12); //col
 
         //getting random placement (-2 and +2 so we don't touch the border)
-        int row_start = randomRange(2, 19);
-        int col_start = randomRange(2, 79);
+        int row_start = 2 + (rand() % 17);//randomRange(2, 19);
+        int col_start = 2 + (rand() % 77);//randomRange(2, 79);
         int i, j;
 
         //legality checks if its legal to place room there
         if (legality(row_start, col_start, rand_vertical, rand_horizontal)) {
 
             //adds room to dungeon
-            for (i = row_start; i < row_start + rand_vertical; i++ ) {
+            for (i = row_start; i < row_start + rand_vertical; i++) {
                 for (j = col_start; j < col_start + rand_horizontal; j++) {
                     dungeon[i][j] = '.';
                 }
@@ -121,7 +131,7 @@ bool legality(int startRow, int startCol, int endRow, int endCol) {
 
     for (i = startRow - 1; i < endRow + 1; i++) {
         for (j = startCol - 1; j < endCol + 1; j++) {
-            if (dungeon[i][j] == '.')
+            if (dungeon[i][j] == '.' || dungeon[i][j] == '@')
                 return false;
         }
     }
@@ -132,9 +142,8 @@ bool legality(int startRow, int startCol, int endRow, int endCol) {
 //produces random range based on numbers
 int randomRange(int lower, int upper) {
     srand(time(NULL));
-    int num;
 
-    return num = (rand() % (upper - lower + 1)) + lower;
+    return (rand() % (upper - lower + 1)) + lower;
 }
 
 //structure for room
@@ -170,7 +179,7 @@ void createCorridors(int* rooms, int num) {
             y = abs(firstRoom.ystart - rooms[4 * i + 1]);
 
             if (sqrt(x*x + y*y) < lowest) {
-                lowest = sqrt(x * x + y * y);
+                lowest = sqrt(x*x + y*y);
 
                 //closest room
                 secondRoom.xstart = rooms[4 * i];
@@ -194,36 +203,33 @@ void createCorridors(int* rooms, int num) {
 //draws corridors
 void printCorridors(int fX, int fY, int eX, int eY) {
 
-    while (fX < eX && fY < eY) {
-        if (fX < eX) {
-            for (int i = fX; i < eX; i++) {
-                if (dungeon[fX][fY] == ' ')
-                    dungeon[fX][fY] == '#';
-            }
-        }
-
-        else {
-            for (int i = fX; i > eX; i--) {
-                if (dungeon[fX][fY] == ' ')
-                    dungeon[fX][fY] == '#';
-            }
-        }
-
-        if (fY < eY) {
-            for (int i = fY; i < eY; i++) {
-                if (dungeon[fX][fY] == ' ')
-                    dungeon[fX][fY] == '#';
-            }
-        }
-
-        else {
-            for (int i = fY; i > eY; i--) {
-                if (dungeon[fX][fY] == ' ')
-                    dungeon[fX][fY] == '#';
-            }
+    if (fX < eX) {
+        for (int i = fX; i < eX; i++) {
+            if (dungeon[fX][fY] == ' ')
+                dungeon[fX][fY] = '#';
         }
     }
 
+    else {
+        for (int i = fX; i > eX; i--) {
+            if (dungeon[fX][fY] == ' ')
+                dungeon[fX][fY] = '#';
+        }
+    }
+
+    if (fY < eY) {
+        for (int i = fY; i < eY; i++) {
+            if (dungeon[fX][fY] == ' ')
+                dungeon[fX][fY] = '#';
+        }
+    }
+
+    else {
+        for (int i = fY; i > eY; i--) {
+            if (dungeon[fX][fY] == ' ')
+                dungeon[fX][fY] = '#';
+        }
+    }
 }
 
 //up staircase with '<' and down staircase with '>'
