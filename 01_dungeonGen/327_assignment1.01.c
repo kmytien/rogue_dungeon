@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
     printDungeon();
 }
 
-//prints Dungeon
+//prints Dungeon - no border set for ease of functionality
 void printDungeon() {
     int row, col;
 
@@ -48,7 +48,7 @@ void printDungeon() {
             else if (col == 0 || col == WORLD_COL - 1)
                 printf("|");
 
-                //this is immutable
+            //this is immutable
             else if (dungeon[row][col] == '@')
                 printf(" ");
 
@@ -69,7 +69,7 @@ void initDungeon() {
     for (row = 0; row < WORLD_ROW; row++) {
         for (col = 0; col < WORLD_COL; col++) {
 
-            //if border, set as 9 - idk just a random character
+            //if outermost cell, set as @ - idk just a random character
             if (row > WORLD_ROW - 3 || row < 2 || col > WORLD_COL - 3 || col < 2)
                 dungeon[row][col] = '@';
 
@@ -81,22 +81,24 @@ void initDungeon() {
 
 //random room generator function
 void createRooms() {
+    srand(time(NULL));
     //makes at least 6 rooms, with max up to 10
     //x-direction can be 4 to 12 blocks
     //y-direction can be 3 to 9 blocks
 
-    int maxRooms = 6 + (rand() % 11); //randomRange(6, 10);
+    int maxRooms = 6 + (rand() % 5);//randomRange(6, 10);
     int* rooms = (int*) malloc(maxRooms * 4 * sizeof(int));
     int currentRooms = 0;
 
     //keeps adding room until it gets to randomized max num of rooms
     while(currentRooms < maxRooms) {
+        //srand(time(NULL));
 
         //getting random room sizes
         int rand_vertical = 3 + (rand() % 7);//randomRange(3, 9); //row
         int rand_horizontal = 4 + (rand() % 9);//randomRange(4, 12); //col
 
-        //getting random placement (-2 and +2 so we don't touch the border)
+        //getting random placement
         int row_start = 2 + (rand() % 17);//randomRange(2, 19);
         int col_start = 2 + (rand() % 77);//randomRange(2, 79);
         int i, j;
@@ -116,9 +118,9 @@ void createRooms() {
             rooms[4 * currentRooms + 1] = col_start;
             rooms[4 * currentRooms + 2] = rand_vertical;
             rooms[4 * currentRooms + 3] = rand_horizontal;
-        }
 
-        currentRooms++;
+            currentRooms++;
+        }
     }
 
     //create rooms then corridors
@@ -129,21 +131,14 @@ void createRooms() {
 bool legality(int startRow, int startCol, int endRow, int endCol) {
     int i, j;
 
-    for (i = startRow - 1; i < endRow + 1; i++) {
-        for (j = startCol - 1; j < endCol + 1; j++) {
+    for (i = startRow - 1; i < startRow + endRow + 1; i++) {
+        for (j = startCol - 1; j < startCol + endCol + 1; j++) {
             if (dungeon[i][j] == '.' || dungeon[i][j] == '@')
                 return false;
         }
     }
 
     return true;
-}
-
-//produces random range based on numbers
-int randomRange(int lower, int upper) {
-    srand(time(NULL));
-
-    return (rand() % (upper - lower + 1)) + lower;
 }
 
 //structure for room
