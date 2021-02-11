@@ -1,7 +1,9 @@
 # Assignment 1.01 | Dungeon Generation
+
 - This assignment is for CS 327
+
 - Here, we are creating and generating the dungeon with requirements listed below
-  - All code is in C.
+  - All code is in C
   - Dungeon measures 80 units in the x (horizontal) direction and 21 units in the y (vertical) direction. A
   standard terminal is 80 × 24, and limiting the dungeon to 21 rows leaves three rows for text, things
   like gameplay messages and player status, which come later.
@@ -19,9 +21,14 @@
   - The dungeon should be fully connected, meaning that from any position on the floor, your adventurer
   should be able to walk to any other position on the floor without passing through rock.
   - Corridors should not extend into rooms, e.g., no hashes should be rendered inside rooms.
+  
+- Some parameters we've set for our dungeon generation
+  - Can only generate 6 to 10 rooms
+  - Rooms' length (x direction) can be 4 to 12 blocks
+  - Rooms' height (y direction) can be 3 to 9 blocks
 
 
 ## Project Team Members:
-- MyTien Kien (kmytien)
-- Haylee Lawrence (hayleel)
-- Sanjana Amatya (samatya)
+- MyTien Kien *(kmytien)*
+- Haylee Lawrence *(hayleel)*
+- Sanjana Amatya *(samatya)*
