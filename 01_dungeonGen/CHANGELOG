@@ -1,3 +1,4 @@
+02/10/2021: 20:00 MK: Fixed createCorridors() and setCorridors(), cleaning up code
 02/10/2021: 18:00 MK HL SA: Bug fixes woooo
 02/10/2021: 13:30 MK: Implemented an idea out for making the corridors
 02/09/2021: 15:00 SA HL MK: Fixed struct() in createCorridors(), finishing up createRoom()
