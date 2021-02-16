@@ -44,9 +44,6 @@ int main(int argc, char* argv[]) {
     char *gameDir = ".rgl327";
     char *savefile = "dungeon";
     char *filepath = malloc(strlen(directory) + strlen(gameDir) + strlen(savefile) + 2 + 1);
-    mkdir(directory, S_IRWXU);
-
-    // sprintf(filepath, "%s/&s/%s", home, gameDir, savefile);
     sprintf(filepath, "%s/&s/%s", home, gameDir, savefile);
     mkdir(directory, S_IRWXU);
 
