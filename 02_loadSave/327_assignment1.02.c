@@ -38,9 +38,10 @@ int main(int argc, char* argv[]) {
     FILE *file;
 
     char *directory = getenv("HOME");
-//     char *filepath = malloc(strlen(strcat(directory, "./rlg327/dungeon")));
-//     strcat(directory, "./rlg327/dungeon");
-    char *gameDir = ".
+   // char *filepath = malloc(strlen(strcat(directory, "./rlg327/dungeon")));
+   // strcat(directory, "./rlg327/dungeon"); //???? ^^^^
+    // what he did in lecture
+    char *gameDir = ".rgl327";
     char *savefile = "dungeon";
     char *filepath = malloc(strlen(directory) + strlen(gameDir) + strlen(savefile) + 2 + 1);
     mkdir(directory, S_IRWXU);
