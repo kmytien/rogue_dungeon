@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <stdint.h>
+#include <endian.h>
 #include "rlg327.c"
+
 
 void file_implementation();
 void saveDungeon(char*);
@@ -16,17 +19,14 @@ void loadDungeon(char*);
 /**
     -- we need to implement hardness this assignment: a room or corridor has hardness of 0, the outer most cells have hardness of 255,
        every other cell has random hardness between 1 - 254 --
-
     In Main:
         - set up directory
         - finish if statements for --save and --load parameters
-
     Save function:
         - write to a file (home/username/.rlg327/dungeon)
           - the whole chart in the pdf are what parameters we need for fwrite and fread (that honestly makes a lot more sense)
           - examples of files are in piazza
         - close the file
-
     Load function:
         - read file (home/username/.rlg327/dungeon)
         - fread (follow the chart on pdf)
@@ -38,14 +38,9 @@ int main(int argc, char* argv[]) {
     FILE *file;
 
     char *directory = getenv("HOME");
-   // char *filepath = malloc(strlen(strcat(directory, "./rlg327/dungeon")));
-   // strcat(directory, "./rlg327/dungeon"); //???? ^^^^
-    // what he did in lecture
-    char *gameDir = ".rgl327";
-    char *savefile = "dungeon";
-    char *filepath = malloc(strlen(directory) + strlen(gameDir) + strlen(savefile) + 2 + 1);
+    char *filepath = malloc(strlen(strcat(directory, "./rlg327/dungeon")));
+    strcat(directory, "./rlg327/dungeon");
     mkdir(directory, S_IRWXU);
-    sprintf(filepath, "%s/&s/%s", home, gameDir, savefile);
 
     file = fopen(directory, "wb+");
 
@@ -64,39 +59,59 @@ int main(int argc, char* argv[]) {
     //if user puts --save and --load in command line
     else if ((strcmp("--save", argv[1]) && strcmp("--load", argv[2])) || strcmp("--save", argv[2]) && strcmp("--load", argv[1])) {
         //reads the dungeon from disk, displays it, rewrites it, and exits
-        //is it save then load or load then save? i think its load and then save bc load displays it and save exits
+        //is it save then load or load then save?
         saveDungeon(filepath);
         loadDungeon(filepath);
     }
 
     else {
-        //generates and prints dungeon like normal  -how do we do this?
+        //generates and prints dungeon like normal
     }
 }
 
-/**
-void file_implementation(file) {
 
+void file_implementation(file) {
     //fseek - moves file pointer position to certain location (wherever you put in parenthesis)
     //SEEK_SET - moves file pointer position to the beginning of the file
     //fread - reads data into an array
 
-    //need to look at file type markers and how to make markers?
+    //read file type marker
     fseek(file, 0, SEEK_SET);
-    char marker[8];
-    fread(marker, 1, 8, file);
+    char marker[4];
+    fread(marker, 1, 4, file);
 
-
-    // file version markers
-    fseek(file, 6, SEEK_SET);
+    // read file version
+    fseek(file, 4, SEEK_SET);
     //uint32_t - something to do with guaranteeing 32 bits, can declare pointer types/ files with it??
-    uint32_t file_version;
+    uint32_t version;
+    uint32_t read_value;
+    fread(&read_value,sizeof(uint32_t), 1, file);
+    version = be32toh(read_value);
 
     // read the size of the file
+    fseek(file, 4, SEEK_SET);
+    uint32_t size;
+    uint32_t be_size;
+    fread(&be_size, sizeof(uint32_t), 1, file);
+    size = be32toh(be_size);
+
+    // write file type marker
+    fseek(file, 0, SEEK_SET);
+    char marker2[4];
+    strcpy(marker2, "RLG327");
+    fwrite(marker2, sizeof(char), 4, file);
+
+    // write file version
+    fseek(file, 4, SEEK_SET);
+    uint32_t version2 = 0;
+    uint32_t read_value2 = htobe32(version2);
+    fwrite(&read_value2, sizeof(uint32_t), 1, file);
+
+    // write size of file?
 
     // hardness values? and whatever they have to do with files
 }
-**/
+
 
 
 void saveDungeon(char* filepath) {
