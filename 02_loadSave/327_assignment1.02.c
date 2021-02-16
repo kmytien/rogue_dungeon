@@ -38,8 +38,12 @@ int main(int argc, char* argv[]) {
     FILE *file;
 
     char *directory = getenv("HOME");
-    char *filepath = malloc(strlen(strcat(directory, "./rlg327/dungeon")));
-    strcat(directory, "./rlg327/dungeon");
+   // char *filepath = malloc(strlen(strcat(directory, "./rlg327/dungeon")));
+   // strcat(directory, "./rlg327/dungeon"); //???? ^^^^
+    // what he did in lecture
+    char *gameDir = ".rgl327";
+    char *savefile = "dungeon";
+    char *filepath = malloc(strlen(directory) + strlen(gameDir) + strlen(savefile) + 2 + 1);
     mkdir(directory, S_IRWXU);
 
     file = fopen(directory, "wb+");
@@ -59,13 +63,13 @@ int main(int argc, char* argv[]) {
     //if user puts --save and --load in command line
     else if ((strcmp("--save", argv[1]) && strcmp("--load", argv[2])) || strcmp("--save", argv[2]) && strcmp("--load", argv[1])) {
         //reads the dungeon from disk, displays it, rewrites it, and exits
-        //is it save then load or load then save?
+        //is it save then load or load then save? i think its load and then save bc load displays it and save exits
         saveDungeon(filepath);
         loadDungeon(filepath);
     }
 
     else {
-        //generates and prints dungeon like normal
+        //generates and prints dungeon like normal  -how do we do this?
     }
 }
 
