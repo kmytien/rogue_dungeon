@@ -128,8 +128,8 @@ void loadDungeon(char* filepath) {
     int i, j;
     for(i = 0; i < 21; i++) {
       for(j = 0; j < 80; j++) {
-        int8_t h;
-        fread(&h, sizeof(int8_t), 1, filepath);
+        int8_t h[21][80];
+        fread(&h, 1, 1680, f);
       }
     }
 
