@@ -723,28 +723,28 @@ void init_dungeon(dungeon_t *d)
   empty_dungeon(d);
 }
 
-int main(int argc, char *argv[])
-{
-  dungeon_t d;
-  struct timeval tv;
-  uint32_t seed;
+// int main(int argc, char *argv[])
+// {
+//   dungeon_t d;
+//   struct timeval tv;
+//   uint32_t seed;
 
-  UNUSED(in_room);
+//   UNUSED(in_room);
 
-  if (argc == 2) {
-    seed = atoi(argv[1]);
-  } else {
-    gettimeofday(&tv, NULL);
-    seed = (tv.tv_usec ^ (tv.tv_sec << 20)) & 0xffffffff;
-  }
+//   if (argc == 2) {
+//     seed = atoi(argv[1]);
+//   } else {
+//     gettimeofday(&tv, NULL);
+//     seed = (tv.tv_usec ^ (tv.tv_sec << 20)) & 0xffffffff;
+//   }
 
-  printf("Using seed: %u\n", seed);
-  srand(seed);
+//   printf("Using seed: %u\n", seed);
+//   srand(seed);
 
-  init_dungeon(&d);
-  gen_dungeon(&d);
-  render_dungeon(&d);
-  delete_dungeon(&d);
+//   init_dungeon(&d);
+//   gen_dungeon(&d);
+//   render_dungeon(&d);
+//   delete_dungeon(&d);
 
-  return 0;
-}
+//   return 0;
+// }
