@@ -15,6 +15,13 @@ void setCorridors(int, int, int, int);
 bool legality(int, int, int, int);
 
 char dungeon[WORLD_ROW][WORLD_COL];
+int hardness[WORLD_ROW][WORLD_COL];
+
+//structure for room - represents top left corner of a room
+struct room {
+    int xstart; //top left row
+    int ystart; //top left col
+};
 
 /**
  * CS 327: Assignment 1.01: Dungeon Generation
@@ -45,11 +52,11 @@ void printDungeon() {
             if (row == 0 || row == WORLD_ROW - 1)
                 printf("-");
 
-            //border
+                //border
             else if (col == 0 || col == WORLD_COL - 1)
                 printf("|");
 
-            //just used character '@' to represent immutable rock (outermost cells)
+                //just used character '@' to represent immutable rock (outermost cells)
             else if (dungeon[row][col] == '@')
                 printf(" ");
 
@@ -66,16 +73,21 @@ void initDungeon() {
 
     //make outside edges immutable rock, everything else just rock
     int row, col;
+    srand(time(NULL));
 
     for (row = 0; row < WORLD_ROW; row++) {
         for (col = 0; col < WORLD_COL; col++) {
 
             //if outermost cell, set as '@', a character representing immutable rock
-            if (row > WORLD_ROW - 3 || row < 2 || col > WORLD_COL - 3 || col < 2)
+            if (row > WORLD_ROW - 3 || row < 2 || col > WORLD_COL - 3 || col < 2) {
                 dungeon[row][col] = '@';
+                hardness[row][col] = 255;
+            }
 
-            else
+            else {
                 dungeon[row][col] = ' ';
+                hardness[row][col] = (rand() % 254) + 1;
+            }
         }
     }
 }
@@ -110,6 +122,7 @@ void createRooms() {
             for (i = row_start; i < row_start + rand_vertical; i++) {
                 for (j = col_start; j < col_start + rand_horizontal; j++) {
                     dungeon[i][j] = '.';
+                    hardness[i][j] = 0;
                 }
             }
 
@@ -141,12 +154,6 @@ bool legality(int startRow, int startCol, int endRow, int endCol) {
 
     return true;
 }
-
-//structure for room - represents top left corner of a room
-struct room {
-    int xstart; //top left row
-    int ystart; //top left col
-};
 
 //corridor maker - num is number of rooms that are made
 void createCorridors(int* rooms, int num) {
@@ -186,22 +193,28 @@ void setCorridors(int fX, int fY, int eX, int eY) {
     //starting at rows
     if (fX < eX) {
         for (int i = fX; i < eX; i++) {
-            if (dungeon[i][fY] == ' ')
+            if (dungeon[i][fY] == ' ') {
                 dungeon[i][fY] = '#';
+                hardness[i][fY] = 0;
+            }
         }
 
         //looking at columns
         if (fY < eY) {
             for (int i = fY; i < eY; i++) {
-                if (dungeon[eX][i] == ' ')
+                if (dungeon[eX][i] == ' ') {
                     dungeon[eX][i] = '#';
+                    hardness[eX][i] = 0;
+                }
             }
         }
 
         else {
             for (int i = fY; i > eY; i--) {
-                if (dungeon[eX][i] == ' ')
+                if (dungeon[eX][i] == ' ') {
                     dungeon[eX][i] = '#';
+                    hardness[eX][i] = 0;
+                }
             }
         }
     }
@@ -209,22 +222,28 @@ void setCorridors(int fX, int fY, int eX, int eY) {
 
     else {
         for (int i = fX; i > eX; i--) {
-            if (dungeon[i][fY] == ' ')
+            if (dungeon[i][fY] == ' ') {
                 dungeon[i][fY] = '#';
+                hardness[i][fY] = 0;
+            }
         }
 
         //looking at columns
         if (fY < eY) {
             for (int i = fY; i < eY; i++) {
-                if (dungeon[eX][i] == ' ')
+                if (dungeon[eX][i] == ' ') {
                     dungeon[eX][i] = '#';
+                    hardness[eX][i] = 0;
+                }
             }
         }
 
         else {
             for (int i = fY; i > eY; i--) {
-                if (dungeon[eX][i] == ' ')
+                if (dungeon[eX][i] == ' ') {
                     dungeon[eX][i] = '#';
+                    hardness[eX][i] = 0;
+                }
             }
         }
     }
@@ -247,6 +266,7 @@ void staircase() {
 
             if (dungeon[row][col] == '.') {
                 dungeon[row][col] = '<';
+                hardness[row][col] = 0;
                 isFloor = true;
             }
         }
@@ -265,6 +285,7 @@ void staircase() {
 
             if (dungeon[row][col] == '.') {
                 dungeon[row][col] = '>';
+                hardness[row][col] = 0;
                 isFloor = true;
             }
         }
