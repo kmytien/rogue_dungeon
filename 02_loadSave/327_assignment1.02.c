@@ -7,9 +7,10 @@
 #include "rlg327.c"
 
 
-void file_implementation();
 void saveDungeon(char*);
 void loadDungeon(char*);
+
+char dungeon_t *dungeon;
 
 /**
  * CS 327: Assignment 1.02: Dungeon Load/Save
@@ -35,21 +36,17 @@ void loadDungeon(char*);
 
 int main(int argc, char* argv[]) {
     // make the .directory in home and set the directory name for reference
-    FILE *file;
 
     char *directory = getenv("HOME");
-   // char *filepath = malloc(strlen(strcat(directory, "./rlg327/dungeon")));
-   // strcat(directory, "./rlg327/dungeon"); //???? ^^^^
-    // what he did in lecture
-    char *gameDir = ".rgl327";
+    char *gameDir = ".rlg327";
     char *savefile = "dungeon";
-    char *filepath = malloc(strlen(directory) + strlen(gameDir) + strlen(savefile) + 2 + 1);
-    sprintf(filepath, "%s/%s/%s", home, gameDir, savefile);
+    char *filepath = malloc((strlen(directory) + strlen(gameDir) + strlen(savefile) + 2 + 1) * sizeof(char));
+
     mkdir(directory, S_IRWXU);
+    sprintf(filepath, "%s/%s/%s", directory, gameDir, savefile);
+    fopen(filepath, "w");
 
-    file = fopen(directory, "wb+");
-
-    if(file == NULL) {
+    if(filepath == NULL) {
         fprintf(stderr, "ERROR, Could not open dungeon file");
         exit(1);
     }
@@ -57,86 +54,130 @@ int main(int argc, char* argv[]) {
     if (strcmp("--save", argv[1]) == 0)
         saveDungeon(filepath);
 
-    //if user puts --load in command line
     else if (strcmp("--load", argv[1]) == 0)
         loadDungeon(filepath);
 
-    //if user puts --save and --load in command line
-    else if ((strcmp("--save", argv[1]) && strcmp("--load", argv[2])) || strcmp("--save", argv[2]) && strcmp("--load", argv[1])) {
-        //reads the dungeon from disk, displays it, rewrites it, and exits
-        //is it save then load or load then save?
+    else if ((strcmp("--save", argv[1]) && strcmp("--load", argv[2])) || strcmp("--load", argv[1]) && strcmp("--save", argv[2])) {
         saveDungeon(filepath);
         loadDungeon(filepath);
     }
 
     else {
         //generates and prints dungeon like normal
+        gen_dungeon(*dungeon);
     }
 }
 
+//fseek - moves file pointer position to certain location (wherever you put in parenthesis)
+//SEEK_SET - moves file pointer position to the beginning of the file
+//fread - reads data into an array
 
-void file_implementation(file) {
-    //fseek - moves file pointer position to certain location (wherever you put in parenthesis)
-    //SEEK_SET - moves file pointer position to the beginning of the file
-    //fread - reads data into an array
+//load-- read a dungeon from the file and print it
+void loadDungeon(char* filepath) {
+    int row, col, rooms;
+    FILE* f = fopen(file, "r");
+    //read semantic file type marker
+    fseek(filepath, 0, SEEK_SET);
+    char file_type[13];
+    file_type[12] = '\0';
+    fread(file_type, 1, 12, filepath);
 
-    //read file type marker
-    fseek(file, 0, SEEK_SET);
-    char marker[4];
-    fread(marker, 1, 4, file);
-
-    // read file version
-    fseek(file, 4, SEEK_SET);
-    //uint32_t - something to do with guaranteeing 32 bits, can declare pointer types/ files with it??
+    //read file version
+    fseek(filepath, 4, SEEK_SET); //(its like a fancy 32 bit integer)
     uint32_t version;
     uint32_t read_value;
-    fread(&read_value,sizeof(uint32_t), 1, file);
+    fread(&read_value, sizeof(uint32_t), 1, filepath);
     version = be32toh(read_value);
 
-    // read the size of the file
-    fseek(file, 4, SEEK_SET);
-    uint32_t size;
-    uint32_t be_size;
-    fread(&be_size, sizeof(uint32_t), 1, file);
+    //read the size of the file
+    fseek(filepath, 4, SEEK_SET);
+    int size;
+    int be_size;
+    fread(&be_size, sizeof(uint32_t), 1, filepath);
     size = be32toh(be_size);
 
-    // write file type marker
-    fseek(file, 0, SEEK_SET);
-    char marker2[4];
-    strcpy(marker2, "RLG327");
-    fwrite(marker2, sizeof(char), 4, file);
-
-    // write file version
-    fseek(file, 4, SEEK_SET);
-    uint32_t version2 = 0;
-    uint32_t read_value2 = htobe32(version2);
-    fwrite(&read_value2, sizeof(uint32_t), 1, file);
-
-    // write size of file?
+    //would print characters of dungeon based on hardness
+    for (row = 0; row < 21; row++) {
+      for (col = 0; col < 80; col++) {
+        //if hardness is 255 outermost cells
+        if (dungeon.hardness == 255) {
+          dungeon[row][col] = ter_wall_immutable;
+        }
+        //if hardness 0 - corridors/rooms
+        else if (dungeon.hardness == 0) {
+          dungeon[row][col] = ter_floor; // HOW DO I FIND THE HARDNESS OF STAIRS
+        }
+        else if(dungeon.hardness > 1 && dungeon.hardness < 255) {
+          dungeon[row][col] = ter_wall;
+        }
+      }
+    }
+    // add rooms
+    // HOW DO I ADD STAIRCASES
+    for (rooms = 0; rooms < dungeon.num_rooms; rooms++) {
+      for (row = room.position[dim_y]; row < room.size[dim_y]; row++) {
+        for (col = room.position[dim_x]; col < room.size[dim_x]; col++) {
+          dungeon[row][col] = ter_floor_room;
+        }
+      }
+    }
+    //print dungeon
+    render_dungeon(dungeon);
 
     // hardness values? and whatever they have to do with files
+    int i, j;
+    for(i = 0; i < 21; i++) {
+      for(j = 0; j < 80; j++) {
+        int8_t h;
+        fread(&h, sizeof(int8_t), 1, filepath);
+      }
+    }
+
+
+
+
+    fclose(f);
 }
 
-
-
+//save dungeon to a file in the directory
 void saveDungeon(char* filepath) {
-    FILE* f = fopen(filepath, "w");
-
-    //using fwrite(&pointer to where elements are written, offset, num bytes, file)
-
-}
 
 
-//this is where the PC would be loaded
-void loadDungeon(char* filepath) {
-    FILE* f = fopen(filepath, "r");
+    FILE* f = fopen(file, "w");  //filepathpath      pathpath    pathpath      filepathpath
 
-    //would use fread
+    //semantic file_type marker
+    char semantic[13] = "RLG327-S2021";
+    fwrite(&semantic, 1, 12, f);
 
-    //would print characters of dungeon based on hardness
+    //file version marker set to 0
+    fseek(file, 0, SEEK_SET);
+    uint32_t marker = 0;
+    marker = be32toh(marker);
+    fwrite(&marker, 1, 4, f);
 
-    //print dungeon
+    //size of files
+    uint32_t size;
+    size = be32toh(size);
+    fwrite(&size, 1, 4, f);
 
-    //file close
+    //PC
+    uint8_t PCx;
+    uint8_t PCy;
+    fwrite(&PCx, 1, 1, f);
+    fwrite(&PCy, 1, 1, f);
+
+    //hardness - do we have to do something more here?
+    uint8_t hardness[21][80];
+    for (int i = 0; i < 21; i++) {
+      for (int j = 0; j < 80; j++) {
+          fwrite(&hardness, 1, 1680, f);
+      }
+    }
+
+    //rooms
+    uint16_t rooms;
+
+    //close file
+    fclose(f);
 
 }
