@@ -10,7 +10,7 @@
 void saveDungeon(char*);
 void loadDungeon(char*);
 
-char dungeon_t *dungeon;
+dungeon_t *dungeon;
 
 /**
  * CS 327: Assignment 1.02: Dungeon Load/Save
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
 
     else {
         //generates and prints dungeon like normal
-        gen_dungeon(*dungeon);
+        gen_dungeon(&*dungeon);
     }
 }
 
@@ -75,32 +75,32 @@ int main(int argc, char* argv[]) {
 //load-- read a dungeon from the file and print it
 void loadDungeon(char* filepath) {
     int row, col, rooms;
-    FILE* f = fopen(file, "r");
+    FILE* f = fopen(filepath, "r");
     //read semantic file type marker
-    fseek(filepath, 0, SEEK_SET);
+    fseek(f, 0, SEEK_SET);
     char file_type[13];
     file_type[12] = '\0';
-    fread(file_type, 1, 12, filepath);
+    fread(file_type, 1, 12, f);
 
     //read file version
-    fseek(filepath, 4, SEEK_SET); //(its like a fancy 32 bit integer)
+    fseek(f, 4, SEEK_SET); //(its like a fancy 32 bit integer)
     uint32_t version;
     uint32_t read_value;
-    fread(&read_value, sizeof(uint32_t), 1, filepath);
+    fread(&read_value, sizeof(uint32_t), 1, f);
     version = be32toh(read_value);
 
     //read the size of the file
-    fseek(filepath, 4, SEEK_SET);
+    fseek(f, 4, SEEK_SET);
     int size;
     int be_size;
-    fread(&be_size, sizeof(uint32_t), 1, filepath);
+    fread(&be_size, sizeof(uint32_t), 1, f);
     size = be32toh(be_size);
 
     //would print characters of dungeon based on hardness
     for (row = 0; row < 21; row++) {
       for (col = 0; col < 80; col++) {
         //if hardness is 255 outermost cells
-        if (dungeon.hardness == 255) {
+        if (dungeon.hardness[row][col] -> 255) {
           dungeon[row][col] = ter_wall_immutable;
         }
         //if hardness 0 - corridors/rooms
@@ -143,14 +143,14 @@ void loadDungeon(char* filepath) {
 void saveDungeon(char* filepath) {
 
 
-    FILE* f = fopen(file, "w");  //filepathpath      pathpath    pathpath      filepathpath
+    FILE* f = fopen(filpath, "w");  //filepathpath      pathpath    pathpath      filepathpath
 
     //semantic file_type marker
     char semantic[13] = "RLG327-S2021";
     fwrite(&semantic, 1, 12, f);
 
     //file version marker set to 0
-    fseek(file, 0, SEEK_SET);
+    fseek(f, 0, SEEK_SET);
     uint32_t marker = 0;
     marker = be32toh(marker);
     fwrite(&marker, 1, 4, f);
@@ -181,3 +181,4 @@ void saveDungeon(char* filepath) {
     fclose(f);
 
 }
+
