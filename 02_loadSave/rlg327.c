@@ -21,6 +21,8 @@ int hardness[WORLD_ROW][WORLD_COL];
 struct room {
     int xstart; //top left row
     int ystart; //top left col
+    int width; // x length
+    int height; // y length
 };
 
 /**
