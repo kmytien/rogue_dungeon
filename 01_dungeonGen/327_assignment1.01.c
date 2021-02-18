@@ -19,27 +19,27 @@ int hardness[WORLD_ROW][WORLD_COL];
 
 //structure for room - represents top left corner of a room
 struct room {
-    int xstart; //top left row
-    int ystart; //top left col
+
+    //changed from int to uint8_t
+    uint8_t xstart; //top left row
+    uint8_t ystart; //top left col
+    uint8_t xsize; //width
+    uint8_t ysize; //height
 };
 
-/**
- * CS 327: Assignment 1.01: Dungeon Generation
- * Project by: Sanjana Amatya, MyTien Kien, Haylee Lawrence
- */
+//for upstairs
+struct upstairs {
+    uint16_t up;
+    uint8_t up_x;
+    uint8_t up_y;
+};
 
-int main(int argc, char* argv[]) {
-
-    //initialize dungeon
-    initDungeon();
-
-    //generating dungeon
-    //calls createCorridors and staircase()
-    createRooms();
-
-    //print dungeon
-    printDungeon();
-}
+//for downstairs
+struct downstairs {
+    uint16_t down;
+    uint8_t down_x;
+    uint8_t down_y;
+};
 
 //prints dungeon output
 void printDungeon() {
@@ -57,7 +57,7 @@ void printDungeon() {
                 printf("|");
 
                 //just used character '@' to represent immutable rock (outermost cells)
-            else if (dungeon[row][col] == '@')
+            else if (dungeon[row][col] == '*')
                 printf(" ");
 
             else
@@ -80,7 +80,7 @@ void initDungeon() {
 
             //if outermost cell, set as '@', a character representing immutable rock
             if (row > WORLD_ROW - 3 || row < 2 || col > WORLD_COL - 3 || col < 2) {
-                dungeon[row][col] = '@';
+                dungeon[row][col] = '*';
                 hardness[row][col] = 255;
             }
 
@@ -147,7 +147,7 @@ bool legality(int startRow, int startCol, int endRow, int endCol) {
 
     for (i = startRow - 1; i < startRow + endRow + 1; i++) {
         for (j = startCol - 1; j < startCol + endCol + 1; j++) {
-            if (dungeon[i][j] == '.' || dungeon[i][j] == '@')
+            if (dungeon[i][j] == '.' || dungeon[i][j] == '*')
                 return false;
         }
     }
@@ -166,17 +166,24 @@ void createCorridors(int* rooms, int num) {
     for (currRoom = 0; currRoom < num; currRoom++) {
         firstRoom.xstart = rooms[4 * currRoom];
         firstRoom.ystart = rooms[(4 * currRoom) + 1];
+        firstRoom.xsize = rooms[(4 * currRoom) + 2];
+        firstRoom.ysize = rooms[(4 * currRoom) + 3];
 
         //set for secondRoom struct
         //if at last room, connect last room to first room in array
         if (currRoom == num - 1) {
             secondRoom.xstart = rooms[0];
             secondRoom.ystart = rooms[1];
+            secondRoom.xsize = rooms[2];
+            secondRoom.ysize = rooms[3];
+
         }
 
         else {
             secondRoom.xstart = rooms[(4 * currRoom) + 4];
             secondRoom.ystart = rooms[(4 * currRoom + 1) + 4];
+            secondRoom.xsize = rooms[(4 * currRoom + 2) + 4];
+            secondRoom.ysize = rooms[(4 * currRoom + 3) + 4];
         }
 
         //actually sets corridors it in dungeon
@@ -251,22 +258,26 @@ void setCorridors(int fX, int fY, int eX, int eY) {
 
 //up staircase with '<' and down staircase with '>'
 void staircase() {
-    int stairs, i, row, col;
+    struct upstairs up;
+    struct downstairs down;
+
+    int i;
     bool isFloor = false;
 
     //randomly generate num between 1 and 2 and then place 1-2 of each staircase in a room
     //up stairs '<'
-    stairs = (rand() % 2) + 1;
-    for (i = 0; i < stairs; i++) {
+    up.up = (rand() % 2) + 1;
+    for (i = 0; i < up.up; i++) {
 
         //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
         while (!isFloor) {
-            col = (rand() % 79) + 1;
-            row = (rand() % 20) + 1;
+            up.up_x = (rand() % 79) + 1; //col
+            up.up_y = (rand() % 20) + 1; //row
 
-            if (dungeon[row][col] == '.') {
-                dungeon[row][col] = '<';
-                hardness[row][col] = 0;
+            //[up.up_y][up.up_x] == [row][col]
+            if (dungeon[up.up_y][up.up_x] == '.') {
+                dungeon[up.up_y][up.up_x] = '<';
+                hardness[up.up_y][up.up_x] = 0;
                 isFloor = true;
             }
         }
@@ -275,17 +286,17 @@ void staircase() {
     }
 
     //down stairs '>'
-    stairs = (rand() % 2) + 1;
-    for (i = 0; i < stairs; i++) {
+    down.down = (rand() % 2) + 1;
+    for (i = 0; i < down.down; i++) {
 
         //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
         while (!isFloor) {
-            col = (rand() % 79) + 1;
-            row = (rand() % 20) + 1;
+            down.down_x = (rand() % 79) + 1;
+            down.down_y = (rand() % 20) + 1;
 
-            if (dungeon[row][col] == '.') {
-                dungeon[row][col] = '>';
-                hardness[row][col] = 0;
+            if (dungeon[down.down_y][down.down_x] == '.') {
+                dungeon[down.down_y][down.down_x] = '>';
+                hardness[down.down_y][down.down_x] = 0;
                 isFloor = true;
             }
         }
