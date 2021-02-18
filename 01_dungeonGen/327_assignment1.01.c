@@ -23,7 +23,6 @@ uint16_t numRooms;
 
 //structure for room - represents top left corner of a room
 struct room {
-
     //changed from int to uint8_t
     uint8_t xstart; //top left row
     uint8_t ystart; //top left col
@@ -262,8 +261,6 @@ void setCorridors(int fX, int fY, int eX, int eY) {
 
 //up staircase with '<' and down staircase with '>'
 void staircase() {
-    struct upstairs upS;
-    struct downstairs downS;
 
     int i;
     bool isFloor = false;
@@ -271,17 +268,18 @@ void staircase() {
     //randomly generate num between 1 and 2 and then place 1-2 of each staircase in a room
     //up stairs '<'
     up = (rand() % 2) + 1;
+    struct upstairs upS[up];
     for (i = 0; i < up; i++) {
 
         //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
         while (!isFloor) {
-            upS.up_x = (rand() % 79) + 1; //col
-            upS.up_y = (rand() % 20) + 1; //row
+            upS[i].up_x = (rand() % 79) + 1; //col
+            upS[i].up_y = (rand() % 20) + 1; //row
 
             //[up.up_y][up.up_x] == [row][col]
-            if (dungeon[upS.up_y][upS.up_x] == '.') {
-                dungeon[upS.up_y][upS.up_x] = '<';
-                hardness[upS.up_y][upS.up_x] = 0;
+            if (dungeon[upS[i].up_y][upS[i].up_x] == '.') {
+                dungeon[upS[i].up_y][upS[i].up_x] = '<';
+                hardness[upS[i].up_y][upS[i].up_x] = 0;
                 isFloor = true;
             }
         }
@@ -291,16 +289,17 @@ void staircase() {
 
     //down stairs '>'
     down = (rand() % 2) + 1;
+    struct downstairs downS[down];
     for (i = 0; i < down; i++) {
 
         //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
         while (!isFloor) {
-            downS.down_x = (rand() % 79) + 1;
-            downS.down_y = (rand() % 20) + 1;
+            downS[i].down_x = (rand() % 79) + 1;
+            downS[i].down_y = (rand() % 20) + 1;
 
-            if (dungeon[downS.down_y][downS.down_x] == '.') {
-                dungeon[downS.down_y][downS.down_x] = '>';
-                hardness[downS.down_y][downS.down_x] = 0;
+            if (dungeon[downS[i].down_y][downS[i].down_x] == '.') {
+                dungeon[downS[i].down_y][downS[i].down_x] = '>';
+                hardness[downS[i].down_y][downS[i].down_x] = 0;
                 isFloor = true;
             }
         }
