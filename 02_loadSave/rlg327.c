@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <stdint.h>
 
 #define WORLD_ROW 21
 #define WORLD_COL 80
@@ -10,24 +11,23 @@ void printDungeon();
 void initDungeon();
 void createRooms();
 void staircase();
-void createCorridors(int);
+void createCorridors(int*,int);
 void setCorridors(int, int, int, int);
 bool legality(int, int, int, int);
 
 char dungeon[WORLD_ROW][WORLD_COL];
 int hardness[WORLD_ROW][WORLD_COL];
-int* rooms;
 uint16_t up;
 uint16_t down;
 uint16_t numRooms;
 
 //structure for room - represents top left corner of a room
 struct room {
-    //changed from int to uint8_t
-    uint8_t xstart; //top left row
-    uint8_t ystart; //top left col
-    uint8_t xsize; //width
-    uint8_t ysize; //height
+    //changed from int to uint8_t, back to int bc issue in createCorridors
+    int xstart; //top left row
+    int ystart; //top left col
+    int xsize; //width
+    int ysize; //height
 };
 
 //for upstairs
@@ -41,6 +41,16 @@ struct downstairs {
     uint8_t down_x;
     uint8_t down_y;
 };
+
+int main(int argc, char* argv[]) {
+    //initialize dungeon
+    initDungeon();
+    //generating dungeon
+    //calls createCorridors and staircase()
+    createRooms();
+    //print dungeon
+    printDungeon();
+}
 
 //prints dungeon output
 void printDungeon() {
@@ -100,13 +110,13 @@ void createRooms() {
     //x-direction can be 4 to 12 blocks
     //y-direction can be 3 to 9 blocks
 
-    int maxRooms = 6 + (rand() % 5);
+    //int maxRooms = 6 + (rand() % 5);
+    int num_fails = 0, consec = 0;
+    int* rooms = (int*) malloc(20 * 4 * sizeof(int));
     int currentRooms = 0;
-    rooms = (int*) malloc(maxRooms * 4 * sizeof(int));
-    numRooms = maxRooms;
 
     //keeps adding room until it gets to randomized max num of rooms
-    while(currentRooms < maxRooms) {
+    while(num_fails < 100) {
 
         //getting random room sizes
         int rand_vertical = 3 + (rand() % 7);
@@ -135,11 +145,18 @@ void createRooms() {
             rooms[(4 * currentRooms) + 3] = rand_horizontal;
 
             currentRooms++;
+            consec = 0;
         }
+	    else {
+	        consec = 1;
+	        if (consec == 1) {
+	            num_fails++;
+	        }
+	    }
     }
 
     //create rooms then corridors
-    createCorridors(maxRooms);
+    createCorridors(rooms, currentRooms);
 }
 
 //checks if placement of room is legal
@@ -159,7 +176,7 @@ bool legality(int startRow, int startCol, int endRow, int endCol) {
 
 //corridor maker - num is number of rooms that are made
 //was int* rooms, int num parameters
-void createCorridors(int num) {
+void createCorridors(int* rooms, int num) {
 
     int currRoom;
     struct room firstRoom;
