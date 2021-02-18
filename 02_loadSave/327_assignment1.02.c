@@ -24,16 +24,27 @@ int main(int argc, char* argv[]) {
 
     mkdir(directory, S_IRWXU);
     sprintf(filepath, "%s/%s/%s", directory, gameDir, savefile);
+    //printf("%s", filepath);
 
-    if (strcmp("--save", argv[1]) == 0)
-        saveDungeon(filepath);
+    if (argc > 1) {
+        if (strcmp("--save", argv[1]) == 0)
+            saveDungeon(filepath);
 
-    else if (strcmp("--load", argv[1]) == 0)
-        loadDungeon(filepath);
+        else if (strcmp("--load", argv[1]) == 0)
+            loadDungeon(filepath);
 
-    else if ((strcmp("--save", argv[1]) == 0 && strcmp("--load", argv[2]) == 0) || (strcmp("--load", argv[1]) == 0 && strcmp("--save", argv[2]) == 0)) {
-        saveDungeon(filepath);
-        loadDungeon(filepath);
+        else if ((strcmp("--save", argv[1]) == 0 && strcmp("--load", argv[2]) == 0) ||
+                 (strcmp("--load", argv[1]) == 0 && strcmp("--save", argv[2]) == 0)) {
+            saveDungeon(filepath);
+            loadDungeon(filepath);
+        }
+
+        else {
+            //generates and prints dungeon like normal
+            initDungeon();
+            createRooms();
+            printDungeon();
+        }
     }
 
     else {
@@ -86,12 +97,13 @@ void loadDungeon(char* filepath) {
 
     //hardness values
     fseek(f, 22, SEEK_SET);
-    //int8_t h[21][80]; //do we even need this
+    int8_t h[21][80]; //do we even need this
+    fread(&h, 1, 1680, f);
 
     for(int i = 0; i < 21; i++) {
         for(int j = 0; j < 80; j++) {
             //or is it &h[][] or &hardness[i][j]?? -- check
-            fread(&hardness[i][j], 1, 1680, f);
+            hardness[i][j] = h[i][j];
         }
     }
 
@@ -104,8 +116,8 @@ void loadDungeon(char* filepath) {
                 dungeon[i][j] = '#';
 
             else if (hardness[i][j] == 255) {
-                //if (i > 18 || i < 2 || j > 77 || j < 2) //dont think we need this -- check
-                dungeon[i][j] = '*';
+                if (i > 18 || i < 2 || j > 77 || j < 2) //dont think we need this -- check
+                    dungeon[i][j] = '*';
             }
         }
     }
@@ -141,7 +153,7 @@ void loadDungeon(char* filepath) {
 
     //stairs
     //num of upstairs
-    upS = malloc(up * sizeof(struct upstairs));
+    //upS = malloc(up * sizeof(struct upstairs));
     fseek(f, 1704 + (numRooms*4), SEEK_SET);
     fread(&up, 1, 2, f);
     up = be32toh(up);
@@ -149,22 +161,22 @@ void loadDungeon(char* filepath) {
     //upstairs' x and y
     fseek(f, 1706 + (numRooms*4), SEEK_SET);
     for (int i = 0; i < up; i++) {
-        fread(&upS[i].up_x, 1, 1, f);
-        fread(&upS[i].up_y, 1, 1, f);
+        fread(&upS[i]->up_x, 1, 1, f);
+        fread(&upS[i]->up_y, 1, 1, f);
     }
 
     //setting upstairs
     int upX, upY;
     for (int i = 0; i < up; i++) {
-        upX = upS[i].up_x;
-        upY = upS[i].up_y;
+        upX = upS[i]->up_x;
+        upY = upS[i]->up_y;
 
         if (hardness[upY][upX] == 0)
             dungeon[upY][upX] = '<';
     }
 
     //num of downstairs
-    downS = malloc(down * sizeof(struct downstairs));
+    //downS = malloc(down * sizeof(struct downstairs));
     fseek(f, 1706 + (numRooms*4) + (up * 2), SEEK_SET);
     fread(&down, 1, 2, f);
     down = be32toh(down);
@@ -173,15 +185,15 @@ void loadDungeon(char* filepath) {
     fseek(f, 1708 + (numRooms*4) + (up * 2), SEEK_SET);
 
     for (int i = 0; i < down; i++) {
-        fread(&downS[i].down_x, 1, 1, f);
-        fread(&downS[i].down_y, 1, 1, f);
+        fread(&downS[i]->down_x, 1, 1, f);
+        fread(&downS[i]->down_y, 1, 1, f);
     }
 
     //setting upstairs
     int downX, downY;
     for (int i = 0; i < up; i++) {
-        downX = downS[i].down_x;
-        downY = downS[i].down_y;
+        downX = downS[i]->down_x;
+        downY = downS[i]->down_y;
 
         if (hardness[downY][downX] == 0)
             dungeon[downY][downX] = '>';
@@ -204,20 +216,20 @@ void saveDungeon(char* filepath) {
     //file_type
     fseek(f, 0, SEEK_SET);
     char file_type[13] = "RLG327-S2021";
-    fwrite(&file_type, sizeof(char), 12, f);
+    fwrite(file_type, sizeof(char), 12, f);
     //file_type = be32toh(file_type); //this brings up an error for some reason.. -- commenting out for now
 
     //file version marker set to 0
     fseek(f, 12, SEEK_SET);
     uint32_t version = 0;
-    fwrite(&version, sizeof(uint32_t), 1, f); //is it 1 or is it 4??
     version = be32toh(version);
+    fwrite(&version, sizeof(uint32_t), 1, f); //is it 1 or is it 4??
 
     //size of files
     fseek(f, 16, SEEK_SET);
     uint32_t size;
-    fwrite(&size, sizeof(uint32_t), 1, f);
     size = be32toh(size);
+    fwrite(&size, sizeof(uint32_t), 1, f);
 
     //PC
     fseek(f, 20, SEEK_SET);
@@ -228,14 +240,16 @@ void saveDungeon(char* filepath) {
 
     //hardness values
     fseek(f, 22, SEEK_SET);
-    //int8_t h[21][80]; //do we even need this
-
+    int8_t h[21][80]; //do we even need this
+    fwrite(&h, 1, 1680, f);
+    
     for(int i = 0; i < 21; i++) {
         for(int j = 0; j < 80; j++) {
             //or is it &hardness[i][j] or &h?? -- check
-            fread(&hardness[i][j], 1, 1680, f);
+            h[i][j] = hardness[i][j];
         }
     }
+	
 
     //rooms
     //num of rooms
@@ -255,7 +269,7 @@ void saveDungeon(char* filepath) {
 
     //stairs
     //num of upstairs
-    upS = malloc(up * sizeof(struct upstairs));
+    //upS = malloc(up * sizeof(struct upstairs));
     fseek(f, 1704 + (numRooms*4), SEEK_SET);
     fwrite(&up, 1, 2, f);
     up = be32toh(up);
@@ -263,12 +277,12 @@ void saveDungeon(char* filepath) {
     //upstairs' x and y
     fseek(f, 1706 + (numRooms*4), SEEK_SET);
     for (int i = 0; i < up; i++) {
-        fwrite(&upS[i].up_x, 1, 1, f);
-        fwrite(&upS[i].up_y, 1, 1, f);
+        fwrite(&upS[i]->up_x, 1, 1, f);
+        fwrite(&upS[i]->up_y, 1, 1, f);
     }
 
     //num of downstairs
-    downS = malloc(down * sizeof(struct downstairs));
+    //downS = malloc(down * sizeof(struct downstairs));
     fseek(f, 1706 + (numRooms*4) + (up * 2), SEEK_SET);
     fwrite(&down, 1, 2, f);
     down = be32toh(down);
@@ -277,8 +291,8 @@ void saveDungeon(char* filepath) {
     fseek(f, 1708 + (numRooms*4) + (up * 2), SEEK_SET);
 
     for (int i = 0; i < down; i++) {
-        fwrite(&downS[i].down_x, 1, 1, f);
-        fwrite(&downS[i].down_y, 1, 1, f);
+        fwrite(&downS[i]->down_x, 1, 1, f);
+        fwrite(&downS[i]->down_y, 1, 1, f);
     }
 
     //close file
