@@ -117,37 +117,35 @@ void loadDungeon(char* filepath) {
                 dungeon[i][j] = '#';
 
             else if (hardness[i][j] == 255) {
-                if (i > 18 || i < 2 || j > 77 || j < 2) //dont think we need this -- check
-                    dungeon[i][j] = '*';
+                //if (i > 18 || i < 2 || j > 77 || j < 2) //dont think we need this -- check
+                dungeon[i][j] = '*';
             }
         }
     }
 
-    //reads rooms
     fseek(f, 1702, SEEK_SET);
+    fread(&numRooms, 1, 2, f);
+    numRooms = be32toh(numRooms);
+
+    fseek(f, 1704, SEEK_SET);
+
+    //reads rooms
+    /*fseek(f, 1702, SEEK_SET);
     int count = malloc(size - 1704);
     Room rooms = count / 4;
-    fread(count, 1, (size - 1704), f);
+    fread(count, 1, (size - 1704), f);*/
 
     int i, j = 0;
-    for(i = 0; i < (size - 1704)/4; i++) {
-        int x, y, w, h; // w and h are width and height
-
-        //look into struct in 1.01
-        rooms[i].xstart = count[j];
-        rooms[i].ystart = count[j + 1];
-        rooms[i].w = count[j + 2];
-        rooms[i].h = count[j + 3];
-
-        /*fread(&x, sizeof(int8_t), 1, f);
-        fread(&y, sizeof(int8_t), 1, f);
-        fread(&w, sizeof(int8_t), 1, f);
-        fread(&h, sizeof(int8_t), 1, f);*/
+    for(i = 0; i < numRooms; i+=4) {
+        fread(&rooms[i], 1, 1, f);
+        fread(&rooms[i + 1], 1, 1, f);
+        fread(&rooms[i + 2]), 1, 1, f);
+        fread(&rooms[i + 3], 1, 1, f);
     }
 
     // plot rooms in dungeon based on read from files
     int o, p, q;
-    for(o = 0; i < (size - 1704)/4; o++) {
+    for(o = 0; i < numRooms; o++) {
         for(p = rooms[o].y; p < rooms[o].y + rooms[o].h; p++) {
             for(q = rooms[o].x; q < rooms[o].x + rooms[o].w; q++) {
                 dungeon[p][q] = '.';
@@ -207,19 +205,13 @@ void saveDungeon(char* filepath) {
         }
     }
 
-    /**
-    //writes rooms
-    // GLOBAL? VARIABLE IN 1.01 IS tot_rooms I THINK WE CAN ACCESS IT W/O ISSUE
-    uint8_t rooms[tot_rooms][4];
-    // for loop to write the corrdinates x and y then the x size (width) and then y length (height)
-    fwrite(&rooms, 1, 4*tot_rooms, f);
-    **/
-
     //rooms
+    //num of rooms
     fseek(f, 1702, SEEK_SET);
     fwrite(&numRooms, 1, 2, f);
     numRooms = be32toh(numRooms);
 
+    //rooms x, y, and dimensions
     fseek(f, 1704, SEEK_SET);
     //maybe? - no endian conversion needed
     for (int i = 0; i < numRooms; i+=4) {
@@ -230,9 +222,28 @@ void saveDungeon(char* filepath) {
     }
 
     //stairs
-    //fseek(f, 1704 + (numRooms*4), SEEK_SET);
-    //fwrite(&);
+    //num of upstairs
+    fseek(f, 1704 + (numRooms*4), SEEK_SET);
+    fwrite(&up, 1, 2, f);
+    up = be32toh(up);
 
+    //upstairs' x and y
+    fseek(f, 1706 + (numRooms*4), SEEK_SET);
+    for (int i = 0; i < up; i++) {
+        //fwrite(&); -idk what to do for stairs
+    }
+
+    //num of downstairs
+    fseek(f, 1706 + (numRooms*4) + (up * 2), SEEK_SET);
+    fwrite(&down, 1, 2, f);
+    down = be32toh(down);
+
+    //downstairs' x and y
+    fseek(f, 1708 + (numRooms*4) + (up * 2), SEEK_SET);
+    for (int i = 0; i < down; i++) {
+        //idk what to do here
+    }
+    
     //close file
     fclose(f);
 
