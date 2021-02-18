@@ -27,14 +27,20 @@ int main(int argc, char* argv[]) {
     //printf("%s", filepath);
 
     if (argc > 1) {
-        if (strcmp("--save", argv[1]) == 0)
+      if (strcmp("--save", argv[1]) == 0) {
+	    initDungeon();
+            createRooms();
             saveDungeon(filepath);
+      }
+      else if (strcmp("--load", argv[1]) == 0) {
+	   initDungeon();
+           createRooms();
+           loadDungeon(filepath);
+      }
 
-        else if (strcmp("--load", argv[1]) == 0)
-            loadDungeon(filepath);
-
-        else if ((strcmp("--save", argv[1]) == 0 && strcmp("--load", argv[2]) == 0) ||
-                 (strcmp("--load", argv[1]) == 0 && strcmp("--save", argv[2]) == 0)) {
+        else if ((strcmp("--save", argv[1]) == 0 && strcmp("--load", argv[2]) == 0) || (strcmp("--load", argv[1]) == 0 && strcmp("--save", argv[2]) == 0)) {
+	    initDungeon();
+            createRooms();
             saveDungeon(filepath);
             loadDungeon(filepath);
         }
@@ -44,6 +50,8 @@ int main(int argc, char* argv[]) {
             initDungeon();
             createRooms();
             printDungeon();
+
+	    // printHardness();
         }
     }
 
@@ -52,6 +60,8 @@ int main(int argc, char* argv[]) {
         initDungeon();
         createRooms();
         printDungeon();
+
+	//printHardness();
     }
 }
 
@@ -69,19 +79,18 @@ void loadDungeon(char* filepath) {
     //read semantic file type marker
     fseek(f, 0, SEEK_SET);
     char file_type[13];
-    file_type[12] = '\0';
-    fread(file_type, sizeof(char), 12, f);
+    fread(&file_type, 4, 1, f);
 
     //read file version
     fseek(f, 12, SEEK_SET);
-    uint32_t version = 0;
-    fread(&version, sizeof(uint32_t), 1, f);
-    version = be32toh(version);
+    uint32_t version;
+    fread(&version, 4, 1, f);
+    //version = be32toh(version);
 
     //read the size of the file
     fseek(f, 16, SEEK_SET);
     uint32_t size;
-    fread(&size, sizeof(uint32_t), 1, f);
+    fread(&size, 4, 1, f);
     size = be32toh(size);
 
     //pc - do we have to convert to big endian here? -- check
@@ -214,51 +223,45 @@ void saveDungeon(char* filepath) {
     }
 
     //file_type
-    fseek(f, 0, SEEK_SET);
-    char file_type[13] = "RLG327-S2021";
-    fwrite(file_type, sizeof(char), 12, f);
+    char file_type[] = "RLG327-S2021";
+    fwrite(file_type, 1, 12, f);
     //file_type = be32toh(file_type); //this brings up an error for some reason.. -- commenting out for now
 
     //file version marker set to 0
-    fseek(f, 12, SEEK_SET);
     uint32_t version = 0;
-    version = be32toh(version);
-    fwrite(&version, sizeof(uint32_t), 1, f); //is it 1 or is it 4??
+    // version = be32toh(version);
+    fwrite(&version, 4, 1, f); //is it 1 or is it 4??
 
     //size of files
-    fseek(f, 16, SEEK_SET);
-    uint32_t size;
+    uint32_t size = 1702 + (4*numRooms);
     size = be32toh(size);
-    fwrite(&size, sizeof(uint32_t), 1, f);
+    fwrite(&size, 4, 1, f);
 
     //PC
-    fseek(f, 20, SEEK_SET);
     uint8_t pc_x;
     uint8_t pc_y;
-    fwrite(&pc_x, sizeof(uint8_t), 1, f);
-    fwrite(&pc_y, sizeof(uint8_t), 1, f);
+    fwrite(&pc_x, 1, sizeof(uint8_t), f);
+    fwrite(&pc_y, 1, sizeof(uint8_t), f);
 
     //hardness values
-    fseek(f, 22, SEEK_SET);
     int8_t h[21][80]; //do we even need this
-    fwrite(&h, 1, 1680, f);
     
     for(int i = 0; i < 21; i++) {
         for(int j = 0; j < 80; j++) {
             //or is it &hardness[i][j] or &h?? -- check
-            h[i][j] = hardness[i][j];
+	  h[i][j] = hardness[i][j];
         }
     }
+    fwrite(&h, 1, 1680, f);
+    // printHardness();
 	
 
     //rooms
     //num of rooms
-    fseek(f, 1702, SEEK_SET);
     fwrite(&numRooms, 1, 2, f);
     numRooms = be32toh(numRooms);
 
     //rooms x, y, and dimensions
-    fseek(f, 1704, SEEK_SET);
     //maybe? - no endian conversion needed
     for (int i = 0; i < numRooms; i+=4) {
         fwrite(&roomsDimensions[i], 1, 1, f);
@@ -270,12 +273,10 @@ void saveDungeon(char* filepath) {
     //stairs
     //num of upstairs
     //upS = malloc(up * sizeof(struct upstairs));
-    fseek(f, 1704 + (numRooms*4), SEEK_SET);
     fwrite(&up, 1, 2, f);
     up = be32toh(up);
 
     //upstairs' x and y
-    fseek(f, 1706 + (numRooms*4), SEEK_SET);
     for (int i = 0; i < up; i++) {
         fwrite(&upS[i]->up_x, 1, 1, f);
         fwrite(&upS[i]->up_y, 1, 1, f);
@@ -283,18 +284,16 @@ void saveDungeon(char* filepath) {
 
     //num of downstairs
     //downS = malloc(down * sizeof(struct downstairs));
-    fseek(f, 1706 + (numRooms*4) + (up * 2), SEEK_SET);
     fwrite(&down, 1, 2, f);
     down = be32toh(down);
 
     //downstairs' x and y
-    fseek(f, 1708 + (numRooms*4) + (up * 2), SEEK_SET);
-
     for (int i = 0; i < down; i++) {
         fwrite(&downS[i]->down_x, 1, 1, f);
         fwrite(&downS[i]->down_y, 1, 1, f);
     }
 
+    //printDungeon();
     //close file
     fclose(f);
 }
