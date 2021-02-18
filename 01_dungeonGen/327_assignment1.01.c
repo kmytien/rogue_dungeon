@@ -11,24 +11,23 @@ void printDungeon();
 void initDungeon();
 void createRooms();
 void staircase();
-void createCorridors(int);
+void createCorridors(int*,int);
 void setCorridors(int, int, int, int);
 bool legality(int, int, int, int);
 
 char dungeon[WORLD_ROW][WORLD_COL];
 int hardness[WORLD_ROW][WORLD_COL];
-int* rooms;
 uint16_t up;
 uint16_t down;
 uint16_t numRooms;
 
 //structure for room - represents top left corner of a room
 struct room {
-    //changed from int to uint8_t
-    uint8_t xstart; //top left row
-    uint8_t ystart; //top left col
-    uint8_t xsize; //width
-    uint8_t ysize; //height
+    //changed from int to uint8_t, back to int bc issue in createCorridors
+    int xstart; //top left row
+    int ystart; //top left col
+    int xsize; //width
+    int ysize; //height
 };
 
 //for upstairs
@@ -112,12 +111,12 @@ void createRooms() {
     //y-direction can be 3 to 9 blocks
 
     //int maxRooms = 6 + (rand() % 5);
-    int num_fails = 0;
+    int num_fails = 0, consec = 0;
     int* rooms = (int*) malloc(4 * sizeof(int));
     int currentRooms = 0;
 
     //keeps adding room until it gets to randomized max num of rooms
-    while(num_fails < 30) {
+    while(num_fails < 100) {
 
         //getting random room sizes
         int rand_vertical = 3 + (rand() % 7);
@@ -146,14 +145,18 @@ void createRooms() {
             rooms[(4 * currentRooms) + 3] = rand_horizontal;
 
             currentRooms++;
+            consec = 0;
         }
-	else {
-	    num_fails++;
-	}
+	    else {
+	        consec = 1;
+	        if (consec == 1) {
+	            num_fails++;
+	        }
+	    }
     }
 
     //create rooms then corridors
-    createCorridors(currentRooms);
+    createCorridors(rooms, currentRooms);
 }
 
 //checks if placement of room is legal
@@ -173,7 +176,7 @@ bool legality(int startRow, int startCol, int endRow, int endCol) {
 
 //corridor maker - num is number of rooms that are made
 //was int* rooms, int num parameters
-void createCorridors(int num) {
+void createCorridors(int* rooms, int num) {
 
     int currRoom;
     struct room firstRoom;
