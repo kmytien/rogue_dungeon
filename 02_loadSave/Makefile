@@ -4,4 +4,4 @@
 rlg327: rlg327.c
 	gcc rlg327.c -o rlg327
 clean:
-	rm -f 327_assignment1.02 rgl327 heap
+	rm -f 327_assignment1.02 rgl327
