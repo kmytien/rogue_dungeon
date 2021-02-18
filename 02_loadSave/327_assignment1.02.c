@@ -220,27 +220,61 @@ void saveDungeon(char* filepath) {
         fwrite(&rooms[i + 3], 1, 1, f);
     }
 
+    // I tried, sorry if it doesnt work :(
     //stairs
     //num of upstairs
+    upstairs = malloc(sizeOf((numRooms) * 4))
+
     fseek(f, 1704 + (numRooms*4), SEEK_SET);
     fwrite(&up, 1, 2, f);
     up = be32toh(up);
 
     //upstairs' x and y
     fseek(f, 1706 + (numRooms*4), SEEK_SET);
-    for (int i = 0; i < up; i++) {
-        //fwrite(&); -idk what to do for stairs -- need to do
+    int upX, upY;
+    while(up < 1) {
+        for (int i = 0; i < 21; i++) {
+            for(int j = 0; j < 80; j++) {
+                dungeon[i][j] = "<";
+                upstairs[up].upX = j;
+                upstairs[up].upY = i;
+                up++;
+            }
+        }
     }
 
+    for (int i = 0; i < up; i++)
+    {
+        fwrite(&upstairs[i].upX, 1, 1, f);
+        fread(&upstairs[i].upY, 1, 1, f);
+    }
+
+
     //num of downstairs
+    downstairs = malloc(sizeOf((numRooms) * 4));
+
     fseek(f, 1706 + (numRooms*4) + (up * 2), SEEK_SET);
     fwrite(&down, 1, 2, f);
     down = be32toh(down);
 
     //downstairs' x and y
     fseek(f, 1708 + (numRooms*4) + (up * 2), SEEK_SET);
-    for (int i = 0; i < down; i++) {
-        //idk what to do here -- need to do
+    int downX, downY;
+    while(down < 1) {
+        for (int i = 0; i < 21; i++) {
+            for(int j = 0; j < 80; j++) {
+                dungeon[i][j] = ">";
+                downstairs[up].downX = j;
+                upstairs[up].downY = i;
+                down++;
+            }
+        }
+    }
+
+    for (int i = 0; i < down; i++)
+    {
+        fwrite(&downstairs[i].downX, 1, 1, f);
+        fread(&downstairs[i].downY, 1, 1, f);
     }
 
     //close file
