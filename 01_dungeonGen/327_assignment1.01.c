@@ -112,7 +112,7 @@ void createRooms() {
 
     //int maxRooms = 6 + (rand() % 5);
     int num_fails = 0, consec = 0;
-    int* rooms = (int*) malloc(4 * sizeof(int));
+    int* rooms = (int*) malloc(20 * 4 * sizeof(int));
     int currentRooms = 0;
 
     //keeps adding room until it gets to randomized max num of rooms
