@@ -16,6 +16,8 @@ bool legality(int, int, int, int);
 
 char dungeon[WORLD_ROW][WORLD_COL];
 int hardness[WORLD_ROW][WORLD_COL];
+int* rooms;
+int16_t numRooms;
 
 //structure for room - represents top left corner of a room
 struct room {
@@ -100,8 +102,9 @@ void createRooms() {
     //y-direction can be 3 to 9 blocks
 
     int maxRooms = 6 + (rand() % 5);
-    int* rooms = (int*) malloc(maxRooms * 4 * sizeof(int));
     int currentRooms = 0;
+    rooms = (int*) malloc(maxRooms * 4 * sizeof(int));
+    numRooms = maxRooms;
 
     //keeps adding room until it gets to randomized max num of rooms
     while(currentRooms < maxRooms) {
