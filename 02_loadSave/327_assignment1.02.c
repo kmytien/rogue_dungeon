@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
     else if (strcmp("--load", argv[1]) == 0)
         loadDungeon(filepath);
 
-    else if ((strcmp("--save", argv[1]) && strcmp("--load", argv[2])) || strcmp("--load", argv[1]) && strcmp("--save", argv[2])) {
+    else if ((strcmp("--save", argv[1]) == 0 && strcmp("--load", argv[2]) == 0) || (strcmp("--load", argv[1]) == 0 && strcmp("--save", argv[2]) == 0)) {
         saveDungeon(filepath);
         loadDungeon(filepath);
     }
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
 
 //load-- read a dungeon from the file and print it
 void loadDungeon(char* filepath) {
-    int row, col, rooms;
+    //int row, col;
     FILE* f = fopen(filepath, "r");
 
     if (f == NULL) {
@@ -128,32 +128,31 @@ void loadDungeon(char* filepath) {
     numRooms = be32toh(numRooms);
 
     fseek(f, 1704, SEEK_SET);
-
-    //reads rooms
-    /*fseek(f, 1702, SEEK_SET);
-    int count = malloc(size - 1704);
-    Room rooms = count / 4;
-    fread(count, 1, (size - 1704), f);*/
-
-    int i, j = 0;
-    for(i = 0; i < numRooms; i+=4) {
+    for (int i = 0; i < numRooms; i+=4) {
         fread(&rooms[i], 1, 1, f);
         fread(&rooms[i + 1], 1, 1, f);
-        fread(&rooms[i + 2]), 1, 1, f);
+        fread(&rooms[i + 2], 1, 1, f);
         fread(&rooms[i + 3], 1, 1, f);
     }
 
-    // plot rooms in dungeon based on read from files
-    int o, p, q;
-    for(o = 0; i < numRooms; o++) {
-        for(p = rooms[o].y; p < rooms[o].y + rooms[o].h; p++) {
-            for(q = rooms[o].x; q < rooms[o].x + rooms[o].w; q++) {
-                dungeon[p][q] = '.';
+    //setting rooms
+    int topX, topY, xSize, ySize;
+    for (int i = 0; i < numRooms; i+=4) {
+
+        topX = rooms[i];
+        topY = rooms[i + 1];
+        xSize = rooms[i + 2];
+        ySize = rooms[i + 3];
+
+        for (int j = topX; j < topX + xSize; j++) {
+            for (int k = topY; k < topY + ySize; k++){
+                if (hardness[j][k] == 0)
+                    dungeon[j][k] = '.';
             }
         }
     }
 
-    //stairs
+    //stairs -- need to do
 
     printDungeon();
     fclose(f);
@@ -196,7 +195,7 @@ void saveDungeon(char* filepath) {
 
     //hardness values
     fseek(f, 22, SEEK_SET);
-    int8_t h[21][80]; //do we even need this
+    //int8_t h[21][80]; //do we even need this
 
     for(int i = 0; i < 21; i++) {
         for(int j = 0; j < 80; j++) {
@@ -230,7 +229,7 @@ void saveDungeon(char* filepath) {
     //upstairs' x and y
     fseek(f, 1706 + (numRooms*4), SEEK_SET);
     for (int i = 0; i < up; i++) {
-        //fwrite(&); -idk what to do for stairs
+        //fwrite(&); -idk what to do for stairs -- need to do
     }
 
     //num of downstairs
@@ -241,10 +240,9 @@ void saveDungeon(char* filepath) {
     //downstairs' x and y
     fseek(f, 1708 + (numRooms*4) + (up * 2), SEEK_SET);
     for (int i = 0; i < down; i++) {
-        //idk what to do here
+        //idk what to do here -- need to do
     }
-    
+
     //close file
     fclose(f);
-
 }
