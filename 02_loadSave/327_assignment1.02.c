@@ -14,23 +14,6 @@ void loadDungeon(char*);
  * Project by: Sanjana Amatya, MyTien Kien, Haylee Lawrence
  */
 
-/**
-    -- we need to implement hardness this assignment: a room or corridor has hardness of 0, the outer most cells have hardness of 255,
-       every other cell has random hardness between 1 - 254 --
-    In Main:
-        - set up directory
-        - finish if statements for --save and --load parameters
-    Save function:
-        - write to a file (home/username/.rlg327/dungeon)
-          - the whole chart in the pdf are what parameters we need for fwrite and fread (that honestly makes a lot more sense)
-          - examples of files are in piazza
-        - close the file
-    Load function:
-        - read file (home/username/.rlg327/dungeon)
-        - fread (follow the chart on pdf)
-        - print dungeon
-**/
-
 int main(int argc, char* argv[]) {
 
     //make the .directory in home and set the directory name for reference
@@ -97,14 +80,18 @@ void loadDungeon(char* filepath) {
     fread(&pc_x, sizeof(uint8_t), 1, f);
     fread(&pc_y, sizeof(uint8_t), 1, f);
 
+    if (hardness[(int) pc_y][(int) pc_x] == 0) {
+        dungeon[(int) pc_y][(int) pc_x] = '@';
+    }
+
     //hardness values
     fseek(f, 22, SEEK_SET);
-    int8_t h[21][80]; //do we even need this
+    //int8_t h[21][80]; //do we even need this
 
     for(int i = 0; i < 21; i++) {
         for(int j = 0; j < 80; j++) {
-            //or is it &hardness[i][j]?? -- check
-            fread(&h, 1, 1680, f);
+            //or is it &h[][] or &hardness[i][j]?? -- check
+            fread(&hardness[i][j], 1, 1680, f);
         }
     }
 
@@ -129,20 +116,20 @@ void loadDungeon(char* filepath) {
 
     fseek(f, 1704, SEEK_SET);
     for (int i = 0; i < numRooms; i+=4) {
-        fread(&rooms[i], 1, 1, f);
-        fread(&rooms[i + 1], 1, 1, f);
-        fread(&rooms[i + 2], 1, 1, f);
-        fread(&rooms[i + 3], 1, 1, f);
+        fread(&roomsDimensions[i], 1, 1, f);
+        fread(&roomsDimensions[i + 1], 1, 1, f);
+        fread(&roomsDimensions[i + 2], 1, 1, f);
+        fread(&roomsDimensions[i + 3], 1, 1, f);
     }
 
     //setting rooms
     int topX, topY, xSize, ySize;
     for (int i = 0; i < numRooms; i+=4) {
 
-        topX = rooms[i];
-        topY = rooms[i + 1];
-        xSize = rooms[i + 2];
-        ySize = rooms[i + 3];
+        topX = roomsDimensions[i];
+        topY = roomsDimensions[i + 1];
+        xSize = roomsDimensions[i + 2];
+        ySize = roomsDimensions[i + 3];
 
         for (int j = topX; j < topX + xSize; j++) {
             for (int k = topY; k < topY + ySize; k++){
@@ -152,7 +139,53 @@ void loadDungeon(char* filepath) {
         }
     }
 
-    //stairs -- need to do
+    //stairs
+    //num of upstairs
+    upS = malloc(up * sizeof(struct upstairs));
+    fseek(f, 1704 + (numRooms*4), SEEK_SET);
+    fread(&up, 1, 2, f);
+    up = be32toh(up);
+
+    //upstairs' x and y
+    fseek(f, 1706 + (numRooms*4), SEEK_SET);
+    for (int i = 0; i < up; i++) {
+        fread(&upS[i].up_x, 1, 1, f);
+        fread(&upS[i].up_y, 1, 1, f);
+    }
+
+    //setting upstairs
+    int upX, upY;
+    for (int i = 0; i < up; i++) {
+        upX = upS[i].up_x;
+        upY = upS[i].up_y;
+
+        if (hardness[upY][upX] == 0)
+            dungeon[upY][upX] = '<';
+    }
+
+    //num of downstairs
+    downS = malloc(down * sizeof(struct downstairs));
+    fseek(f, 1706 + (numRooms*4) + (up * 2), SEEK_SET);
+    fread(&down, 1, 2, f);
+    down = be32toh(down);
+
+    //downstairs' x and y
+    fseek(f, 1708 + (numRooms*4) + (up * 2), SEEK_SET);
+
+    for (int i = 0; i < down; i++) {
+        fread(&downS[i].down_x, 1, 1, f);
+        fread(&downS[i].down_y, 1, 1, f);
+    }
+
+    //setting upstairs
+    int downX, downY;
+    for (int i = 0; i < up; i++) {
+        downX = downS[i].down_x;
+        downY = downS[i].down_y;
+
+        if (hardness[downY][downX] == 0)
+            dungeon[downY][downX] = '>';
+    }
 
     printDungeon();
     fclose(f);
@@ -214,67 +247,38 @@ void saveDungeon(char* filepath) {
     fseek(f, 1704, SEEK_SET);
     //maybe? - no endian conversion needed
     for (int i = 0; i < numRooms; i+=4) {
-        fwrite(&rooms[i], 1, 1, f);
-        fwrite(&rooms[i + 1], 1, 1, f);
-        fwrite(&rooms[i + 2], 1, 1, f);
-        fwrite(&rooms[i + 3], 1, 1, f);
+        fwrite(&roomsDimensions[i], 1, 1, f);
+        fwrite(&roomsDimensions[i + 1], 1, 1, f);
+        fwrite(&roomsDimensions[i + 2], 1, 1, f);
+        fwrite(&roomsDimensions[i + 3], 1, 1, f);
     }
 
-    // I tried, sorry if it doesnt work :(
     //stairs
     //num of upstairs
-    upstairs = malloc(sizeOf((numRooms) * 4))
-
+    upS = malloc(up * sizeof(struct upstairs));
     fseek(f, 1704 + (numRooms*4), SEEK_SET);
     fwrite(&up, 1, 2, f);
     up = be32toh(up);
 
     //upstairs' x and y
     fseek(f, 1706 + (numRooms*4), SEEK_SET);
-    int upX, upY;
-    while(up < 1) {
-        for (int i = 0; i < 21; i++) {
-            for(int j = 0; j < 80; j++) {
-                dungeon[i][j] = "<";
-                upstairs[up].upX = j;
-                upstairs[up].upY = i;
-                up++;
-            }
-        }
+    for (int i = 0; i < up; i++) {
+        fwrite(&upS[i].up_x, 1, 1, f);
+        fwrite(&upS[i].up_y, 1, 1, f);
     }
-
-    for (int i = 0; i < up; i++)
-    {
-        fwrite(&upstairs[i].upX, 1, 1, f);
-        fread(&upstairs[i].upY, 1, 1, f);
-    }
-
 
     //num of downstairs
-    downstairs = malloc(sizeOf((numRooms) * 4));
-
-    fseek(f, 1706 + (numRooms*4) + (down * 2), SEEK_SET);
+    downS = malloc(down * sizeof(struct downstairs));
+    fseek(f, 1706 + (numRooms*4) + (up * 2), SEEK_SET);
     fwrite(&down, 1, 2, f);
     down = be32toh(down);
 
     //downstairs' x and y
     fseek(f, 1708 + (numRooms*4) + (up * 2), SEEK_SET);
-    int downX, downY;
-    while(down < 1) {
-        for (int i = 0; i < 21; i++) {
-            for(int j = 0; j < 80; j++) {
-                dungeon[i][j] = ">";
-                downstairs[down].downX = j;
-                downstairs[down].downY = i;
-                down++;
-            }
-        }
-    }
 
-    for (int i = 0; i < down; i++)
-    {
-        fwrite(&downstairs[i].downX, 1, 1, f);
-        fread(&downstairs[i].downY, 1, 1, f);
+    for (int i = 0; i < down; i++) {
+        fwrite(&downS[i].down_x, 1, 1, f);
+        fwrite(&downS[i].down_y, 1, 1, f);
     }
 
     //close file
