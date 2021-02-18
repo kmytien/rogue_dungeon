@@ -100,13 +100,13 @@ void createRooms() {
     //x-direction can be 4 to 12 blocks
     //y-direction can be 3 to 9 blocks
 
-    int maxRooms = 6 + (rand() % 5);
+    //int maxRooms = 6 + (rand() % 5);
+    int num_fails = 0;
+    int* rooms = (int*) malloc(4 * sizeof(int));
     int currentRooms = 0;
-    rooms = (int*) malloc(maxRooms * 4 * sizeof(int));
-    numRooms = maxRooms;
 
     //keeps adding room until it gets to randomized max num of rooms
-    while(currentRooms < maxRooms) {
+    while(num_fails < 50) {
 
         //getting random room sizes
         int rand_vertical = 3 + (rand() % 7);
@@ -136,10 +136,13 @@ void createRooms() {
 
             currentRooms++;
         }
+	    else {
+	        num_fails++;
+	    }
     }
 
     //create rooms then corridors
-    createCorridors(maxRooms);
+    createCorridors(rooms, currentRooms);
 }
 
 //checks if placement of room is legal
