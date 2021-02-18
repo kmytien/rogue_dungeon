@@ -32,6 +32,7 @@ void loadDungeon(char*);
 **/
 
 int main(int argc, char* argv[]) {
+
     //make the .directory in home and set the directory name for reference
     char *directory = getenv("HOME");
     char *gameDir = ".rlg327";
@@ -40,7 +41,6 @@ int main(int argc, char* argv[]) {
 
     mkdir(directory, S_IRWXU);
     sprintf(filepath, "%s/%s/%s", directory, gameDir, savefile);
-    //fopen(filepath, "w"); - we dont have to open file yet
 
     if (strcmp("--save", argv[1]) == 0)
         saveDungeon(filepath);
@@ -117,8 +117,8 @@ void loadDungeon(char* filepath) {
                 dungeon[i][j] = '#';
 
             else if (hardness[i][j] == 255) {
-                if (i > 18 || i < 2 || j > 77 || j < 2)
-                    dungeon[i][j] = '@'; // prob have to change a few things e.o - bc @ represents player and here o, representing it as immutable hardness
+                if (i > 18 || i < 2 || j > 77 || j < 2) //dont think we need this -- check
+                    dungeon[i][j] = '*';
             }
         }
     }
@@ -148,11 +148,11 @@ void loadDungeon(char* filepath) {
     // plot rooms in dungeon based on read from files
     int o, p, q;
     for(o = 0; i < (size - 1704)/4; o++) {
-      for(p = rooms[o].y; p < rooms[o].y + rooms[o].h; p++) {
-        for(q = rooms[o].x; q < rooms[o].x + rooms[o].w; q++) {
-          dungeon[p][q] = '.';
+        for(p = rooms[o].y; p < rooms[o].y + rooms[o].h; p++) {
+            for(q = rooms[o].x; q < rooms[o].x + rooms[o].w; q++) {
+                dungeon[p][q] = '.';
+            }
         }
-      }
     }
 
     //stairs
@@ -175,7 +175,7 @@ void saveDungeon(char* filepath) {
     fseek(f, 0, SEEK_SET);
     char file_type[13] = "RLG327-S2021";
     fwrite(&file_type, sizeof(char), 12, f);
-    file_type = be32oh(file_type);
+    //file_type = be32toh(file_type); //this brings up an error for some reason.. -- commenting out for now
 
     //file version marker set to 0
     fseek(f, 12, SEEK_SET);
@@ -202,17 +202,36 @@ void saveDungeon(char* filepath) {
 
     for(int i = 0; i < 21; i++) {
         for(int j = 0; j < 80; j++) {
-            //or is it &hardness[i][j]?? -- check
-            fread(&h, 1, 1680, f);
+            //or is it &hardness[i][j] or &h?? -- check
+            fread(&hardness[i][j], 1, 1680, f);
         }
     }
 
+    /**
     //writes rooms
     // GLOBAL? VARIABLE IN 1.01 IS tot_rooms I THINK WE CAN ACCESS IT W/O ISSUE
     uint8_t rooms[tot_rooms][4];
     // for loop to write the corrdinates x and y then the x size (width) and then y length (height)
     fwrite(&rooms, 1, 4*tot_rooms, f);
+    **/
 
+    //rooms
+    fseek(f, 1702, SEEK_SET);
+    fwrite(&numRooms, 1, 2, f);
+    numRooms = be32toh(numRooms);
+
+    fseek(f, 1704, SEEK_SET);
+    //maybe? - no endian conversion needed
+    for (int i = 0; i < numRooms; i+=4) {
+        fwrite(&rooms[i], 1, 1, f);
+        fwrite(&rooms[i + 1], 1, 1, f);
+        fwrite(&rooms[i + 2], 1, 1, f);
+        fwrite(&rooms[i + 3], 1, 1, f);
+    }
+
+    //stairs
+    //fseek(f, 1704 + (numRooms*4), SEEK_SET);
+    //fwrite(&);
 
     //close file
     fclose(f);
