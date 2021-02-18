@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <stdint.h>
 
 #define WORLD_ROW 21
 #define WORLD_COL 80
@@ -41,6 +42,16 @@ struct downstairs {
     uint8_t down_x;
     uint8_t down_y;
 };
+
+int main(int argc, char* argv[]) {
+    //initialize dungeon
+    initDungeon();
+    //generating dungeon
+    //calls createCorridors and staircase()
+    createRooms();
+    //print dungeon
+    printDungeon();
+}
 
 //prints dungeon output
 void printDungeon() {
@@ -106,7 +117,7 @@ void createRooms() {
     int currentRooms = 0;
 
     //keeps adding room until it gets to randomized max num of rooms
-    while(num_fails < 50) {
+    while(num_fails < 30) {
 
         //getting random room sizes
         int rand_vertical = 3 + (rand() % 7);
@@ -136,13 +147,13 @@ void createRooms() {
 
             currentRooms++;
         }
-	    else {
-	        num_fails++;
-	    }
+	else {
+	    num_fails++;
+	}
     }
 
     //create rooms then corridors
-    createCorridors(rooms, currentRooms);
+    createCorridors(currentRooms);
 }
 
 //checks if placement of room is legal
