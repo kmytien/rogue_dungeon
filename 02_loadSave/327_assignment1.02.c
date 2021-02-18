@@ -253,7 +253,7 @@ void saveDungeon(char* filepath) {
     //num of downstairs
     downstairs = malloc(sizeOf((numRooms) * 4));
 
-    fseek(f, 1706 + (numRooms*4) + (up * 2), SEEK_SET);
+    fseek(f, 1706 + (numRooms*4) + (down * 2), SEEK_SET);
     fwrite(&down, 1, 2, f);
     down = be32toh(down);
 
@@ -264,8 +264,8 @@ void saveDungeon(char* filepath) {
         for (int i = 0; i < 21; i++) {
             for(int j = 0; j < 80; j++) {
                 dungeon[i][j] = ">";
-                downstairs[up].downX = j;
-                upstairs[up].downY = i;
+                downstairs[down].downX = j;
+                downstairs[down].downY = i;
                 down++;
             }
         }
