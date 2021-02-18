@@ -17,13 +17,14 @@ bool legality(int, int, int, int);
 
 char dungeon[WORLD_ROW][WORLD_COL];
 int hardness[WORLD_ROW][WORLD_COL];
+int* roomsDimensions;
 uint16_t up;
 uint16_t down;
 uint16_t numRooms;
 
 //structure for room - represents top left corner of a room
 struct room {
-    //changed from int to uint8_t, back to int bc issue in createCorridors
+
     int xstart; //top left row
     int ystart; //top left col
     int xsize; //width
@@ -34,13 +35,13 @@ struct room {
 struct upstairs {
     uint8_t up_x;
     uint8_t up_y;
-};
+} *upS;
 
 //for downstairs
 struct downstairs {
     uint8_t down_x;
     uint8_t down_y;
-};
+} *downS;
 
 //prints dungeon output
 void printDungeon() {
@@ -53,11 +54,11 @@ void printDungeon() {
             if (row == 0 || row == WORLD_ROW - 1)
                 printf("-");
 
-                //border
+            //border
             else if (col == 0 || col == WORLD_COL - 1)
                 printf("|");
 
-                //just used character '@' to represent immutable rock (outermost cells)
+            //just used character '*' to represent immutable rock (outermost cells)
             else if (dungeon[row][col] == '*')
                 printf(" ");
 
@@ -103,6 +104,7 @@ void createRooms() {
     //int maxRooms = 6 + (rand() % 5);
     int num_fails = 0, consec = 0;
     int* rooms = (int*) malloc(20 * 4 * sizeof(int));
+    roomsDimensions = rooms;
     int currentRooms = 0;
 
     //keeps adding room until it gets to randomized max num of rooms
@@ -134,15 +136,22 @@ void createRooms() {
             rooms[(4 * currentRooms) + 2] = rand_vertical;
             rooms[(4 * currentRooms) + 3] = rand_horizontal;
 
+            //for global var to use in 1.02
+            roomsDimensions[4 * currentRooms] = row_start;
+            roomsDimensions[(4 * currentRooms) + 1] = col_start;
+            roomsDimensions[(4 * currentRooms) + 2] = rand_vertical;
+            roomsDimensions[(4 * currentRooms) + 3] = rand_horizontal;
+
             currentRooms++;
             consec = 0;
         }
-	    else {
-	        consec = 1;
-	        if (consec == 1) {
-	            num_fails++;
-	        }
-	    }
+
+        else {
+            consec = 1;
+
+            if (consec == 1)
+                num_fails++;
+        }
     }
 
     //create rooms then corridors
@@ -186,7 +195,6 @@ void createCorridors(int* rooms, int num) {
             secondRoom.ystart = rooms[1];
             secondRoom.xsize = rooms[2];
             secondRoom.ysize = rooms[3];
-
         }
 
         else {
@@ -275,7 +283,6 @@ void staircase() {
     //randomly generate num between 1 and 2 and then place 1-2 of each staircase in a room
     //up stairs '<'
     up = (rand() % 2) + 1;
-    struct upstairs upS[up];
     for (i = 0; i < up; i++) {
 
         //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
@@ -296,7 +303,6 @@ void staircase() {
 
     //down stairs '>'
     down = (rand() % 2) + 1;
-    struct downstairs downS[down];
     for (i = 0; i < down; i++) {
 
         //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
