@@ -35,13 +35,20 @@ struct room {
 struct upstairs {
     uint8_t up_x;
     uint8_t up_y;
-} *upS;
+} *upS[4];
 
 //for downstairs
 struct downstairs {
     uint8_t down_x;
     uint8_t down_y;
-} *downS;
+} *downS[4];
+
+int main(int argc, char* argv[]) {
+    initDungeon();
+    createRooms();
+    printDungeon();
+}
+
 
 //prints dungeon output
 void printDungeon() {
@@ -104,7 +111,7 @@ void createRooms() {
     //int maxRooms = 6 + (rand() % 5);
     int num_fails = 0, consec = 0;
     int* rooms = (int*) malloc(20 * 4 * sizeof(int));
-    roomsDimensions = rooms;
+    roomsDimensions = (int*) malloc(20 * 4 * sizeof(int));
     int currentRooms = 0;
 
     //keeps adding room until it gets to randomized max num of rooms
@@ -146,12 +153,14 @@ void createRooms() {
             consec = 0;
         }
 
+        
         else {
             consec = 1;
 
             if (consec == 1)
                 num_fails++;
         }
+        
     }
 
     //create rooms then corridors
@@ -283,17 +292,18 @@ void staircase() {
     //randomly generate num between 1 and 2 and then place 1-2 of each staircase in a room
     //up stairs '<'
     up = (rand() % 2) + 1;
+    struct upstairs ups[up];
     for (i = 0; i < up; i++) {
 
         //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
         while (!isFloor) {
-            upS[i].up_x = (rand() % 79) + 1; //col
-            upS[i].up_y = (rand() % 20) + 1; //row
+            ups[i].up_x = (rand() % 79) + 1; //col
+            ups[i].up_y = (rand() % 20) + 1; //row
 
             //[up.up_y][up.up_x] == [row][col]
-            if (dungeon[upS[i].up_y][upS[i].up_x] == '.') {
-                dungeon[upS[i].up_y][upS[i].up_x] = '<';
-                hardness[upS[i].up_y][upS[i].up_x] = 0;
+            if (dungeon[ups[i].up_y][ups[i].up_x] == '.') {
+                dungeon[ups[i].up_y][ups[i].up_x] = '<';
+                hardness[ups[i].up_y][ups[i].up_x] = 0;
                 isFloor = true;
             }
         }
@@ -303,16 +313,17 @@ void staircase() {
 
     //down stairs '>'
     down = (rand() % 2) + 1;
+    struct downstairs downs[down];
     for (i = 0; i < down; i++) {
 
-        //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
+      //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
         while (!isFloor) {
-            downS[i].down_x = (rand() % 79) + 1;
-            downS[i].down_y = (rand() % 20) + 1;
+            downs[i].down_x = (rand() % 79) + 1;
+            downs[i].down_y = (rand() % 20) + 1;
 
-            if (dungeon[downS[i].down_y][downS[i].down_x] == '.') {
-                dungeon[downS[i].down_y][downS[i].down_x] = '>';
-                hardness[downS[i].down_y][downS[i].down_x] = 0;
+            if (dungeon[downs[i].down_y][downs[i].down_x] == '.') {
+                dungeon[downs[i].down_y][downs[i].down_x] = '>';
+                hardness[downs[i].down_y][downs[i].down_x] = 0;
                 isFloor = true;
             }
         }
