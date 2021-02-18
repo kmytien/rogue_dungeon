@@ -42,16 +42,6 @@ struct downstairs {
     uint8_t down_y;
 };
 
-int main(int argc, char* argv[]) {
-    //initialize dungeon
-    initDungeon();
-    //generating dungeon
-    //calls createCorridors and staircase()
-    createRooms();
-    //print dungeon
-    printDungeon();
-}
-
 //prints dungeon output
 void printDungeon() {
     int row, col;
