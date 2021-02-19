@@ -11,12 +11,12 @@ void printDungeon();
 void initDungeon();
 void createRooms();
 void staircase();
+void spawnPC();
 void createCorridors(int*,int);
 void setCorridors(int, int, int, int);
 bool legality(int, int, int, int);
 
 char dungeon[WORLD_ROW][WORLD_COL];
-int hardness[WORLD_ROW][WORLD_COL];
 int* roomsDimensions;
 uint16_t up;
 uint16_t down;
@@ -35,14 +35,24 @@ struct room {
 struct upstairs {
     uint8_t up_x;
     uint8_t up_y;
-} *upS[4];
+} *ups;
 
 //for downstairs
 struct downstairs {
     uint8_t down_x;
     uint8_t down_y;
-} *downS[4];
+} *downs;
 
+//for pc
+struct player {
+    uint8_t row;
+    uint8_t col;
+} pc;
+
+//for hardness
+struct hardness {
+    uint8_t hardness[WORLD_ROW][WORLD_COL];
+} d;
 
 //prints dungeon output
 void printDungeon() {
@@ -55,11 +65,11 @@ void printDungeon() {
             if (row == 0 || row == WORLD_ROW - 1)
                 printf("-");
 
-            //border
+                //border
             else if (col == 0 || col == WORLD_COL - 1)
                 printf("|");
 
-            //just used character '*' to represent immutable rock (outermost cells)
+                //just used character '*' to represent immutable rock (outermost cells)
             else if (dungeon[row][col] == '*')
                 printf(" ");
 
@@ -84,12 +94,12 @@ void initDungeon() {
             //if outermost cell, set as '@', a character representing immutable rock
             if (row > WORLD_ROW - 3 || row < 2 || col > WORLD_COL - 3 || col < 2) {
                 dungeon[row][col] = '*';
-                hardness[row][col] = 255;
+                d.hardness[row][col] = 255;
             }
 
             else {
                 dungeon[row][col] = ' ';
-                hardness[row][col] = (rand() % 254) + 1;
+                d.hardness[row][col] = (rand() % 254) + 1;
             }
         }
     }
@@ -127,7 +137,7 @@ void createRooms() {
             for (i = row_start; i < row_start + rand_vertical; i++) {
                 for (j = col_start; j < col_start + rand_horizontal; j++) {
                     dungeon[i][j] = '.';
-                    hardness[i][j] = 0;
+                    d.hardness[i][j] = 0;
                 }
             }
 
@@ -147,14 +157,14 @@ void createRooms() {
             consec = 0;
         }
 
-        
+
         else {
             consec = 1;
 
             if (consec == 1)
                 num_fails++;
         }
-        
+
     }
 
     //create rooms then corridors
@@ -223,7 +233,7 @@ void setCorridors(int fX, int fY, int eX, int eY) {
         for (int i = fX; i < eX; i++) {
             if (dungeon[i][fY] == ' ') {
                 dungeon[i][fY] = '#';
-                hardness[i][fY] = 0;
+                d.hardness[i][fY] = 0;
             }
         }
 
@@ -232,7 +242,7 @@ void setCorridors(int fX, int fY, int eX, int eY) {
             for (int i = fY; i < eY; i++) {
                 if (dungeon[eX][i] == ' ') {
                     dungeon[eX][i] = '#';
-                    hardness[eX][i] = 0;
+                    d.hardness[eX][i] = 0;
                 }
             }
         }
@@ -241,7 +251,7 @@ void setCorridors(int fX, int fY, int eX, int eY) {
             for (int i = fY; i > eY; i--) {
                 if (dungeon[eX][i] == ' ') {
                     dungeon[eX][i] = '#';
-                    hardness[eX][i] = 0;
+                    d.hardness[eX][i] = 0;
                 }
             }
         }
@@ -252,7 +262,7 @@ void setCorridors(int fX, int fY, int eX, int eY) {
         for (int i = fX; i > eX; i--) {
             if (dungeon[i][fY] == ' ') {
                 dungeon[i][fY] = '#';
-                hardness[i][fY] = 0;
+                d.hardness[i][fY] = 0;
             }
         }
 
@@ -261,7 +271,7 @@ void setCorridors(int fX, int fY, int eX, int eY) {
             for (int i = fY; i < eY; i++) {
                 if (dungeon[eX][i] == ' ') {
                     dungeon[eX][i] = '#';
-                    hardness[eX][i] = 0;
+                    d.hardness[eX][i] = 0;
                 }
             }
         }
@@ -270,7 +280,7 @@ void setCorridors(int fX, int fY, int eX, int eY) {
             for (int i = fY; i > eY; i--) {
                 if (dungeon[eX][i] == ' ') {
                     dungeon[eX][i] = '#';
-                    hardness[eX][i] = 0;
+                    d.hardness[eX][i] = 0;
                 }
             }
         }
@@ -286,7 +296,7 @@ void staircase() {
     //randomly generate num between 1 and 2 and then place 1-2 of each staircase in a room
     //up stairs '<'
     up = (rand() % 2) + 1;
-    struct upstairs ups[up];
+    ups = malloc(sizeof(struct upstairs) * 2);
     for (i = 0; i < up; i++) {
 
         //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
@@ -297,7 +307,7 @@ void staircase() {
             //[up.up_y][up.up_x] == [row][col]
             if (dungeon[ups[i].up_y][ups[i].up_x] == '.') {
                 dungeon[ups[i].up_y][ups[i].up_x] = '<';
-                hardness[ups[i].up_y][ups[i].up_x] = 0;
+                d.hardness[ups[i].up_y][ups[i].up_x] = 0;
                 isFloor = true;
             }
         }
@@ -307,21 +317,40 @@ void staircase() {
 
     //down stairs '>'
     down = (rand() % 2) + 1;
-    struct downstairs downs[down];
+    downs = malloc(sizeof(struct downstairs) * 2);
     for (i = 0; i < down; i++) {
 
-      //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
+        //pick 2 random numbers 1-78, 1-19, if that dungeon cell is a . then set as a stair and exit while loop
         while (!isFloor) {
             downs[i].down_x = (rand() % 79) + 1;
             downs[i].down_y = (rand() % 20) + 1;
 
             if (dungeon[downs[i].down_y][downs[i].down_x] == '.') {
                 dungeon[downs[i].down_y][downs[i].down_x] = '>';
-                hardness[downs[i].down_y][downs[i].down_x] = 0;
+                d.hardness[downs[i].down_y][downs[i].down_x] = 0;
                 isFloor = true;
             }
         }
 
         isFloor = false;
+    }
+
+    spawnPC();
+}
+
+void spawnPC () {
+    int x, y;
+    bool spawn = false;
+    srand(time(NULL));
+
+    while (!spawn) {
+        x = (rand() % 79) + 1;
+        y = (rand() % 20) + 1;
+
+        if (dungeon[y][x] == '.') {
+            pc.col = x;
+            pc.row = y;
+            spawn = true;
+        }
     }
 }
