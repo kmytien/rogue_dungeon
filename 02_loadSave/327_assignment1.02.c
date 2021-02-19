@@ -4,7 +4,6 @@
 #include <sys/stat.h>
 #include <stdint.h>
 #include <endian.h>
-#include "rlg327.c"
 #include <stdbool.h>
 #include <time.h>
 
@@ -423,7 +422,7 @@ void loadDungeon(char* filepath) {
 
     //read semantic file type marker
     char file_type[13];
-    fread(&file_type, 4, 1, f);
+    fread(&file_type, 1, 12, f);
 
     //read file version
     uint32_t version;
