@@ -27,8 +27,13 @@ int main(int argc, char* argv[]) {
 
 
     if (argc > 1) {
-	
-	if (argc == 2)
+	if (argc == 3) {
+		if ((strcmp("--save", argv[1]) == 0 && strcmp("--load", argv[2]) == 0) || (strcmp("--load", argv[1]) == 0 && strcmp("--save", argv[2]) == 0)) {
+		    loadDungeon(filepath);
+		    saveDungeon(filepath);
+		}
+        }
+	else if (argc == 2) {
 		if (strcmp("--save", argv[1]) == 0) {
 		    initDungeon();
 		    createRooms();
@@ -38,13 +43,7 @@ int main(int argc, char* argv[]) {
 		else if (strcmp("--load", argv[1]) == 0) {
 		    loadDungeon(filepath);
 		}
-
-	else if (argc == 3) {
-		if ((strcmp("--save", argv[1]) == 0 && strcmp("--load", argv[2]) == 0) || (strcmp("--load", argv[1]) == 0 && strcmp("--save", argv[2]) == 0)) {
-		    loadDungeon(filepath);
-		    saveDungeon(filepath);
-		}
-        }
+	}
 
         //generates and prints dungeon like normal
         return 0;
