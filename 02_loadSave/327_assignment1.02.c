@@ -64,6 +64,50 @@ struct hardness {
     uint8_t hardness[WORLD_ROW][WORLD_COL];
 } d;
 
+int main(int argc, char* argv[]) {
+
+    //make the .directory in home and set the directory name for reference
+    char *directory = getenv("HOME");
+    char *gameDir = ".rlg327";
+    char *savefile = "dungeon";
+    char *filepath = malloc((strlen(directory) + strlen(gameDir) + strlen(savefile) + 2 + 1) * sizeof(char));
+
+    mkdir(directory, S_IRWXU);
+    sprintf(filepath, "%s/%s/%s", directory, gameDir, savefile);
+    //printf("%s", filepath);
+
+
+    if (argc > 1) {
+
+        if (strcmp("--save", argv[1]) == 0) {
+            initDungeon();
+            createRooms();
+            printDungeon();
+            saveDungeon(filepath);
+        }
+
+        else if (strcmp("--load", argv[1]) == 0) {
+            loadDungeon(filepath);
+        }
+
+        else if ((strcmp("--save", argv[1]) == 0 && strcmp("--load", argv[2]) == 0) || (strcmp("--load", argv[1]) == 0 && strcmp("--save", argv[2]) == 0)) {
+            saveDungeon(filepath);
+            loadDungeon(filepath);
+        }
+
+        //generates and prints dungeon like normal
+        return 0;
+    }
+
+    else {
+        //generates and prints dungeon like normal
+        initDungeon();
+        createRooms();
+        printDungeon();
+        return 0;
+    }
+}
+
 //prints dungeon output
 void printDungeon() {
     int row, col;
@@ -364,51 +408,6 @@ void spawnPC () {
         }
     }
 }
-
-int main(int argc, char* argv[]) {
-
-    //make the .directory in home and set the directory name for reference
-    char *directory = getenv("HOME");
-    char *gameDir = ".rlg327";
-    char *savefile = "dungeon";
-    char *filepath = malloc((strlen(directory) + strlen(gameDir) + strlen(savefile) + 2 + 1) * sizeof(char));
-
-    mkdir(directory, S_IRWXU);
-    sprintf(filepath, "%s/%s/%s", directory, gameDir, savefile);
-    //printf("%s", filepath);
-
-
-    if (argc > 1) {
-
-        if (strcmp("--save", argv[1]) == 0) {
-            initDungeon();
-            createRooms();
-            printDungeon();
-            saveDungeon(filepath);
-        }
-
-        else if (strcmp("--load", argv[1]) == 0) {
-            loadDungeon(filepath);
-        }
-
-        else if ((strcmp("--save", argv[1]) == 0 && strcmp("--load", argv[2]) == 0) || (strcmp("--load", argv[1]) == 0 && strcmp("--save", argv[2]) == 0)) {
-            saveDungeon(filepath);
-            loadDungeon(filepath);
-        }
-
-        //generates and prints dungeon like normal
-        return 0;
-    }
-
-    else {
-        //generates and prints dungeon like normal
-        initDungeon();
-        createRooms();
-        printDungeon();
-        return 0;
-    }
-}
-
 
 //load-- read a dungeon from the file and print it
 void loadDungeon(char* filepath) {
