@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <endian.h>
 #include "rlg327.c"
+#include <stdbool.h>
+#include <time.h>
 
 #define WORLD_ROW 21
 #define WORLD_COL 80
