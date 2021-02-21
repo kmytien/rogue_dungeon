@@ -1,4 +1,4 @@
-# Assignment 1.02 | Dungeon Saving and Loading
+# Assignment 1.02 | Path Finding
 - This assignment is for CS 327 Spring 2021
 
 ## Project Team Members:
