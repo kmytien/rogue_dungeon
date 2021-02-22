@@ -22,6 +22,12 @@ typedef struct corridor_path {
   int32_t cost;
 } corridor_path_t;
 
+typedef struct monster_path {
+  heap_node_t *hn;
+  uint8_t pos[2];
+  uint32_t cost;
+} monster_path_t;
+
 typedef enum dim {
   dim_x,
   dim_y,
@@ -83,22 +89,33 @@ typedef struct dungeon {
 
 //DID NOT ADD static/unsigned int methods - not sure if we need to?
 int gen_dungeon(dungeon_t *d);
+
 void render_dungeon(dungeon_t *d);
+
 void delete_dungeon(dungeon_t *d);
+
 void init_dungeon(dungeon_t *d);
+
 int write_dungeon_map(dungeon_t *d, FILE *f);
+
 int write_rooms(dungeon_t *d, FILE *f);
+
 int write_stairs(dungeon_t *d, FILE *f);
+
 int makedirectory(char *dir);
+
 int write_dungeon(dungeon_t *d, char *file);
+
 int read_dungeon_map(dungeon_t *d, FILE *f);
+
 int read_stairs(dungeon_t *d, FILE *f);
+
 int read_rooms(dungeon_t *d, FILE *f);
+
 int read_dungeon(dungeon_t *d, char *file);
+
 int read_pgm(dungeon_t *d, char *pgm);
+
 void usage(char *name);
-
-
-
 
 #endif
