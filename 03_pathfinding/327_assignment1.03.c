@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "rlg327.c" //we really should have a header file, its the best practice
-#include "heap.h" //we have a header for heap right?
+//#include "heap.h" //we have a header for heap right? -rlg327 calls heap so we shouldnt need to unless we call it
 
 /**
     Notes:
