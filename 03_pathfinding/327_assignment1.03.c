@@ -111,11 +111,6 @@ void gen_distances(dungeon_t *d, int pcX, int pcY) {
     int i, j;
     // render pc at random spot
     pc(&d);
-
-    //generating distances by calling dijkstra_path for evey cell???? then set to defined int arrays??
-    while ((p = heap_remove_min(&heap))) {
-      p->hn = NULL;
-    }
 }
 
 static int32_t dijkstra_nontunnel(const void *key, const void *with) {
