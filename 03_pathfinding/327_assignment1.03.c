@@ -9,6 +9,8 @@ void pc(dungeon_t d, int pcX, int pcY)
 // FOR BOTH MAPS -1 SIGNIFIES THE PC
 int nt_dist[DUNGEON_Y][DUNGEON_X]; // int array that works as the distance map for non-tunneling -2 IS WALL
 int t_dist[DUNGEON_Y][DUNGEON_X]; // int array for the distance map for tunnelling monsters
+// for all cells
+    // d -> nt_dist[i][j] = paths[i][j].cost;
 
 /**
     Notes:
