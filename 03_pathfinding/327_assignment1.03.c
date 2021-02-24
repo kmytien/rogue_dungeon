@@ -33,7 +33,7 @@ void pc(dungeon_t *d) {
         x = (rand() % 80) + 1;
         y = (rand() % 20) + 1;
 
-        if(d->map[x][y] == ter_floor) {
+        if(d->map[y][x] == ter_floor) {
             d->pc[dim_x] = x;
             d->pc[dim_y] = y;
             placePC = true;
@@ -311,13 +311,11 @@ int main(int argc, char* argv[]) {
     dungeon_t *d;
     //generate a dungeon
 
-    if (argc > 1) {
-        gen_dungeon(d);
-        render_dungeon(d);
-    }
-    else if (argv[2] == "--load") {
-        //call load
-    }
+    
+    gen_dungeon(&d);
+    render_dungeon(&d);
+  
+  
 
     pc(d);
 
