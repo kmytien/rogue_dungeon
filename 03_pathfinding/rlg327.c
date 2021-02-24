@@ -36,6 +36,12 @@ typedef struct corridor_path {
     int32_t cost;
 } corridor_path_t;
 
+typedef struct monster_path {
+    heap_node_t *hn;
+    uint8_t pos[2];
+    uint32_t cost;
+} monster_path_t;
+
 typedef enum dim {
     dim_x,
     dim_y,
