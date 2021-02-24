@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <limits.h>
 #include "rlg327.h"
 
 // FOR BOTH MAPS -1 SIGNIFIES THE PC
@@ -25,7 +26,7 @@ typedef struct dijkstra_nontunnel {
 
 /**
     Notes:
-      - Need to use Djistka's Algorithm
+      - Need to use Dijkstra's Algorithm
       - Creating path finding algorithms for monsters
           - some can go through walls
           - some can only move through open space
@@ -42,14 +43,14 @@ typedef struct dijkstra_nontunnel {
 **/
 
 //cost for tunneling
-int tunnel_cost (dungeon_t *d, x, y) {
+int tunnel_cost (dungeon_t *d, int x, int y) {
     return (d->hardness[y][x] / 85);
 }
 
 // places the pc (@) in a random cell that is a floor (corridor or room)
 void pc(dungeon_t *d) {
   bool placePC = false;
-  int x, y;
+  int x, y, i, j;
 
   while(!placePC) {
     x = (rand() % 80) + 1;
@@ -72,7 +73,7 @@ static void dijkstra_nontunnel(dungeon_t *d)  {
   static monster_path_t path[DUNGEON_Y][DUNGEON_X], *p;
   static uint32_t initialized = 0;
   heap_t h;
-  uint32_t x, y;
+  uint32_t x, y, i, j;
 
   if (!initialized) {
     for (y = 0; y < DUNGEON_Y; y++) {
@@ -84,12 +85,13 @@ static void dijkstra_nontunnel(dungeon_t *d)  {
     initialized = 1;
   }
 
-  for (y = 0; y < DUNGEON_Y; y++) {
+  /** NOT SURE IF WE NEED THIS BC THIS INITIALIZES COST AS INT_SIZE FOR EVERY CELL AND SINCE WE DONT NEED COST IDK IF WE NEED THIS
+    for (y = 0; y < DUNGEON_Y; y++) {
     for (x = 0; x < DUNGEON_X; x++) {
       //path[y][x].cost = INT_MAX;
       d->nontunnel[y][x] = INT_MAX;
     }
-  }
+    } **/
 
   //path[from[dim_y]][from[dim_x]].cost = 0;
   d->nontunnel[d->pc[dim_y]][d->pc[dim_x]] = 0;
@@ -155,14 +157,14 @@ static void dijkstra_nontunnel(dungeon_t *d)  {
   // set the costs to the distance map
   for (i = 0; i < DUNGEON_Y; i++) {
     for (j = 0; j < DUNGEON_X; j++) {
-      d -> nt_dist[i][j] = paths[i][j].cost;
+      d -> nt_dist[i][j] = path[i][j].cost;
     }
   }
   // print the nontunnel map
   for (i = 1; i < DUNGEON_Y; i++) { // 1-20 x, 1-80 y?? for borders
     for (j = 1; j < DUNGEON_X; j++) {
       // gen dists for those who cannot tunnel (thru wall) ONLY SEARCH POINTS THAT ARE HARDNESS 0??
-      if (y == dungeon.pc[dim_y] && x == dungeon.pc[dim_x]){
+      if (y == d->pc[dim_y] && x == d->pc[dim_x]){
         printf("%c", '@');
       }
       else if(path[y][x].cost != INT_MAX) {
@@ -186,7 +188,7 @@ static void dijkstra_tunnel(dungeon_t *d)  {
   static monster_path_t path[DUNGEON_Y][DUNGEON_X], *p;
   static uint32_t initialized = 0;
   heap_t h;
-  uint32_t x, y;
+  uint32_t x, y, i, j;
 
   if (!initialized) {
     for (y = 0; y < DUNGEON_Y; y++) {
@@ -198,12 +200,13 @@ static void dijkstra_tunnel(dungeon_t *d)  {
     initialized = 1;
   }
 
-  for (y = 0; y < DUNGEON_Y; y++) {
+  /** SEE LAST INSTANCE OF THIS IN THE NON TUNNEL DIJKSTRA
+     for (y = 0; y < DUNGEON_Y; y++) {
     for (x = 0; x < DUNGEON_X; x++) {
       //path[y][x].cost = INT_MAX;
       d->tunnel[y][x] = INT_MAX;
     }
-  }
+    } **/
 
   //path[from[dim_y]][from[dim_x]].cost = 0;
   d->tunnel[d->pc[dim_y]][d->pc[dim_x]] = 0;
@@ -270,7 +273,7 @@ static void dijkstra_tunnel(dungeon_t *d)  {
   // set the cost equal to the map cells
   for (i = 0; i < DUNGEON_Y; i++) {
     for (j = 0; j < DUNGEON_X; j++) {
-      d -> t_dist[i][j] = paths[i][j].cost;
+      d->t_dist[i][j] = path[i][j].cost;
     }
   }
 
@@ -278,7 +281,7 @@ static void dijkstra_tunnel(dungeon_t *d)  {
   for (i = 1; i < DUNGEON_Y; i++) { // 1-20 x, 1-80 y?? for borders
     for (j = 1; j < DUNGEON_X; j++) {
       // gen dists for those who cannot tunnel (thru wall) ONLY SEARCH POINTS THAT ARE HARDNESS 0??
-      if (y == dungeon.pc[dim_y] && x == pos[dim_x]){
+      if (y == d->pc[dim_y] && x == d->pc[dim_x]){
         printf("%c", '@');
       } else if(path[y][x].cost != INT_MAX) {
         printf("%d", path[y][x].cost % 10);
@@ -301,11 +304,10 @@ static void dijkstra_tunnel(dungeon_t *d)  {
       // call load
     }
 
-    int pcX, pcY;
-    placePC(&d, &pcX, pcY);
+    pc(d);
 
-    dijkstra_tunnel(&d, pcX, pcY);
-    dijkstra_nontunnel(&d, pcX, pcY);
+    dijkstra_tunnel(d);
+    dijkstra_nontunnel(d);
 
     
     // calculate all distance maps
