@@ -1,46 +1,11 @@
 #makefile for 1.03 pathfinding
-CC = gcc
-CXX = g++
-ECHO = echo
-RM = rm -f
+all: 327_assignment1.03 rlg327 heap
 
-TERM = "\"S2021\""
-
-CFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
-CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
-
-LDFLAGS = 
-
-BIN = rlg327 327_assignment1.03
-OBJS = rlg327.o heap.o 327_assignment1.03.o
-
-all: $(BIN) etags
-
-$(BIN): $(OBJS)
-	@$(ECHO) Linking $@
-	@$(CC) $^ -o $@ $(LDFLAGS)
-
--include $(OBJS:.o=.d)
-
-%.o: %.c
-	@$(ECHO) Compiling $<
-	@$(CC) $(CFLAGS) -MMD -MF $*.d -c $<
-
-%.o: %.cpp
-	@$(ECHO) Compiling $<
-	@$(CXX) $(CXXFLAGS) -MMD -MF $*.d -c $<
-
-.PHONY: all clean clobber etags
-
+327_assignment1.03: 327_assignment1.03.c
+	gcc 327_assignment1.03.c -o 327_assignment1.03
+rlg327: rlg327.c rlg327.h
+	gcc rlg327.c -o rlg327
+heap: heap.c heap.h
+	gcc heap.c -o heap
 clean:
-	@$(ECHO) Removing all generated files
-	@$(RM) *.o $(BIN) *.d TAGS core vgcore.* gmon.out
-
-clobber: clean
-	@$(ECHO) Removing backup files
-	@$(RM) *~ \#* *pgm
-
-etags:
-	@$(ECHO) Updating TAGS
-	@etags *.[ch]
-
+	rm -f 327_assignment1.03 rlg327 heap
