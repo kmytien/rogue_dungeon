@@ -3,14 +3,25 @@
 #include <stdbool.h>
 #include "rlg327.h"
 
-void pc(dungeon_t*);
-static void dijkstra_nontunnel(dungeon_t);
-
 // FOR BOTH MAPS -1 SIGNIFIES THE PC
 int nt_dist[DUNGEON_Y][DUNGEON_X]; // int array that works as the distance map for non-tunneling -2 IS WALL
 int t_dist[DUNGEON_Y][DUNGEON_X]; // int array for the distance map for tunnelling monsters
 // for all cells
     // d -> nt_dist[i][j] = paths[i][j].cost;
+
+typedef struct dijkstra_nontunnel {
+    heap_node_t *hn;
+    uint8_t pos[2];
+    uint8_t from[2];
+    int32_t cost;
+  } dijkstra_nontunnel_t;
+    
+  typedef struct dijkstra_tunnel {
+    heap_node_t *hn;
+    uint8_t pos[2];
+    uint8_t from[2];
+    int32_t cost;
+  } dijkstra_tunnel_t;
 
 /**
     Notes:
@@ -29,19 +40,6 @@ int t_dist[DUNGEON_Y][DUNGEON_X]; // int array for the distance map for tunnelli
         - printDungeon view that prints all three views
       - Probably should use his code for 1.01 & 1.02
 **/
-
-int main(int argc, char* argv[]) {
-    dungeon_t *d;
-    // generate a dungeon
-    if (argc == 1)
-      gen_dungeon(d);
-      render_dungeon(d);
-    else if (argv[2] == "--load") {
-      // call load
-    }
-
-    // calculate all distance maps
-}
 
 //cost for tunneling
 int tunnel_cost (dungeon_t *d, x, y) {
@@ -66,7 +64,7 @@ void pc(dungeon_t *d) {
 }
 
 static int32_t dijkstra_nontunnel_cmp(const void *key, const void *with) {
-  return ((dijkstra_nontunnel*) key) ->cost - ((dijkstra_nontunnel*) with) ->cost;
+  return ((dijkstra_nontunnel_t *) key) ->cost - ((dijkstra_nontunnel_t *) with) ->cost;
 }
 
 //FOR MONSTERS WHO CAN'T TUNNEL
@@ -180,7 +178,7 @@ static void dijkstra_nontunnel(dungeon_t *d)  {
 }
 
 static int32_t dijkstra_tunnel_cmp(const void *key, const void *with) {
-  return ((dijkstra_nontunnel*) key) ->cost - ((dijkstra_nontunnel*) with) ->cost;
+  return ((dijkstra_tunnel_t *) key) ->cost - ((dijkstra_tunnel_t *) with) ->cost;
 }
 
 //FOR MONSTERS WHO CAN TUNNEL
@@ -291,4 +289,25 @@ static void dijkstra_tunnel(dungeon_t *d)  {
     }
   }
  }
+
+ int main(int argc, char* argv[]) {
+    dungeon_t *d;
+    // generate a dungeon
+    if (argc > 1) {
+      gen_dungeon(d);
+      render_dungeon(d);
+    }
+    else if (argv[2] == "--load") {
+      // call load
+    }
+
+    int pcX, pcY;
+    placePC(&d, &pcX, pcY);
+
+    dijkstra_tunnel(&d, pcX, pcY);
+    dijkstra_nontunnel(&d, pcX, pcY);
+
+    
+    // calculate all distance maps
+  }
 }
