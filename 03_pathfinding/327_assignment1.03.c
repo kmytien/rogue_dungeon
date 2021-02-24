@@ -9,40 +9,15 @@
 // FOR BOTH MAPS -1 SIGNIFIES THE PC
 int nt_dist[DUNGEON_Y][DUNGEON_X]; // int array that works as the distance map for non-tunneling -2 IS WALL
 int t_dist[DUNGEON_Y][DUNGEON_X]; // int array for the distance map for tunnelling monsters
+
 // for all cells
 // d -> nt_dist[i][j] = paths[i][j].cost;
 
-typedef struct dijkstra_nontunnel {
-    heap_node_t *hn;
-    uint8_t pos[2];
-    uint8_t from[2];
-    int32_t cost;
-} dijkstra_nontunnel_t;
 
-typedef struct dijkstra_tunnel {
-    heap_node_t *hn;
-    uint8_t pos[2];
-    uint8_t from[2];
-    int32_t cost;
-} dijkstra_tunnel_t;
+//defining functions
+int tunnel_cost(dungeon_t *d, int x, int y);
+void pc(dungeon_t *d);
 
-/**
-    Notes:
-      - Need to use Dijkstra's Algorithm
-      - Creating path finding algorithms for monsters
-          - some can go through walls
-          - some can only move through open space
-      - Output: "Your submission, when run, should generate a dungeon, calculate all distance maps, render all three
-        views of the dungeon (the “standard” view and the two distance maps), and exit."
-      - Method: "A na¨ıve implementation will call pathfinding for every monster in the dungeon, but in practice, every
-        monster is trying to get to the same place, so rather than calculating paths from the monsters to the player
-        character (PC), we can instead calculate the distance from the PC to every point in the dungeon, and this
-        only needs to be updated when the PC moves or the dungeon changes. Each monster will choose to move to
-        the neighboring cell with the lowest distance to PC."
-        - have a method that calcs distance to every point that calls dijkstrasMethod
-        - printDungeon view that prints all three views
-      - Probably should use his code for 1.01 & 1.02
-**/
 
 //cost for tunneling
 int tunnel_cost (dungeon_t *d, int x, int y) {
@@ -329,8 +304,10 @@ static void dijkstra_tunnel(dungeon_t *d)  {
             }
         }
     }
+}
 
- int main(int argc, char* argv[]) {
+
+int main(int argc, char* argv[]) {
     dungeon_t *d;
     //generate a dungeon
 
@@ -350,4 +327,3 @@ static void dijkstra_tunnel(dungeon_t *d)  {
 
     //calculate all distance maps
  }
-}
