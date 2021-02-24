@@ -1,3 +1,7 @@
+02/24/21 13:10 MK: Fixed rlg327 header file and cleaned up main file
+02/23/21 22:00 MK: Redid Dijkstra methods for both tunnel and nontunneling monsters
+02/23/21 18:00 HL SA: Debugged a lot of methods
+02/23/21 16:30 HL SA ML: Worked on finishing methods
 02/22/21 16:00 MK HL SA: Worked on Dijstrka's methods. gen_distances, print_maps, and main
 02/21/21 16:00 MK HL: Outlined assignment functions
 02/20/21 11:30 HL: Made Makefile, CHANGELOG, README, and 327_assignment1.03.c
