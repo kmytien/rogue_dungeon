@@ -84,6 +84,8 @@ typedef struct dungeon {
    * and pulling in unnecessary data with each map cell would add a lot   *
    * of overhead to the memory system.                                    */
   uint8_t hardness[DUNGEON_Y][DUNGEON_X];
+  uint8_t nontunnel[DUNGEON_Y][DUNGEON_X];
+  uint8_t tunnel[DUNGEON_Y][DUNGEON_X];
   pair_t pc;
 } dungeon_t;
 
