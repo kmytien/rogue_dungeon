@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <limits.h>
+
+#include "heap.h" //changed from .h for both bc i cant figure out why im getting errorssss-h
 #include "rlg327.h"
 
 // FOR BOTH MAPS -1 SIGNIFIES THE PC
@@ -327,9 +329,8 @@ static void dijkstra_tunnel(dungeon_t *d)  {
             }
         }
     }
-}
 
-int main(int argc, char* argv[]) {
+ int main(int argc, char* argv[]) {
     dungeon_t *d;
     //generate a dungeon
 
@@ -348,4 +349,5 @@ int main(int argc, char* argv[]) {
 
 
     //calculate all distance maps
+ }
 }
