@@ -9,17 +9,15 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <errno.h>
+#include "rlg327.h"
 
-#include "heap.h"
-
+/**
 #define DUMP_HARDNESS_IMAGES 0
 
-/* Returns true if random float in [0,1] is less than *
- * numerator/denominator.  Uses only integer math.    */
+
 # define rand_under(numerator, denominator) \
   (rand() < ((RAND_MAX / denominator) * numerator))
 
-/* Returns random integer in [min, max]. */
 # define rand_range(min, max) ((rand() % (((max) + 1) - (min))) + (min))
 # define UNUSED(f) ((void) f)
 
@@ -89,14 +87,6 @@ typedef struct dungeon {
     uint16_t num_rooms;
     room_t *rooms;
     terrain_type_t map[DUNGEON_Y][DUNGEON_X];
-    /* Since hardness is usually not used, it would be expensive to pull it *
-     * into cache every time we need a map cell, so we store it in a        *
-     * parallel array, rather than using a structure to represent the       *
-     * cells.  We may want a cell structure later, but from a performanace  *
-     * perspective, it would be a bad idea to ever have the map be part of  *
-     * that structure.  Pathfinding will require efficient use of the map,  *
-     * and pulling in unnecessary data with each map cell would add a lot   *
-     * of overhead to the memory system.                                    */
     uint8_t hardness[DUNGEON_Y][DUNGEON_X];
     uint8_t nontunnel[DUNGEON_Y][DUNGEON_X];
     uint8_t tunnel[DUNGEON_Y][DUNGEON_X];
@@ -104,6 +94,8 @@ typedef struct dungeon {
     uint8_t t_dist[DUNGEON_Y][DUNGEON_X];
     pair_t pc;
 } dungeon_t;
+**/
+
 
 static uint32_t in_room(dungeon_t *d, int16_t y, int16_t x) {
     int i;
