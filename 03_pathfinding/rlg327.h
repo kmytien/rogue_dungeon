@@ -2,18 +2,40 @@
 #define RLG327_H
 
 #include "heap.h"
+#include <stdio.h>
 
 #define DUMP_HARDNESS_IMAGES 0
-#define rand_under(numerator, denominator) \ (rand() < ((RAND_MAX / denominator) * numerator))
-#define rand_range(min, max) ((rand() % (((max) + 1) - (min))) + (min))
 
-#define UNUSED(f) ((void) f)
+/* Returns true if random float in [0,1] is less than *
+ * numerator/denominator.  Uses only integer math.    */
+# define rand_under(numerator, denominator) \
+  (rand() < ((RAND_MAX / denominator) * numerator))
+
+/* Returns random integer in [min, max]. */
+# define rand_range(min, max) ((rand() % (((max) + 1) - (min))) + (min))
+# define UNUSED(f) ((void) f)
 
 #define malloc(size) ({          \
-void *_tmp;                      \
-assert((_tmp = malloc(size)));   \
-    _tmp;                        \
+  void *_tmp;                    \
+  assert((_tmp = malloc(size))); \
+  _tmp;                          \
 })
+
+typedef struct dijkstra_nontunnel {
+    heap_node_t *hn;
+    uint8_t pos[2];
+    uint8_t from[2];
+    int32_t cost;
+} dijkstra_nontunnel_t;
+
+
+typedef struct dijkstra_tunnel {
+    heap_node_t *hn;
+    uint8_t pos[2];
+    uint8_t from[2];
+    int32_t cost;
+} dijkstra_tunnel_t;
+
 
 typedef struct corridor_path {
     heap_node_t *hn;
