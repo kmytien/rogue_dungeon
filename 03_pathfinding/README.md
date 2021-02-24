@@ -3,7 +3,7 @@
 - We used Prof. Sheaffer's 1.02 assignment code for this assignment 
 - This project was designed to implement a paths using the Dijkstra’s Algorithm
 - Some monsters will be able to tunnel through walls 
-- The rest can move hrough open space 
+- The rest can move through open space 
 
 ## Project Team Members:
 - MyTien Kien *(kmytien)*
