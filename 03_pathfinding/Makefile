@@ -9,4 +9,4 @@ rlg327: rlg327.c rlg327.h
 heap: heap.c heap.h
 	gcc heap.c -o heap
 clean:
-	rm -f 327_assignment1.03 rlg327 heap
+	rm -f 327_assignment1.03 rlg327 heap run
