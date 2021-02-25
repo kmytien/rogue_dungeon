@@ -173,25 +173,25 @@ static void dijkstra_nontunnel(dungeon_t *d)  {
         for (pa[dim_x] = 0; pa[dim_x] < DUNGEON_X; pa[dim_x]++) {
         
             if (pa[dim_x] == d->pc[dim_x] && pa[dim_y] == d->pc[dim_y]) 
-                putchar('@');
+                printf("%c", '@');
             
             else {
             	if (mappair(pa) == ter_wall_immutable || mappair(pa) == ter_wall)
-            	    putchar(' ');
+            	    printf("%c", ' ');
             	
             	else if (mappair(pa) == ter_floor || mappair(pa) == ter_floor_room || mappair(pa) == ter_floor_hall 
 		    	 || mappair(pa) == ter_stairs || mappair(pa) == ter_stairs_up || mappair(pa) == ter_stairs_down) {
 		 
 		    if (path[pa[dim_y]][pa[dim_x]].cost == INT_MAX) //d->nt_dist[pa[dim_y]][pa[dim_x]] == UCHAR_MAX){
-                         putchar('X');
+                         printf("%c", 'X');
                          
                     else
-                         putchar('0' + path[pa[dim_y]][pa[dim_x]].cost % 10);//d->nt_dist[pa[dim_y]][pa[dim_x]] % 10);
+                         printf("%d", path[pa[dim_y]][pa[dim_x]].cost % 10);//d->nt_dist[pa[dim_y]][pa[dim_x]] % 10);
                     	 
 		}
             }
         }
-        putchar('\n');
+        printf("\n");
     }
     
 }
@@ -310,39 +310,39 @@ static void dijkstra_tunnel(dungeon_t *d)  {
     
     heap_delete(&h);
     
-    /**
+    
     //set the cost equal to the map cells
     for (i = 0; i < DUNGEON_Y; i++) {
         for (j = 0; j < DUNGEON_X; j++) {
             d->t_dist[i][j] = path[i][j].cost;
         }
     }
-    **/
+    
     
     pair_t pa;
     for (pa[dim_y] = 0; pa[dim_y] < DUNGEON_Y; pa[dim_y]++) {
         for (pa[dim_x] = 0; pa[dim_x] < DUNGEON_X; pa[dim_x]++) {
         
             if (pa[dim_x] == d->pc[dim_x] && pa[dim_y] == d->pc[dim_y]) 
-                putchar('@');
+                printf("%c", '@');
             
             else {
             	if (mappair(pa) == ter_wall_immutable || mappair(pa) == ter_wall)
-            	    putchar(' ');
+            	    printf("%c", ' ');
             	
             	else if (mappair(pa) == ter_floor || mappair(pa) == ter_floor_room || mappair(pa) == ter_floor_hall 
 		    	 || mappair(pa) == ter_stairs || mappair(pa) == ter_stairs_up || mappair(pa) == ter_stairs_down) {
 		 
 		    if (path[pa[dim_y]][pa[dim_x]].cost == INT_MAX) //d->nt_dist[pa[dim_y]][pa[dim_x]] == UCHAR_MAX){
-                         putchar('X');
+                         printf("%c", 'X');
                          
                     else
-                         putchar('0' + path[pa[dim_y]][pa[dim_x]].cost % 10);//d->nt_dist[pa[dim_y]][pa[dim_x]] % 10);
+                         printf("%d", path[pa[dim_y]][pa[dim_x]].cost % 10);//d->nt_dist[pa[dim_y]][pa[dim_x]] % 10);
                     	 
 		}
             }
         }
-        putchar('\n');
+        printf("\n");
     }
 }
 
