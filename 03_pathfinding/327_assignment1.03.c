@@ -18,14 +18,14 @@ int t_dist[DUNGEON_Y][DUNGEON_X]; // int array for the distance map for tunnelli
 
 
 //defining functions
-int tunnel_cost(dungeon_t *d, int x, int y);
+//int tunnel_cost(dungeon_t *d, int x, int y);
 void pc(dungeon_t *d);
 
 
 //cost for tunneling
-int tunnel_cost (dungeon_t *d, int x, int y) {
-    return 1 + (d->hardness[y][x] / 85);
-}
+//int tunnel_cost (dungeon_t *d, int x, int y) {
+//    return 1 + (d->hardness[y][x] / 85);
+//}
 
 // places the pc (@) in a random cell that is a floor (corridor or room)
 void pc(dungeon_t *d) {
@@ -66,22 +66,25 @@ static void dijkstra_nontunnel(dungeon_t *d)  {
     }
 
     // NOT SURE IF WE NEED THIS BC THIS INITIALIZES COST AS INT_SIZE FOR EVERY CELL AND SINCE WE DONT NEED COST IDK IF WE NEED THIS
-      for (y = 0; y < DUNGEON_Y; y++) {
-          for (x = 0; x < DUNGEON_X; x++) {
+    for (y = 0; y < DUNGEON_Y; y++) {
+        for (x = 0; x < DUNGEON_X; x++) {
             path[y][x].cost = INT_MAX;
-            //d->nontunnel[y][x] = INT_MAX;
-          }
-      }
+            d->nt_dist[y][x] = 255;
+        }
+    }
+
+    
 
     path[d->pc[dim_y]][d->pc[dim_x]].cost = 0;
     //d->nontunnel[d->pc[dim_y]][d->pc[dim_x]] = 0;
+    //d->nt_dist[d->pc[dim_y]][d->pc[dim_x]] = 0;
 
     //going to change so its not focusing on corridors
     heap_init(&h, dijkstra_nontunnel_cmp, NULL);
 
     for (y = 0; y < DUNGEON_Y; y++) {
         for (x = 0; x < DUNGEON_X; x++) {
-            if (mapxy(x, y) != ter_wall_immutable) {
+            if (hardnessxy(x, y) == 0) {//mapxy(x, y) >= ter_floor) {
                 path[y][x].hn = heap_insert(&h, &path[y][x]);
             } else {
                 path[y][x].hn = NULL;
@@ -92,88 +95,105 @@ static void dijkstra_nontunnel(dungeon_t *d)  {
 
     while ((p = heap_remove_min(&h))) {
         p->hn = NULL;
+        
+        //int tunnelcost = tunnel_cost(d, p->pos[dim_x], p->pos[dim_y]);
+        //d->nt_dist[p->pos[dim_y]][p->pos[dim_x]] = p->cost;
 
-        if ((path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost > p->cost)) {
+        if ((path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost > (p->cost + tunnel_cost(p->pos)))) {
             //(d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x] - 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
-            path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost = p->cost + 1;
+            path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x] - 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].hn);
         }
 
-        if ((path[p->pos[dim_y] - 1][p->pos[dim_x]].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x]].cost > p->cost)) {
+        if ((path[p->pos[dim_y] - 1][p->pos[dim_x]].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x]].cost > (p->cost + tunnel_cost(p->pos)))) {
             //(d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x]] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
-            path[p->pos[dim_y] - 1][p->pos[dim_x]    ].cost = p->cost + 1;
+            path[p->pos[dim_y] - 1][p->pos[dim_x]    ].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x]] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1][p->pos[dim_x]].hn);
         }
 
-        if ((path[p->pos[dim_y]][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost > p->cost)) {
+        if ((path[p->pos[dim_y]][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost > (p->cost + tunnel_cost(p->pos)))) {
             //(d->nontunnel[p->pos[dim_y]][p->pos[dim_x] - 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
-            path[p->pos[dim_y]    ][p->pos[dim_x] - 1].cost = p->cost + hardnesspair(p->pos);
+            path[p->pos[dim_y]    ][p->pos[dim_x] - 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y]][p->pos[dim_x] - 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y]][p->pos[dim_x] - 1].hn);
         }
 
-        if ((path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].cost > p->cost)) {
+        if ((path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].cost > (p->cost + tunnel_cost(p->pos)))) {
             //(d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x] - 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
-            path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].cost = p->cost + 1;
+            path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x] - 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] +  1][p->pos[dim_x] - 1].hn);
         }
 
-        if ((path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].cost > p->cost)) {
+        if ((path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].cost > (p->cost + tunnel_cost(p->pos)))) {
             //(d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x] + 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
-            path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].cost = p->cost + 1;
+            path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x] + 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].hn);
         }
 
-        if ((path[p->pos[dim_y]][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y]][p->pos[dim_x] + 1].cost > p->cost)) {
+        if ((path[p->pos[dim_y]][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y]][p->pos[dim_x] + 1].cost > (p->cost + tunnel_cost(p->pos)))) {
             //(d->nontunnel[p->pos[dim_y]][p->pos[dim_x] + 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
-            path[p->pos[dim_y]    ][p->pos[dim_x] + 1].cost = p->cost + 1;
+            path[p->pos[dim_y]    ][p->pos[dim_x] + 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y]][p->pos[dim_x] + 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y]    ][p->pos[dim_x] + 1].hn);
         }
 
-        if ((path[p->pos[dim_y] + 1][p->pos[dim_x]].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x]].cost > p->cost)) {
+        if ((path[p->pos[dim_y] + 1][p->pos[dim_x]].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x]].cost > (p->cost + tunnel_cost(p->pos)))) {
             //(d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x]] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
-            path[p->pos[dim_y] + 1][p->pos[dim_x]    ].cost = p->cost + 1;
+            path[p->pos[dim_y] + 1][p->pos[dim_x]    ].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x]] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1][p->pos[dim_x]    ].hn);
         }
 
-        if ((path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].cost > p->cost)) {
+        if ((path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].cost > (p->cost + tunnel_cost(p->pos)))) {
             //(d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x] + 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
-            path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].cost = p->cost + 1;
+            path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x] + 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].hn);
-        }   
-        
+        }
     }
     
-       // set the costs to the distance map
-	for (i = 0; i < DUNGEON_Y; i++) {
-		for (j = 0; j < DUNGEON_X; j++) {
-		        d -> nt_dist[i][j] = path[i][j].cost;
-		 }
-	}
-
-        // print the nontunnel map
-        for (y = 1; y < DUNGEON_Y; y++) { // 1-20 x, 1-80 y?? for borders
-            for (x = 1; x < DUNGEON_X; x++) {
-                // gen dists for those who cannot tunnel (thru wall) ONLY SEARCH POINTS THAT ARE HARDNESS 0??
-                if (y == d->pc[dim_y] && x == d->pc[dim_x]){
-                    printf("%c", '@');
-                }
-                else if(path[y][x].cost != INT_MAX) {
-                    printf("%d", path[y][x].cost % 10);
-                }
-                else {
-                    printf("%c", ' ');
-                }
-                printf("\n");
+    heap_delete(&h);
+    
+    
+    // set the costs to the distance map
+    for (i = 0; i < DUNGEON_Y; i++) {
+        for (j = 0; j < DUNGEON_X; j++) {
+            d->nt_dist[i][j] = path[i][j].cost;
+        }
+    }
+    
+    
+    pair_t pa;
+    
+    for (pa[dim_y] = 0; pa[dim_y] < DUNGEON_Y; pa[dim_y]++) {
+        for (pa[dim_x] = 0; pa[dim_x] < DUNGEON_X; pa[dim_x]++) {
+        
+            if (pa[dim_x] == d->pc[dim_x] && pa[dim_y] == d->pc[dim_y]) 
+                putchar('@');
+            
+            else {
+            	if (mappair(pa) == ter_wall_immutable || mappair(pa) == ter_wall)
+            	    putchar(' ');
+            	
+            	else if (mappair(pa) == ter_floor || mappair(pa) == ter_floor_room || mappair(pa) == ter_floor_hall 
+		    	 || mappair(pa) == ter_stairs || mappair(pa) == ter_stairs_up || mappair(pa) == ter_stairs_down) {
+		 
+		    if (path[pa[dim_y]][pa[dim_x]].cost == INT_MAX) //d->nt_dist[pa[dim_y]][pa[dim_x]] == UCHAR_MAX){
+                         putchar('X');
+                         
+                    else
+                         putchar('0' + path[pa[dim_y]][pa[dim_x]].cost % 10);//d->nt_dist[pa[dim_y]][pa[dim_x]] % 10);
+                    	 
+		}
             }
         }
+        putchar('\n');
+    }
+    
 }
 
 
@@ -203,7 +223,7 @@ static void dijkstra_tunnel(dungeon_t *d)  {
       for (y = 0; y < DUNGEON_Y; y++) {
           for (x = 0; x < DUNGEON_X; x++) {
             path[y][x].cost = INT_MAX;
-            //d->tunnel[y][x] = INT_MAX;
+            d->t_dist[y][x] = 0;
           }
       }
 
@@ -228,109 +248,107 @@ static void dijkstra_tunnel(dungeon_t *d)  {
     while ((p = heap_remove_min(&h))) {
         p->hn = NULL;
 
-        int tunnelcost = tunnel_cost(d, p->pos[dim_x], p->pos[dim_y]);
+        //int tunnelcost = 1;
+        //d->t_dist[p->pos[dim_y]][p->pos[dim_x]] = p->cost;
 
-        if ((path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost > p->cost + tunnelcost)) {
-            //(d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x] - 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1) {
-            path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost = p->cost + tunnelcost;
+        if ((path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost > p->cost + tunnel_cost(p->pos))) {
+            //(d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x] - 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
+            path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x] - 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].hn);
         }
 
-        if ((path[p->pos[dim_y] - 1][p->pos[dim_x]].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x]].cost > p->cost + tunnelcost)) {
-            //(d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x]] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1) {
-            path[p->pos[dim_y] - 1][p->pos[dim_x]    ].cost = p->cost + tunnelcost;
+        if ((path[p->pos[dim_y] - 1][p->pos[dim_x]].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x]].cost > p->cost + tunnel_cost(p->pos))) {
+            //(d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x]] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
+            path[p->pos[dim_y] - 1][p->pos[dim_x]    ].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x]] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1][p->pos[dim_x]].hn);
         }
 
-        if ((path[p->pos[dim_y]][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost > p->cost + tunnelcost)) {
-            //(d->nontunnel[p->pos[dim_y]][p->pos[dim_x] - 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1) {
-            path[p->pos[dim_y]    ][p->pos[dim_x] - 1].cost = p->cost + tunnelcost;
+        if ((path[p->pos[dim_y]][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] - 1].cost > p->cost + tunnel_cost(p->pos))) {
+            //(d->nontunnel[p->pos[dim_y]][p->pos[dim_x] - 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
+            path[p->pos[dim_y]    ][p->pos[dim_x] - 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y]][p->pos[dim_x] - 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y]][p->pos[dim_x] - 1].hn);
         }
 
-        if ((path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].cost > p->cost + tunnelcost)) {
-            //(d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x] - 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1) {
-            path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].cost = p->cost + tunnelcost;
+        if ((path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].cost > p->cost + tunnel_cost(p->pos))) {
+            //(d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x] - 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
+            path[p->pos[dim_y] + 1][p->pos[dim_x] - 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x] - 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] +  1][p->pos[dim_x] - 1].hn);
         }
 
-        if ((path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].cost > p->cost + tunnelcost)) {
-            //(d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x] + 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1) {
-            path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].cost = p->cost + tunnelcost;
+        if ((path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].cost > p->cost + tunnel_cost(p->pos))) {
+            //(d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x] + 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
+            path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] - 1][p->pos[dim_x] + 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] - 1][p->pos[dim_x] + 1].hn);
         }
 
-        if ((path[p->pos[dim_y]][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y]][p->pos[dim_x] + 1].cost > p->cost + tunnelcost)) {
-            //(d->nontunnel[p->pos[dim_y]][p->pos[dim_x] + 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1) {
-            path[p->pos[dim_y]    ][p->pos[dim_x] + 1].cost = p->cost + tunnelcost;
+        if ((path[p->pos[dim_y]][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y]][p->pos[dim_x] + 1].cost > p->cost + tunnel_cost(p->pos))) {
+            //(d->nontunnel[p->pos[dim_y]][p->pos[dim_x] + 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
+            path[p->pos[dim_y]    ][p->pos[dim_x] + 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y]][p->pos[dim_x] + 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y]    ][p->pos[dim_x] + 1].hn);
         }
 
-        if ((path[p->pos[dim_y] + 1][p->pos[dim_x]].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x]].cost > p->cost + tunnelcost)) {
-            //(d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x]] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1) {
-            path[p->pos[dim_y] + 1][p->pos[dim_x]    ].cost = p->cost + tunnelcost;
+        if ((path[p->pos[dim_y] + 1][p->pos[dim_x]].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x]].cost > p->cost + tunnel_cost(p->pos))) {
+            //(d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x]] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
+            path[p->pos[dim_y] + 1][p->pos[dim_x]    ].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x]] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1][p->pos[dim_x]    ].hn);
         }
 
-        if ((path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].cost > p->cost + tunnelcost)) {
-            //(d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x] + 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1) {
-            path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].cost = p->cost + tunnelcost;
+        if ((path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].hn) && (path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].cost > p->cost + tunnel_cost(p->pos))) {
+            //(d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x] + 1] > d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1)) {
+            path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].cost = p->cost + tunnel_cost(p->pos);
             //d->nontunnel[p->pos[dim_y] + 1][p->pos[dim_x] + 1] = d->nontunnel[p->pos[dim_y]][p->pos[dim_x]] + 1;
             heap_decrease_key_no_replace(&h, path[p->pos[dim_y] + 1][p->pos[dim_x] + 1].hn);
         }
     }
     
-    // set the cost equal to the map cells
-        for (i = 0; i < DUNGEON_Y; i++) {
-            for (j = 0; j < DUNGEON_X; j++) {
-                d->t_dist[i][j] = path[i][j].cost;
+    heap_delete(&h);
+    
+    /**
+    //set the cost equal to the map cells
+    for (i = 0; i < DUNGEON_Y; i++) {
+        for (j = 0; j < DUNGEON_X; j++) {
+            d->t_dist[i][j] = path[i][j].cost;
+        }
+    }
+    **/
+    
+    pair_t pa;
+    for (pa[dim_y] = 0; pa[dim_y] < DUNGEON_Y; pa[dim_y]++) {
+        for (pa[dim_x] = 0; pa[dim_x] < DUNGEON_X; pa[dim_x]++) {
+        
+            if (pa[dim_x] == d->pc[dim_x] && pa[dim_y] == d->pc[dim_y]) 
+                putchar('@');
+            
+            else {
+            	if (mappair(pa) == ter_wall_immutable || mappair(pa) == ter_wall)
+            	    putchar(' ');
+            	
+            	else if (mappair(pa) == ter_floor || mappair(pa) == ter_floor_room || mappair(pa) == ter_floor_hall 
+		    	 || mappair(pa) == ter_stairs || mappair(pa) == ter_stairs_up || mappair(pa) == ter_stairs_down) {
+		 
+		    if (path[pa[dim_y]][pa[dim_x]].cost == INT_MAX) //d->nt_dist[pa[dim_y]][pa[dim_x]] == UCHAR_MAX){
+                         putchar('X');
+                         
+                    else
+                         putchar('0' + path[pa[dim_y]][pa[dim_x]].cost % 10);//d->nt_dist[pa[dim_y]][pa[dim_x]] % 10);
+                    	 
+		}
             }
         }
-
-        // print
-        for (y = 1; y < DUNGEON_Y; y++) { // 1-20 x, 1-80 y?? for borders
-            for (x = 1; x < DUNGEON_X; x++) {
-                // gen dists for those who cannot tunnel (thru wall) ONLY SEARCH POINTS THAT ARE HARDNESS 0??
-                if (y == d->pc[dim_y] && x == d->pc[dim_x]){
-                    printf("%c", '@');
-                } else if(path[y][x].cost != INT_MAX) {
-                    printf("%d", path[y][x].cost % 10);
-                } else {
-                    printf("%c", ' ');
-                }
-                printf("\n");
-            }
-        }
+        putchar('\n');
+    }
 }
 
 
-/*int main(int argc, char* argv[]) {
-    dungeon_t *d;
-    //generate a dungeon
-
-   
-    gen_dungeon(d);
-    render_dungeon(d);
-    
-
-    pc(d);
-
-    dijkstra_tunnel(d);
-    dijkstra_nontunnel(d);
-
-
-    //calculate all distance maps
- }*/
  
- int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   dungeon_t d;
   time_t seed;
   struct timeval tv;
@@ -464,8 +482,8 @@ static void dijkstra_tunnel(dungeon_t *d)  {
   }
 
   render_dungeon(&d);
-  //dijkstra_tunnel(&d);
   dijkstra_nontunnel(&d);
+  dijkstra_tunnel(&d);
 
   if (do_save) {
     if (do_save_seed) {
