@@ -35,7 +35,7 @@ static void dijkstra_nontunnel(dungeon_t *d) {
     for (y = 0; y < DUNGEON_Y; y++) {
         for (x = 0; x < DUNGEON_X; x++) {
             path[y][x].cost = INT_MAX;
-            d->nt_dist[y][x] = INT_MAX;
+            //d->nt_dist[y][x] = INT_MAX;
         }
     }
 
@@ -146,7 +146,6 @@ static void dijkstra_nontunnel(dungeon_t *d) {
         }
         printf("\n");
     }
-
 }
 
 
@@ -177,7 +176,7 @@ static void dijkstra_tunnel(dungeon_t *d) {
     for (y = 0; y < DUNGEON_Y; y++) {
         for (x = 0; x < DUNGEON_X; x++) {
             path[y][x].cost = INT_MAX;
-            d->t_dist[y][x] = INT_MAX;
+            //d->t_dist[y][x] = INT_MAX;
         }
     }
 
