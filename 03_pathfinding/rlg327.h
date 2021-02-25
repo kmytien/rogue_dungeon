@@ -78,6 +78,7 @@ typedef int8_t pair_t[num_dims];
 #define mapxy(x, y) (d->map[y][x])
 #define hardnesspair(pair) (d->hardness[pair[dim_y]][pair[dim_x]])
 #define hardnessxy(x, y) (d->hardness[y][x])
+#define tunnel_cost(pair) (1 + (d->hardness[pair[dim_y]][pair[dim_x]]/ 85))
 
 
 typedef enum __attribute__ ((__packed__)) terrain_type {
