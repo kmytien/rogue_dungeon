@@ -115,8 +115,6 @@ typedef struct dungeon {
      * of overhead to the memory system.                                    */
 
     uint8_t hardness[DUNGEON_Y][DUNGEON_X];
-    uint8_t nontunnel[DUNGEON_Y][DUNGEON_X];
-    uint8_t tunnel[DUNGEON_Y][DUNGEON_X];
     uint8_t nt_dist[DUNGEON_Y][DUNGEON_X];
     uint8_t t_dist[DUNGEON_Y][DUNGEON_X];
     pair_t pc;
