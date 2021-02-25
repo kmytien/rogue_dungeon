@@ -112,11 +112,11 @@ static void dijkstra_nontunnel(dungeon_t *d) {
 
 
     //set the costs to the distance map
-    for (i = 0; i < DUNGEON_Y; i++) {
+    /*for (i = 0; i < DUNGEON_Y; i++) {
         for (j = 0; j < DUNGEON_X; j++) {
             d->nt_dist[i][j] = path[i][j].cost;
         }
-    }
+    }*/
 
 
     pair_t pa;
@@ -253,11 +253,11 @@ static void dijkstra_tunnel(dungeon_t *d) {
 
 
     //set the cost equal to the map cells
-    for (i = 0; i < DUNGEON_Y; i++) {
+    /*for (i = 0; i < DUNGEON_Y; i++) {
         for (j = 0; j < DUNGEON_X; j++) {
             d->t_dist[i][j] = path[i][j].cost;
         }
-    }
+    }*/
 
 
     pair_t pa;
