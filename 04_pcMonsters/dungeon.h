@@ -68,7 +68,7 @@ typedef struct dungeon {
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
   pc_t pc;
-  monster_t monster;
+  monster_t *monsters;
 } dungeon_t;
 
 void init_dungeon(dungeon_t *d);
