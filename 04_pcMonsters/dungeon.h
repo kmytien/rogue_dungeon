@@ -47,7 +47,7 @@ struct monster {
    heap_node_t *hn;
    char m;
    uint8_t speed;
-   uint8_t pos[2];
+   pair_t position;
    uint8_t next_pos[2];
    uint8_t mon_type[4];
 } monster_t;
