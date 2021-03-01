@@ -43,6 +43,15 @@ typedef struct pc {
   pair_t position;
 } pc_t;
 
+struct monster {
+   heap_node_t *hn;
+   char m;
+   uint8_t speed;
+   uint8_t pos[2];
+   uint8_t next_pos[2];
+   uint8_t mon_type[4];
+} monster_t;
+
 typedef struct dungeon {
   uint32_t num_rooms;
   room_t *rooms;
@@ -59,6 +68,7 @@ typedef struct dungeon {
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
   pc_t pc;
+  monster_t monster;
 } dungeon_t;
 
 void init_dungeon(dungeon_t *d);
