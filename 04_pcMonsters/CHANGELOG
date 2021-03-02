@@ -1,3 +1,4 @@
+03/02/21 10:30 MK: Started implementing line_of_sight and shortest_path functions
 03/01/21 17:00 HL: Coded generate_monsters, game_done, modified render_dungeon to print monsters, and modified main to take --nummon which updates d->num_monsters
 03/01/21 17:00 SA: Created the functions for different types of movement
 03/01/21 16:00 MK SA HL: Outlined functions, created/modified structs for PC and Monsters and started coding
