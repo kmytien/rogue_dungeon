@@ -53,6 +53,8 @@ struct monster {
    pair_t next_pos;
    uint8_t mon_type[4];
    bool alive;
+   uint32_t sequence;
+   uint32_t next_turn;
 } monster_t;
 
 typedef struct dungeon {
