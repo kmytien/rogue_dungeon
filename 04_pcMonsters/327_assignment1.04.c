@@ -88,15 +88,15 @@ void generate_monsters(dungeon_t *d, char m){ // REMOVED NUM_MONSTERS AND MADE A
 bool game_done(dungeon_t *d) {
     int i;
     //game ends if pc is dead
-    if(d.pc.alive) 
+    if(d.pc.alive)
         return false;
 
     //or if all monsters are dead
     for (i = 0; i < d->num_monsters; i++) {
-        if (d.monsters[i].alive) 
+        if (d.monsters[i].alive)
             return false;
     }
-    
+
     return true;
 }
 
@@ -124,27 +124,121 @@ void straight(monster_t *monster, dungeon_t *d){
 }
 
 
-//for non telepathic monsters if they see pc in line of sight
+//for non telepathic & non tunneling monsters if they see pc in line of sight
 //so most likely if they're in a room
-void line_of_sight(dungeon_t *d, int pc_y, int pc_x) {
-    
+void line_of_sight(dungeon_t *d, int monster_y, int monster_x) {
+    int xdir, ydir
+    bool y_negative = false, x_negative = false; //if pc is left/above monster or right/below monster
+
+    if (monster_x > d->pc.position[dim_x]) {
+        x_negative = true;
+        x_dir = monster_x - d->pc.position[dim_x];
+    }
+
+    else x_dir = d->pc.position[dim_x] - monster_x;
+
+    if (monster_y > d->pc.position[dim_y]) {
+        y_negative = true;
+        y_dir = monster_y = d->pc.position[dim_y];
+    }
+
+    else y_dir = d->pc.position[dim_y] - monster_y;
+
+    //finishing later -mk
+    if (!x_negative) {
+
+    }
+
+    else {
+
+    }
+
+    if (!y_negative) {
+
+    }
+
+    else {
+
+    }
 }
 
+//implementing dijkstra for tuneeling and non tunneling monsters
+void shortest_path(monster_t *monster, dungeon_t *d) {
+    //need to use sheaffer's priority queue - i can look into that - mk
 
-void dijkstra_monster(monster_t *monster, dungeon_t *d) {
-    // implementing dijkstra for tuneeling and non tunneling monsters
+    //monster x, y positions
+    int x = 0, y = 0;
+    int monster_X = monster.pos[1], monster_Y = monster.pos[0];
 
-    // monster x, y positions
-    monster_X = pos[1];
-    monster_Y = pos[0];
-    int x = 0;
-    int y = 0;
-
+    //need to use pc_tunnel[][] that sheaffer used 
     if (/*monsters can tunnel*/) {
+        if () {
 
+        }
 
-    } else {
-      //find shortest path for non tunnel monsters
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+    }
+
+    //need to use pc_distance[][] that sheaffer used
+    else if (/*monsters can't tunnel*/) {
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
+
+        if () {
+
+        }
     }
 }
 
@@ -222,7 +316,7 @@ void move(monster_t *monster, dungeon_t *d, heap_t *heap) {
   } else {
 
 
-  } 
+  }
    // monsters that can turn??
 
 }
