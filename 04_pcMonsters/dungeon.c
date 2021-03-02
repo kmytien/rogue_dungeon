@@ -9,6 +9,7 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #include "heap.h"
 #include "dungeon.h"
