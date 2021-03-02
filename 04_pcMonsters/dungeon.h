@@ -14,7 +14,7 @@
 #define ROOM_MAX_Y             15
 #define SAVE_DIR               ".rlg327"
 #define DUNGEON_SAVE_FILE      "dungeon"
-#define DUNGEON_SAVE_SEMANTIC  "RLG327-" TERM
+#define DUNGEON_SAVE_SEMANTIC  "RLG327-S2021"
 #define DUNGEON_SAVE_VERSION   0U
 
 #define mappair(pair) (d->map[pair[dim_y]][pair[dim_x]])
@@ -41,6 +41,7 @@ typedef struct room {
 
 typedef struct pc {
   pair_t position;
+  bool alive;
 } pc_t;
 
 struct monster {
