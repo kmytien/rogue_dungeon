@@ -50,7 +50,7 @@ struct monster {
    char m;
    uint8_t speed;
    pair_t position;
-   uint8_t next_pos[2];
+   pair_t next_pos;
    uint8_t mon_type[4];
    bool alive;
 } monster_t;
