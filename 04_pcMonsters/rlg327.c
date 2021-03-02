@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
         }
       } else { /* No dash */
         usage(argv[0]);
+	d->num_monsters = NUM_MONSTERS;
       }
     }
   }
