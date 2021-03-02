@@ -56,6 +56,7 @@ struct monster {
 
 typedef struct dungeon {
   uint32_t num_rooms;
+  uint32_t num_monsters;
   room_t *rooms;
   terrain_type_t map[DUNGEON_Y][DUNGEON_X];
   /* Since hardness is usually not used, it would be expensive to pull it *
