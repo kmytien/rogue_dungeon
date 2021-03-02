@@ -114,6 +114,9 @@ int main(int argc, char *argv[])
             pgm_file = argv[++i];
           }
           break;
+	case 'n':
+          if (argv[1] == "--nummon") d->num_monsters = (int) argv[2];
+          break;
         default:
           usage(argv[0]);
         }
