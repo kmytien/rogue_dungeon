@@ -11,7 +11,6 @@
     Notes:
       *** ill make seperate header file for this after we finish, the main function will be in rlg - MK ***
       *** may interpret these however we like ***
-
     - Need to move monsters around
         - "--nummon [INTEGER]" summons an INTEGER number of monsters around (10 is reasonable) DONE
         - Also have a hard coded default in case no --nummon
@@ -25,7 +24,6 @@
               - Tunneling Ability: can tunnel through rock
               - Erratic Behavior: have a 50% chance of moving as per their other characteristics,
                 otherwise they move to a random neighboring cell
-
       - Speed
         - Each monsters gets speed between 5 and 20
         - PC gets speed of 10
@@ -48,20 +46,20 @@ void generate_monsters(dungeon_t *d, char m){ // REMOVED NUM_MONSTERS AND MADE A
     while (!valid) {
         x = (rand() % 80) + 1;
         y = (rand() % 20) + 1;
-        
+
         if (d->map[y][x] == ter_floor && d.pc.position[dim_x] != x && d.pc.position[dim_y] != y) {
             valid = true;
             d.monsters[i].postion[dim_x] = x;
             d.monsters[i].postion[dim_y] = y;
         }
     }
-    
+
     // generate hexidecimal monster type and set as char m
     // do we need srand(time(NULL))?
     int mon = rand() % 15;
-    if (mon <= 9) 
+    if (mon <= 9)
         d.monsters[i].m = '' + mon;
-        
+
     else {
         if (mon == 10) d.monsters[i].m = 'a';
         else if (mon == 11) d.monsters[i].m = 'b';
@@ -70,7 +68,7 @@ void generate_monsters(dungeon_t *d, char m){ // REMOVED NUM_MONSTERS AND MADE A
         else if (mon == 14) d.monsters[i].m = 'e';
         else d.monsters[i].m = 'f';
     }
-    
+
     // convert to binary
     for(j = 0; mon > 0; j++) { // type is stored in an array of 4 numbers
         type[v] = mon % 2;
@@ -82,29 +80,32 @@ void generate_monsters(dungeon_t *d, char m){ // REMOVED NUM_MONSTERS AND MADE A
     d.monsters[i].mon_type[1] = type[1]; // sets tunneling
     d.monsters[i].mon_type[2] = type[2]; // sets telepathy
     d.monsters[i].mon_type[3] = type[3]; // sets intelligence
-    // set speed
-    d.monsters[i].speed = (rand() % 20) + 5;
+    d.monsters[i].speed = (rand() % 20) + 5; //set speed
   }
 }
 
 // boolean decides if the game has been won or lost
 bool game_done(dungeon_t *d) {
     int i;
-    //game ends if pc is dead 
-    if(d.pc.alive) return false;
-    // or if all monsters are dead
+    //game ends if pc is dead
+    if(d.pc.alive) 
+        return false;
+
+    //or if all monsters are dead
     for (i = 0; i < d->num_monsters; i++) {
-      if (d.monsters[i].alive) return false;
+        if (d.monsters[i].alive) 
+            return false;
     }
+    
     return true;
 }
 
-//dumb monsters that go straight (Unintelligent)
-void dumb_monsters(monster_t *monster, dungeon_t *d){
+//for unintelligent monsters (to move straight)
+void straight(monster_t *monster, dungeon_t *d){
     if(monster->pos[1] < d.pc.position[dim_x]) {
         monster->next_pos[0] = monster->pos[0];
         monster->next_pos[1] = monster->pos[1] + 1;
-    } 
+    }
 
     else if(monster->pos[1] > d.pc.position[dim_x]) {
         monster->next_pos[0] = monster->pos[0];
@@ -114,7 +115,7 @@ void dumb_monsters(monster_t *monster, dungeon_t *d){
     else if(monster->pos[0] < d.pc.position[dim_y]) {
         monster->next_pos[0] = monster->pos[0] + 1;
         monster->next_pos[1] = monster->pos[1];
-    } 
+    }
 
     else if(monster->pos[0] > d.pc.position[dim_y]) {
         monster->next_pos[0] = monster->pos[0] - 1;
@@ -123,86 +124,105 @@ void dumb_monsters(monster_t *monster, dungeon_t *d){
 }
 
 
-//for non-telepathic monsters
-void no_line_of_sight() {
-  
+//for non telepathic monsters if they see pc in line of sight
+//so most likely if they're in a room
+void line_of_sight(dungeon_t *d, int pc_y, int pc_x) {
+    
 }
 
 
 void dijkstra_monster(monster_t *monster, dungeon_t *d) {
-    // implementing dijkstra for tuneeling and non tunneling monsters 
+    // implementing dijkstra for tuneeling and non tunneling monsters
 
-    // monster x, y positions 
+    // monster x, y positions
     monster_X = pos[1];
     monster_Y = pos[0];
     int x = 0;
     int y = 0;
-    
+
     if (/*monsters can tunnel*/) {
-        
-      
+
+
     } else {
-      //find shortest path for non tunnel monsters 
+      //find shortest path for non tunnel monsters
     }
 }
 
 
-// moves the monsters for all possibilities 
+// moves the monsters for all possibilities
 void move(monster_t *monster, dungeon_t *d, heap_t *heap) {
-  // uses dijkstra_monster() to find path for the monsters 
-  
-  if(monster.type->'@') {
-    // pc moves randomly
-    
+  // uses dijkstra_monster() to find path for the monsters
+
+  //player character
+  if(monster->type == '@') {
+    //are we going to let this stay still?
+    //we can prob make it move around at least one block :P if we have time
+
+    //not erratic, not tunneling, not telepathic, not smart
+  } else if(monster.type == '0') {
+    //if pc is in line of sight -> move towards pc
+
+    //not erratic, not tunneling, not telepathic, smart
   } else if(monster.type == '1') {
     // monster will move if it sees pc
-    
+
+    //not erratic, not tunneling, telepathic, not smart
   } else if(monster.type == '2') {
     //monster moves if it sees pc or eradically
 
+    //not erratic, not tunneling, telepathic, smart
   } else if(monster.type == '3') {
     // monster can tunnel (moves eradically or can see pc)
 
+    //not erratic, tunneling, not telepathic, not smart
   } else if(monster.type == '4') {
-    // monster can see pc and goes in straght line 
+    // monster can see pc and goes in straght line
 
+    //not erratic, tunneling, not telepathic, smart
   } else if(monster.type == '5') {
-    // monster moves eradically, knows pc location and moves in straight line 
+    // monster moves eradically, knows pc location and moves in straight line
 
+    //not erratic, tunneling, telepathic, not smart
   } else if(monster.type == '6') {
     // tunnel monster moves straight towrads pc
 
+    //not erratic, tunneling, telepathic, smart
   } else if(monster.type == '7') {
-    // tunnel monster moves straight towrads pc or moves eradically 
+    // tunnel monster moves straight towrads pc or moves eradically
 
+    //erratic, not tunneling, not telepathic, not smart
   } else if(monster.type == '8') {
-    // tunnel monster moves straight towrads pc or moves eradically 
+    // tunnel monster moves straight towrads pc or moves eradically
 
+    //erratic, not tunneling, not telepathic, smart
   } else if(monster.type == '9') {
-    
 
+
+    //erratic, not tunneling, telepathic, not smart
   } else if(monster.type == 'a') {
-    
 
+
+    //erratic, not tunneling, telepathic, smart
   } else if(monster.type == 'b') {
-    
 
+
+    //erratic, tunneling, not telepathic, not smart
   } else if(monster.type == 'c') {
-    
 
+
+    //erratic, tunneling, not telepathic, smart
   } else if(monster.type == 'd') {
-    
 
+
+    //erratic, tunneling, telepathic, not smart
   } else if(monster.type == 'e') {
 
-    
-  } else if(monster.type == 'f') {
-    
 
+    //erratic, tunneling, telepathic, smart (f)
   } else {
-    
 
-  }
+
+  } 
    // monsters that can turn??
 
 }
