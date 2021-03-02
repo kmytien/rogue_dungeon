@@ -1,1 +1,4 @@
+03/01/21 17:00 HL: Coded generate_monsters, game_done, and modified render_dungeon to print monsters
+03/01/21 17:00 SA: Created the functions for different types of movement
+03/01/21 16:00 MK SA HL: Outlined functions, created/modified structs for PC and Monsters and started coding
 03/01/21 15:00 MK: Uploaded and created Makefile, Readme, Sheaffer's 1.03 code, CHANGELOG and so on
