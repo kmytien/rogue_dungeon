@@ -50,6 +50,7 @@ struct monster {
    pair_t position;
    uint8_t next_pos[2];
    uint8_t mon_type[4];
+   bool alive;
 } monster_t;
 
 typedef struct dungeon {
