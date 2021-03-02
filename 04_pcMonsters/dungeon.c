@@ -630,6 +630,9 @@ void render_dungeon(dungeon_t *d)
       if (d->pc.position[dim_x] == p[dim_x] && d->pc.position[dim_y] == p[dim_y]) {
         putchar('@');
       } else {
+	for (i = 0; i < d->num_monsters; i++) {
+          if (d->monsters[i].position[dim_x] == p[dim_x] && d->monsters[i].position[dim_x] == p[dim_y]) putchar(d.monsters[i].m);
+        }
         switch (mappair(p)) {
         case ter_wall:
         case ter_wall_immutable:
