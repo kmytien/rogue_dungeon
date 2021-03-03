@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+#include <limits.h>
 
 #include "dungeon.h"
 #include "dims.h"
@@ -153,13 +154,19 @@ void straight(monster_t *monster, dungeon_t *d) {
     if (monster->position[dim_x] < d->pc.position[dim_x]) {
         monster->next_pos[dim_y] = monster->position[dim_y];
         monster->next_pos[dim_x] = monster->position[dim_x] + 1;
-    } else if (monster->position[dim_x] > d->pc.position[dim_x]) {
+    }
+
+    else if (monster->position[dim_x] > d->pc.position[dim_x]) {
         monster->next_pos[dim_y] = monster->position[dim_y];
         monster->next_pos[dim_x] = monster->position[dim_x] - 1;
-    } else if (monster->position[dim_y] < d->pc.position[dim_y]) {
+    }
+
+    else if (monster->position[dim_y] < d->pc.position[dim_y]) {
         monster->next_pos[dim_y] = monster->position[dim_y] + 1;
         monster->next_pos[dim_x] = monster->position[dim_x];
-    } else if (monster->position[dim_y] > d->pc.position[dim_y]) {
+    }
+
+    else if (monster->position[dim_y] > d->pc.position[dim_y]) {
         monster->next_pos[dim_y] = monster->position[dim_y] - 1;
         monster->next_pos[dim_x] = monster->position[dim_x];
     }
@@ -226,67 +233,67 @@ int in_line_of_sight(dungeon_t *d, monster_t *monster) {
         }
         return 1;
     }
-
-    return 1;
 }
 
 
 //implementing dijkstra for tuneeling and non tunneling monsters
-void shortest_path(monster_t *monster, dungeon_t *d) {
+void shortest_path(monster_t* monster, dungeon_t* d) {
     //need to use sheaffer's priority queue - i can look into that - mk
 
     //monster x, y positions
     int x = 0, y = 0, num = INT_MAX;
-    int monster_x = monster.pos[1], monster_y = monster.pos[0];
-
+    int monster_x = monster->pos[1], monster_y = monster->pos[0];
+    bool tunneling = false;
+    //if statement for tunneling
+    
     //need to use pc_tunnel[][] that sheaffer used
-    if (tunnel) {
+    if (tunneling) {
         //need to initialize variables
         //do stuff idk
         //cost > (d->pc_tunnel[monster_y][monster_x] + d->hardness[monster_y][monster_x] / 85)
 
         //cardinal directions
-        if (num > d->dijkstra_tunnel[monster_y - 1][monster_x].cost) {
+        if (num > d->pc_tunnel[monster_y - 1][monster_x]) {
             y = -1;
-            num = d->dijkstra_tunnel[monster_y - 1][monster_x].cost;
+            num = d->pc_tunnel[monster_y - 1][monster_x];
         }
 
-        if (num > d->dijkstra_tunnel[monster_y + 1][monster_x]) {
+        if (num > d->pc_tunnel[monster_y + 1][monster_x]) {
             y = 1;
-            num = d->dijkstra_tunnel[monster_y + 1][monster_x].cost;
+            num = d->pc_tunnel[monster_y + 1][monster_x];
         }
 
-        if (num > d->dijkstra_tunnel[monster_y][monster_x - 1] < num) {
+        if (num > d->pc_tunnel[monster_y][monster_x - 1] < num) {
             x = -1;
-            num = d->dijkstra_tunnel[monster_y][monster_x - 1].cost;
+            num = d->pc_tunnel[monster_y][monster_x - 1];
         }
 
-        if (num > d->dijkstra_tunnel[monster_y][monster_x + 1]) {
+        if (num > d->pc_tunnel[monster_y][monster_x + 1]) {
             x = 1;
-            num = d->dijkstra_tunnel[monster_y][monster_x + 1].cost;
+            num = d->pc_tunnel[monster_y][monster_x + 1];
         }
     }
 
         //need to use pc_distance[][] that sheaffer used -- uhh I'm not really sure how to do that lol, lmk if we need to change it tho
     else {
-        if (d->dijkstra_nontunnel[monster->pos[0] - 1][monster->pos[1]].cost < num) {
+        if (d->pc_distance[monster->pos[0] - 1][monster->pos[1]] < num) {
             x = -1;
-            num = d->dijkstra_nontunnel[monster->pos[0] - 1][monster->pos[1]].cost;
+            num = d->pc_distance[monster->pos[0] - 1][monster->pos[1]];
         }
 
-        if (d->dijkstra_nontunnel[monster->pos[0] + 1][monster->pos[1]].cost < num) {
+        if (d->pc_distance[monster->pos[0] + 1][monster->pos[1]] < num) {
             x = 1;
-            num = d->dijkstra_nontunnel[monster->pos[0] + 1][monster->pos[1]].cost;
+            num = d->pc_distance[monster->pos[0] + 1][monster->pos[1]];
         }
 
-        if (d->dijkstra_nontunnel[monster->pos[0]][monster->pos[1] + 1].cost < num) {
+        if (d->pc_distance[monster->pos[0]][monster->pos[1] + 1] < num) {
             y = 1;
-            num = d->dijkstra_nontunnel[monster->pos[0]][monster->pos[1] + 1].cost;
+            num = d->pc_distance[monster->pos[0]][monster->pos[1] + 1];
         }
 
-        if (d->dijkstra_nontunnel[monster->pos[0]][monster->pos[1] - 1].cost < num) {
+        if (d->pc_distance[monster->pos[0]][monster->pos[1] - 1] < num) {
             y = -1;
-            num = d->dijkstra_nontunnel[monster->pos[0]][monster->pos[1] - 1].cost;
+            num = d->pc_distance[monster->pos[0]][monster->pos[1] - 1];
         }
     }
 
@@ -389,7 +396,7 @@ static int32_t character_cmp(const void *key, const void *with) {
 void run_turns(dungeon_t *d, monster_t *monster) {
     //PUTS ALL MONSTERS IN A PRIORITY QUEUE BASED OFF OF THE CMP
     heap_t h;
-    
+
     //error????
     static path_t monster, *c;
     int i;
