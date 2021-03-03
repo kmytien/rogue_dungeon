@@ -397,7 +397,7 @@ static int32_t character_cmp(const void *key, const void *with) {
 void run_turns(dungeon_t *d, monster_t* monster) {
     //PUTS ALL MONSTERS IN A PRIORITY QUEUE BASED OFF OF THE CMP
     heap_t h;
-    static path_t monster;
+    static path_t monster, *c;
     int i;
 
     //might need to put before generate monsters or in main
@@ -411,7 +411,9 @@ void run_turns(dungeon_t *d, monster_t* monster) {
     //WHILE THE GAME HASNT BEEN WON
     while(!game_done) {
         //TAKE THE TOP MONSTER OUT OF THE QUEUE AND MOVE IT
-
+        c = heap_remove_min(&h);
+        move(monster, d, &h);
+        
         //UPDATE NEXTTURNS
         monster->next_turn = monster->next_turn + (1000 / speed);
         // PUT BACK IN THE HEAP IF IT IS STILL ALIVE
