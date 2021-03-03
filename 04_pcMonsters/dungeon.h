@@ -24,57 +24,57 @@
 #define hardnessxy(x, y) (d->hardness[y][x])
 
 typedef enum __attribute__ ((__packed__)) terrain_type {
-  ter_debug,
-  ter_wall,
-  ter_wall_immutable,
-  ter_floor,
-  ter_floor_room,
-  ter_floor_hall,
-  ter_stairs,
-  ter_stairs_up,
-  ter_stairs_down
+    ter_debug,
+    ter_wall,
+    ter_wall_immutable,
+    ter_floor,
+    ter_floor_room,
+    ter_floor_hall,
+    ter_stairs,
+    ter_stairs_up,
+    ter_stairs_down
 } terrain_type_t;
 
 typedef struct room {
-  pair_t position;
-  pair_t size;
+    pair_t position;
+    pair_t size;
 } room_t;
 
 typedef struct pc {
-  pair_t position;
-  bool alive;
+    pair_t position;
+    bool alive;
 } pc_t;
 
-struct monster {
-   heap_node_t *hn;
-   char m;
-   uint8_t speed;
-   pair_t position;
-   pair_t next_pos;
-   uint8_t mon_type[4];
-   bool alive;
-   uint32_t sequence;
-   uint32_t next_turn;
+typedef struct monster {
+    heap_node_t *hn;
+    char m;
+    uint8_t speed;
+    pair_t position;
+    pair_t next_pos;
+    uint8_t mon_type[4];
+    bool alive;
+    uint32_t sequence;
+    uint32_t next_turn;
 } monster_t;
 
 typedef struct dungeon {
-  uint32_t num_rooms;
-  uint32_t num_monsters;
-  room_t *rooms;
-  terrain_type_t map[DUNGEON_Y][DUNGEON_X];
-  /* Since hardness is usually not used, it would be expensive to pull it *
-   * into cache every time we need a map cell, so we store it in a        *
-   * parallel array, rather than using a structure to represent the       *
-   * cells.  We may want a cell structure later, but from a performanace  *
-   * perspective, it would be a bad idea to ever have the map be part of  *
-   * that structure.  Pathfinding will require efficient use of the map,  *
-   * and pulling in unnecessary data with each map cell would add a lot   *
-   * of overhead to the memory system.                                    */
-  uint8_t hardness[DUNGEON_Y][DUNGEON_X];
-  uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
-  uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
-  pc_t pc;
-  monster_t *monsters;
+    uint32_t num_rooms;
+    uint32_t num_monsters;
+    room_t *rooms;
+    terrain_type_t map[DUNGEON_Y][DUNGEON_X];
+    /* Since hardness is usually not used, it would be expensive to pull it *
+     * into cache every time we need a map cell, so we store it in a        *
+     * parallel array, rather than using a structure to represent the       *
+     * cells.  We may want a cell structure later, but from a performanace  *
+     * perspective, it would be a bad idea to ever have the map be part of  *
+     * that structure.  Pathfinding will require efficient use of the map,  *
+     * and pulling in unnecessary data with each map cell would add a lot   *
+     * of overhead to the memory system.                                    */
+    uint8_t hardness[DUNGEON_Y][DUNGEON_X];
+    uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
+    uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
+    pc_t pc;
+    monster_t *monsters;
 } dungeon_t;
 
 void init_dungeon(dungeon_t *d);
