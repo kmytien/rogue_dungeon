@@ -10,8 +10,24 @@
 #include "assignment_104.h"
 
 
+char lose_message[12] = "you lost lol";
+char win_message[28] = "you won. which is surprising";
+
+struct tunnel {
+    heap_node_t *hn;
+    uint8_t pos[2];
+    int32_t cost;
+} tunnel_t;
+
+struct nontunnel {
+    heap_node_t *hn;
+    uint8_t pos[2];
+    int32_t cost;
+} nontunnel_t;
+
+
 //generates all monsters in dungeon
-void generate_monsters(dungeon_t *d, char m) {
+void generate_monsters(dungeon_t *d) {
     int i, j, type[4], x, y;
     bool valid = false;
 
@@ -39,17 +55,57 @@ void generate_monsters(dungeon_t *d, char m) {
 
         // generate hexidecimal monster type and set as char m
         // do we need srand(time(NULL))?
-        int mon = rand() % 15;
-        if (mon <= 9)
-            d->monsters[i].m = mon;
+        int mon = rand() % 16;
 
-        else {
-            if (mon == 10) d->monsters[i].m = 'a';
-            else if (mon == 11) d->monsters[i].m = 'b';
-            else if (mon == 12) d->monsters[i].m = 'c';
-            else if (mon == 13) d->monsters[i].m = 'd';
-            else if (mon == 14) d->monsters[i].m = 'e';
-            else d->monsters[i].m = 'f';
+        switch(mon) {
+            case 0:
+            	d->monsters[i].m = '0';
+            	break;
+            case 1:
+            	d->monsters[i].m = '1';
+            	break;
+            case 2:
+            	d->monsters[i].m = '2';
+            	break;
+            case 3:
+            	d->monsters[i].m = '3';
+            	break;
+            case 4:
+            	d->monsters[i].m = '4';
+            	break;
+            case 5:
+            	d->monsters[i].m = '5';
+            	break;
+            case 6:
+            	d->monsters[i].m = '6';
+            	break;
+            case 7:
+            	d->monsters[i].m = '7';
+            	break;
+            case 8:
+            	d->monsters[i].m = '8';
+            	break;
+            case 9:
+            	d->monsters[i].m = '9';
+            	break;
+            case 10:
+            	d->monsters[i].m = 'a';
+            	break;
+            case 11:
+            	d->monsters[i].m = 'b';
+            	break;
+            case 12:
+            	d->monsters[i].m = 'c';
+            	break;
+            case 13:
+            	d->monsters[i].m = 'd';
+            	break;
+            case 14:
+            	d->monsters[i].m = 'e';
+            	break;
+            case 15:
+            	d->monsters[i].m = 'f';
+            	break;
         }
 
         d->mons[d->monsters[i].position[dim_y]][d->monsters[i].position[dim_x]] = i+1;
@@ -78,24 +134,24 @@ void generate_monsters(dungeon_t *d, char m) {
 
         // set next_turns
         d->monsters[i].next_turn = 0;
+        d->monsters[i].is_alive = true;
     }
 }
 
 //boolean decides if the game has been won or lost and prints if the game is done
 bool game_done(dungeon_t *d) {
     int i;
+
     //game ends if pc is dead
-    if (d->pc.is_alive) {
-        printf(lose_message);
-        return false;
+    if (!d->pc.is_alive) {
+        printf("%s\n", lose_message);
+        return true;
     }
 
     //or if all monsters are dead
     for (i = 0; i < d->num_monsters; i++) {
-        if (d->monsters[i].is_alive) {
-            printf(win_message);
+        if (d->monsters[i].is_alive)
             return false;
-        }
     }
 
     return true;
@@ -640,7 +696,7 @@ void move(monster_t *monster, dungeon_t *d, heap_t *heap) {
     }
 
     //kill any monsters in the spot moved to
-    combat(&d, &monster);
+    combat(d, monster);
 
     //set monster on the map as the monster currently there
     d->mons[monster->position[dim_y]][monster->position[dim_y]] = monster->sequence;
@@ -652,6 +708,12 @@ void combat(dungeon_t *d, monster_t *m) {
 
     int x = m->position[dim_x];
     int y = m->position[dim_y];
+
+    if (d->pc.position[dim_y] == y && d->pc.position[dim_x] == x) {
+      d->pc.is_alive == false;
+      d->pc.position[dim_y] == -1;
+      d->pc.position[dim_x] == -1;
+    }
 
     //if the if monster next pos has a monster in that spot
     if (d->mons[y][x] != ' ') {
@@ -687,6 +749,9 @@ void run_turns(dungeon_t *d) {
     int i, j, xpos, ypos, size;
     static uint32_t initialized = 0;
 
+    generate_monsters(d);
+    d->pc.is_alive = true;
+
     if (!initialized) {
         initialized = 1;
         for (i = 0; i < d->num_monsters; i++) {
@@ -705,10 +770,10 @@ void run_turns(dungeon_t *d) {
     size = h.size;
 
     //WHILE THE GAME HASNT BEEN WON
-    while (!game_done(&d)) {
-        if (--size != h.size) {
+    while (!game_done(d)) {
+        if (--size != h.size)
             exit(1);
-        }
+
         //TAKE THE TOP MONSTER OUT OF THE QUEUE AND MOVE IT
         c = heap_remove_min(&h);
         ypos = (int) c->pos[0];
@@ -716,21 +781,25 @@ void run_turns(dungeon_t *d) {
         j = d->mons[ypos][xpos];
 
 
-        move(&(d->monsters[j]), &d, &h);
+        move(&(d->monsters[j]), d, &h);
 
         //UPDATE NEXTTURNS
-        d->monsters[j].next_turn = d->monsters[j].next_turn + (1000 / d->monsters[j].speed);
+        d->monsters[j].next_turn += (1000 / d->monsters[j].speed);
 
         // PUT BACK IN THE HEAP IF IT IS STILL ALIVE
-        if (d->monsters[j].is_alive) {
+        if (d->monsters[j].is_alive)
             mon[j].hn = heap_insert(&h, &mon[j]);
-        }
+
         else {
-            heap_decrease_key_no_replace(&h, &mon[j].hn);
+            heap_decrease_key_no_replace(&h, mon[j].hn);
             c->hn = NULL;
         }
 
         //RENDER DUNGEON
-        render_dungeon(&d);
+        render_dungeon(d);
     }
+
+    if (d->pc.is_alive)
+    	printf("%s\n", win_message);
+
 }
