@@ -10,6 +10,6 @@ typedef enum dim {
   num_dims
 } dim_t;
 
-typedef int8_t pair_t[num_dims];
+typedef int pair_t[num_dims];
 
 #endif
