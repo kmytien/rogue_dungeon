@@ -62,18 +62,7 @@ struct nontunnel {
 //
 // } npc;
 
-typedef struct monster {
-    char m;
-    uint8_t mon_type[4];
-    pair_t position;
-    pair_t next_pos;
-    int speed;
-    uint32_t sequence;
-    uint32_t next_turn;
-    uint32_t num_monsters;
-    pair_t last_pos;
-    bool is_alive;
-} monster_t;
+
 
 typedef struct m_path {
   heap_node_t *hn;
