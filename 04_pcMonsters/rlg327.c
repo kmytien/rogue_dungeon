@@ -107,7 +107,6 @@ int main(int argc, char *argv[])
                         if ((!long_arg && argv[i][2]) ||
                             (long_arg && strcmp(argv[i], "-nummon"))) {
                             usage(argv[0]);
-                            d.num_monsters = (uint32_t) atoi(argv[2]);
                         }
                         do_nummon = 1;
                         break;
@@ -116,7 +115,6 @@ int main(int argc, char *argv[])
                 }
             } else { /* No dash */
                 usage(argv[0]);
-                d.num_monsters = NUM_MONSTERS;
             }
         }
     }
@@ -137,8 +135,11 @@ int main(int argc, char *argv[])
         read_dungeon(&d, load_file);
     } else if (do_image) {
         read_pgm(&d, pgm_file);
-    } else {
+    } else if (do_nummon) {
+        d.num_monsters = (uint32_t) atoi(argv[2]);
+    }else {
         gen_dungeon(&d);
+        d.num_monsters = 10;
     }
 
     if (!do_load) {
