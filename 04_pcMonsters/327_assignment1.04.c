@@ -11,6 +11,9 @@
 #include "path.h"
 #include "utils.h"
 
+void combat(dungeon_t *d, monster_t *m);
+void tunneling_hardness(dungeon_t* d, int x, int y);
+
 /**
     NOTES:
       *** ill make seperate header file for this after we finish, the main function will be in rlg - MK ***
@@ -65,8 +68,8 @@ struct nontunnel {
 
 
 typedef struct m_path {
-  heap_node_t *hn;
-  uint8_t pos[2];
+    heap_node_t *hn;
+    uint8_t pos[2];
 } mp_t;
 
 // struct character {
@@ -87,9 +90,9 @@ void generate_monsters(dungeon_t *d, char m) {
 
     // init mons arrays
     for (y = 1; y < 21; y++) {
-      for (x = 1; x < 80; x++) {
-        d->mons[y][x] = ' '; // int array, might need to be changed
-      }
+        for (x = 1; x < 80; x++) {
+            d->mons[y][x] = ' '; // int array, might need to be changed
+        }
     }
 
     // generate needed amnt of monsters
@@ -138,8 +141,8 @@ void generate_monsters(dungeon_t *d, char m) {
 
         //figure out the last known position of the monster?
         if(d->monsters[i].mon_type[3] == 1){ //how does one make sure intelligence is equal to one
-          d->monsters[i].last_pos[0] = 0; //sorry idk how to do the inteligece stuff
-          d->monsters[i].last_pos[1] = 0;
+            d->monsters[i].last_pos[0] = 0; //sorry idk how to do the inteligece stuff
+            d->monsters[i].last_pos[1] = 0;
         }
 
         // set sequence
@@ -262,69 +265,139 @@ int in_line_of_sight(dungeon_t *d, monster_t *monster) {
 void shortest_path(monster_t* monster, dungeon_t* d) {
 
     //monster x, y positions
-    int x = 0, y = 0, num = INT_MAX;
-    int monster_x = monster->position[dim_x], monster_y = monster->position[dim_y];
-    bool tunneling = false;
-    //if statement for tunneling -----------------------------------------------------------need to do
+    int x = 0, y = 0, cost = INT_MAX;
+    int monster_x = monster->next_pos[1], monster_y = monster->next_pos[0];
+    int next_x, next_y;
+    bool tunneling;
 
-    //need to use pc_tunnel[][] that sheaffer used
+    switch (monster->m) {
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case 'c':
+        case 'd':
+        case 'e':
+        case 'f':
+            tunneling = true;
+            break;
+
+        default:
+            tunneling = false;
+    }
+
+
     if (tunneling) {
-        //need to initialize variables
-        //do stuff idk
-        //cost > (d->pc_tunnel[monster_y][monster_x] + d->hardness[monster_y][monster_x] / 85)
 
-        //cardinal directions
-        if (num > d->pc_tunnel[monster_y - 1][monster_x]) {
-            y = -1;
-            num = d->pc_tunnel[monster_y - 1][monster_x];
+        if (cost > (d->pc_tunnel[monster_y - 1][monster_x] + d->hardness[monster_y - 1][monster_x] / 85)) {
+            cost = (d->pc_tunnel[monster_y - 1][monster_x] + d->hardness[monster_y - 1][monster_x] / 85);
+            next_x = monster_x;
+            next_y = monster_y - 1;
         }
 
-        if (num > d->pc_tunnel[monster_y + 1][monster_x]) {
-            y = 1;
-            num = d->pc_tunnel[monster_y + 1][monster_x];
+        if (cost > (d->pc_tunnel[monster_y + 1][monster_x] + d->hardness[monster_y + 1][monster_x] / 85)) {
+            cost = (d->pc_tunnel[monster_y + 1][monster_x] + d->hardness[monster_y + 1][monster_x] / 85);
+            next_x = monster_x;
+            next_y = monster_y + 1;
         }
 
-        if (num > d->pc_tunnel[monster_y][monster_x - 1] < num) {
-            x = -1;
-            num = d->pc_tunnel[monster_y][monster_x - 1];
+        if (cost > (d->pc_tunnel[monster_y][monster_x - 1] + d->hardness[monster_y][monster_x - 1] / 85)) {
+            cost = (d->pc_tunnel[monster_y][monster_x - 1] + d->hardness[monster_y][monster_x - 1] / 85);
+            next_x = monster_x - 1;
+            next_y = monster_y;
         }
 
-        if (num > d->pc_tunnel[monster_y][monster_x + 1]) {
-            x = 1;
-            num = d->pc_tunnel[monster_y][monster_x + 1];
+        if (cost > (d->pc_tunnel[monster_y][monster_x + 1] + d->hardness[monster_y][monster_x + 1] / 85)) {
+            cost = (d->pc_tunnel[monster_y][monster_x + 1] + d->hardness[monster_y][monster_x + 1] / 85);
+            next_x = monster_x + 1;
+            next_y = monster_y;
         }
+
+        if (cost > (d->pc_tunnel[monster_y - 1][monster_x - 1] + d->hardness[monster_y - 1][monster_x - 1] / 85)) {
+            cost = (d->pc_tunnel[monster_y - 1][monster_x - 1] + d->hardness[monster_y - 1][monster_x - 1] / 85);
+            next_x = monster_x - 1;
+            next_y = monster_y - 1;
+        }
+
+        if (cost > (d->pc_tunnel[monster_y + 1][monster_x + 1] + d->hardness[monster_y + 1][monster_x + 1] / 85)) {
+            cost = (d->pc_tunnel[monster_y + 1][monster_x + 1] + d->hardness[monster_y + 1][monster_x + 1] / 85);
+            next_x = monster_x + 1;
+            next_y = monster_y + 1;
+        }
+
+        if (cost > (d->pc_tunnel[monster_y + 1][monster_x - 1] + d->hardness[monster_y + 1][monster_x - 1] / 85)) {
+            cost = (d->pc_tunnel[monster_y + 1][monster_x - 1] + d->hardness[monster_y + 1][monster_x - 1] / 85);
+            next_x = monster_x - 1;
+            next_y = monster_y + 1;
+        }
+
+        if (cost > (d->pc_tunnel[monster_y - 1][monster_x + 1] + d->hardness[monster_y - 1][monster_x + 1] / 85)) {
+            cost = (d->pc_tunnel[monster_y - 1][monster_x + 1] + d->hardness[monster_y - 1][monster_x + 1] / 85);
+            next_x = monster_x + 1;
+            next_y = monster_y - 1;
+        }
+
+        //something w hardness
+        if (hardnessxy(x, y) <= 85) {
+            monster->next_pos[0] = next_y;
+            monster->next_pos[1] = next_x;
+        }
+
+        tunneling_hardness(d, next_x, next_y);
     }
 
 
     else {
-        if (d->pc_distance[monster->position[dim_y] - 1][monster->position[dim_x]] < num) {
-            x = -1;
-            num = d->pc_distance[monster->position[dim_y] - 1][monster->position[dim_x]];
+        if (d->pc_distance[monster_y][monster_x] > d->pc_distance[monster_y - 1][monster_x]) {
+            monster->next_pos[0]--;
         }
 
-        if (d->pc_distance[monster->position[dim_y] + 1][monster->position[dim_x]] < num) {
-            x = 1;
-            num = d->pc_distance[monster->position[dim_y] + 1][monster->position[dim_x]];
+        else if (d->pc_distance[monster_y][monster_x] > d->pc_distance[monster_y + 1][monster_x]) {
+            monster->next_pos[0]++;
         }
 
-        if (d->pc_distance[monster->position[dim_y]][monster->position[dim_x] + 1] < num) {
-            y = 1;
-            num = d->pc_distance[monster->position[dim_y]][monster->position[dim_x] + 1];
+        else if (d->pc_distance[monster_y][monster_x] > d->pc_distance[monster_y][monster_x - 1]) {
+            monster->next_pos[1]--;
         }
 
-        if (d->pc_distance[monster->position[dim_y]][monster->position[dim_x] - 1] < num) {
-            y = -1;
-            num = d->pc_distance[monster->position[dim_y]][monster->position[dim_x] - 1];
+        else if (d->pc_distance[monster_y][monster_x] > d->pc_distance[monster_y][monster_x + 1]) {
+            monster->next_pos[1]++;
+        }
+
+        else if (d->pc_distance[monster_y][monster_x] > d->pc_distance[monster_y - 1][monster_x - 1]) {
+            monster->next_pos[0]--;
+            monster->next_pos[1]--;
+        }
+
+        else if (d->pc_distance[monster_y][monster_x] > d->pc_distance[monster_y + 1][monster_x + 1]) {
+            monster->next_pos[0]++;
+            monster->next_pos[1]++;
+        }
+
+        else if (d->pc_distance[monster_y][monster_x] > d->pc_distance[monster_y + 1][monster_x - 1]) {
+            monster->next_pos[0]++;
+            monster->next_pos[1]--;
+        }
+
+        else if (d->pc_distance[monster_y][monster_x] > d->pc_distance[monster_y - 1][monster_x + 1]) {
+            monster->next_pos[0]--;
+            monster->next_pos[1]++;
         }
     }
-
-    //how do we actually update monster movements
-    //add x and y? i think we use their pos
-    //cause i put pos in their structs so we can do pos[1] - 1 noice yeeee :)
-    monster_x += x;
-    monster_y += y;
 }
 
+void tunneling_hardness(dungeon_t* d, int x, int y) {
+    if (hardnessxy(x, y) <= 85 && hardnessxy(x, y) != 0) {
+        hardnessxy(x, y) = 0;
+        d->map[x][y] = ter_floor_hall;
+
+        dijkstra_tunnel(d);
+        dijkstra(d);
+    }
+
+    else
+        hardnessxy(x, y) -= 85;
+}
 
 // moves the monsters for all possibilities
 void move(monster_t *monster, dungeon_t *d, heap_t *heap) {
@@ -334,12 +407,12 @@ void move(monster_t *monster, dungeon_t *d, heap_t *heap) {
     d->mons[monster->position[dim_y]][monster->position[dim_x]] = ' ';
 
     if (monster->m == '@') {
-      // moves towards pc if monster sees them??
-      //I think pc moves randomly and monster position depends on the pc position
-      monster->next_pos[dim_y] = monster->position[dim_y] + d->pc.position[dim_y];
-      monster->next_pos[dim_x] = monster->position[dim_x]+ d->pc.position[dim_x];
+        // moves towards pc if monster sees them??
+        //I think pc moves randomly and monster position depends on the pc position
+        monster->next_pos[dim_y] = monster->position[dim_y] + d->pc.position[dim_y];
+        monster->next_pos[dim_x] = monster->position[dim_x]+ d->pc.position[dim_x];
 
-      //not erratic, not tunneling, not telepathic, not smart
+        //not erratic, not tunneling, not telepathic, not smart
     } else if (monster->m == '0') {
         //if pc is in line of sight -> move towards pc
         if (in_line_of_sight)
@@ -350,331 +423,331 @@ void move(monster_t *monster, dungeon_t *d, heap_t *heap) {
             monster->next_pos[dim_x] = monster->position[dim_x];
         }
 
-      //not erratic, not tunneling, not telepathic, smart
+        //not erratic, not tunneling, not telepathic, smart
     } else if (monster->m == '1') {
-          if (in_line_of_sight)
-              straight(monster, d);
+        if (in_line_of_sight)
+            straight(monster, d);
 
-          else {
-              monster->next_pos[dim_y] = monster->position[dim_y];
-              monster->next_pos[dim_x] = monster->position[dim_x];
-          }
+        else {
+            monster->next_pos[dim_y] = monster->position[dim_y];
+            monster->next_pos[dim_x] = monster->position[dim_x];
+        }
 
-      //not erratic, not tunneling, telepathic, not smart
+        //not erratic, not tunneling, telepathic, not smart
     } else if (monster->m == '2') {
-          if (in_line_of_sight)
-              straight(monster, d);
+        if (in_line_of_sight)
+            straight(monster, d);
 
-          else {
-              monster->next_pos[dim_y] = monster->position[dim_y];
-              monster->next_pos[dim_x] = monster->position[dim_x];
-          }
+        else {
+            monster->next_pos[dim_y] = monster->position[dim_y];
+            monster->next_pos[dim_x] = monster->position[dim_x];
+        }
 
-      //not erratic, not tunneling, telepathic, smart
+        //not erratic, not tunneling, telepathic, smart
     } else if (monster->m == '3') {
 
-      // telepathic monsters constantly know where the pc is
-      // always move toward the pc
-      shortest_path(monster, d);
-      /**
-          if (in_line_of_sight)
-              straight(monster, d);
+        // telepathic monsters constantly know where the pc is
+        // always move toward the pc
+        shortest_path(monster, d);
+        /**
+            if (in_line_of_sight)
+                straight(monster, d);
 
-          else {
-              monster->next_pos[dim_y] = monster->position[dim_y];
-              monster->next_pos[dim_x] = monster->position[dim_x];
-          }
-      **/
+            else {
+                monster->next_pos[dim_y] = monster->position[dim_y];
+                monster->next_pos[dim_x] = monster->position[dim_x];
+            }
+        **/
 
-      //not erratic, tunneling, not telepathic, not smart
+        //not erratic, tunneling, not telepathic, not smart
     } else if (monster->m == '4') {
-          if (in_line_of_sight)
-              straight(monster, d);
+        if (in_line_of_sight)
+            straight(monster, d);
 
-          //i will figure this out
-          else {
-              int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-              int rand_y = (rand() % 2) - 1;
+            //i will figure this out
+        else {
+            int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+            int rand_y = (rand() % 2) - 1;
 
-              monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-              monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+            monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+            monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-              if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
-                  hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
-                  d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
+            if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
+                hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
+                d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
 
-                  dijkstra_tunnel(d);
-                  dijkstra(d);
-              }
-          }
+                dijkstra_tunnel(d);
+                dijkstra(d);
+            }
+        }
 
-      //not erratic, tunneling, not telepathic, smart
+        //not erratic, tunneling, not telepathic, smart
     } else if (monster->m == '5') {
-          if (in_line_of_sight)
-              straight(monster, d);
+        if (in_line_of_sight)
+            straight(monster, d);
 
-          //i will figure this out
-          else {
-              int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-              int rand_y = (rand() % 2) - 1;
+            //i will figure this out
+        else {
+            int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+            int rand_y = (rand() % 2) - 1;
 
-              monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-              monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+            monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+            monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-              if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
-                  hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
-                  d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
+            if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
+                hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
+                d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
 
-                  dijkstra_tunnel(d);
-                  dijkstra(d);
-              }
-          }
+                dijkstra_tunnel(d);
+                dijkstra(d);
+            }
+        }
 
-      //not erratic, tunneling, telepathic, not smart
+        //not erratic, tunneling, telepathic, not smart
     } else if (monster->m == '6') {
-      /*
-      if (in_line_of_sight)
-          straight(monster, d);
-      */
+        /*
+        if (in_line_of_sight)
+            straight(monster, d);
+        */
 
-          int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-          int rand_y = (rand() % 2) - 1;
+        int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+        int rand_y = (rand() % 2) - 1;
 
-          monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-          monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+        monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+        monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-          if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
-              hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
-              d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
+        if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
+            hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
+            d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
 
-              dijkstra_tunnel(d);
-              dijkstra(d);
-          }
+            dijkstra_tunnel(d);
+            dijkstra(d);
+        }
 
-      //not erratic, tunneling, telepathic, smart
+        //not erratic, tunneling, telepathic, smart
     } else if (monster->m == '7') {
-          shortest_path(monster, d); //idk -- does shortestpath let the monster know where the pc is?
+        shortest_path(monster, d); //idk -- does shortestpath let the monster know where the pc is?
 
-          /*
-          int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-          int rand_y = (rand() % 2) - 1;
+        /*
+        int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+        int rand_y = (rand() % 2) - 1;
 
-          monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-          monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+        monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+        monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-          if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
-              hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
-              d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
+        if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
+            hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
+            d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
 
-              dijkstra_tunnel(d);
-              dijkstra(d);
-          }
-          */
+            dijkstra_tunnel(d);
+            dijkstra(d);
+        }
+        */
 
-      //erratic, not tunneling, not telepathic, not smart
+        //erratic, not tunneling, not telepathic, not smart
     } else if (monster->m == '8') {
-          int is_erratic = rand() % 2;
+        int is_erratic = rand() % 2;
 
-          if (is_erratic) {
-              int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-              int rand_y = (rand() % 2) - 1;
+        if (is_erratic) {
+            int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+            int rand_y = (rand() % 2) - 1;
 
-              monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-              monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+            monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+            monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-          } else if (in_line_of_sight) {
-              straight(monster, d);
+        } else if (in_line_of_sight) {
+            straight(monster, d);
 
-          } else {
-              monster->next_pos[dim_y] = monster->position[dim_y];
-              monster->next_pos[dim_x] = monster->position[dim_x];
-          }
+        } else {
+            monster->next_pos[dim_y] = monster->position[dim_y];
+            monster->next_pos[dim_x] = monster->position[dim_x];
+        }
 
-      //erratic, not tunneling, not telepathic, smart
+        //erratic, not tunneling, not telepathic, smart
     } else if (monster->m == '9') {
-          int is_erratic = rand() % 2;
+        int is_erratic = rand() % 2;
 
-          if (is_erratic) {
-              int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-              int rand_y = (rand() % 2) - 1;
+        if (is_erratic) {
+            int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+            int rand_y = (rand() % 2) - 1;
 
-              monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-              monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+            monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+            monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-          } else if (in_line_of_sight) {
-              //shortest_path(monster, d);
-              straight(monster, d);
+        } else if (in_line_of_sight) {
+            //shortest_path(monster, d);
+            straight(monster, d);
 
-          } else {
-              monster->next_pos[dim_y] = monster->position[dim_y];
-              monster->next_pos[dim_x] = monster->position[dim_x];
-          }
-      //erratic, not tunneling, telepathic, not smart
+        } else {
+            monster->next_pos[dim_y] = monster->position[dim_y];
+            monster->next_pos[dim_x] = monster->position[dim_x];
+        }
+        //erratic, not tunneling, telepathic, not smart
     } else if (monster->m == 'a') {
-          int is_erratic = rand() % 2;
+        int is_erratic = rand() % 2;
 
-          if (is_erratic) {
+        if (is_erratic) {
             int rand_x = (rand() % 2) - 1; //range from -1 to 1?
             int rand_y = (rand() % 2) - 1;
 
             monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
             monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-          } else if (in_line_of_sight){
-              //do tunneling stuff
-              //shortest_path(monster, d);
-              straight(monster, d);
+        } else if (in_line_of_sight){
+            //do tunneling stuff
+            //shortest_path(monster, d);
+            straight(monster, d);
 
-          } else {
-              monster->next_pos[dim_y] = monster->position[dim_y];
-              monster->next_pos[dim_x] = monster->position[dim_x];
-          }
-      //erratic, not tunneling, telepathic, smart
+        } else {
+            monster->next_pos[dim_y] = monster->position[dim_y];
+            monster->next_pos[dim_x] = monster->position[dim_x];
+        }
+        //erratic, not tunneling, telepathic, smart
     } else if (monster->m == 'b') {
-          int is_erratic = rand() % 2;
+        int is_erratic = rand() % 2;
 
-          if (is_erratic) {
+        if (is_erratic) {
             int rand_x = (rand() % 2) - 1; //range from -1 to 1?
             int rand_y = (rand() % 2) - 1;
 
             monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
             monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-          } else {
-              //do tunneling stuff
-              shortest_path(monster, d);
-              //straight(monster, d);
+        } else {
+            //do tunneling stuff
+            shortest_path(monster, d);
+            //straight(monster, d);
 
-          } /*else {
+        } /*else {
               monster->next_pos[dim_y] = monster->position[dim_y];
               monster->next_pos[dim_x] = monster->position[dim_x];
           }*/
 
 
-      //erratic, tunneling, not telepathic, not smart
+        //erratic, tunneling, not telepathic, not smart
     } else if (monster->m == 'c') {
-          int is_erratic = rand() % 2;
+        int is_erratic = rand() % 2;
 
-          if (is_erratic) {
+        if (is_erratic) {
             int rand_x = (rand() % 2) - 1; //range from -1 to 1?
             int rand_y = (rand() % 2) - 1;
 
             monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
             monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-          } else if (in_line_of_sight) {
-              straight(monster, d);
+        } else if (in_line_of_sight) {
+            straight(monster, d);
 
-          } else {
-              int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-              int rand_y = (rand() % 2) - 1;
+        } else {
+            int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+            int rand_y = (rand() % 2) - 1;
 
-              monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-              monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+            monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+            monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-              if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
-                  hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
-                  d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
+            if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
+                hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
+                d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
 
-                  dijkstra_tunnel(d);
-                  dijkstra(d);
-              }
-          }
+                dijkstra_tunnel(d);
+                dijkstra(d);
+            }
+        }
 
-      //erratic, tunneling, not telepathic, smart
+        //erratic, tunneling, not telepathic, smart
     } else if (monster->m == 'd') {
-          int is_erratic = rand() % 2;
+        int is_erratic = rand() % 2;
 
-          if (is_erratic) {
+        if (is_erratic) {
             int rand_x = (rand() % 2) - 1; //range from -1 to 1?
             int rand_y = (rand() % 2) - 1;
 
             monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
             monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-          } else if (in_line_of_sight) {
-              shortest_path(monster, d);
+        } else if (in_line_of_sight) {
+            shortest_path(monster, d);
 
-          } else {
-              int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-              int rand_y = (rand() % 2) - 1;
+        } else {
+            int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+            int rand_y = (rand() % 2) - 1;
 
-              monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-              monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+            monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+            monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-              if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
-                  hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
-                  d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
+            if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
+                hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
+                d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
 
-                  dijkstra_tunnel(d);
-                  dijkstra(d);
-              }
-          }
+                dijkstra_tunnel(d);
+                dijkstra(d);
+            }
+        }
 
-      //erratic, tunneling, telepathic, not smart
+        //erratic, tunneling, telepathic, not smart
     } else if (monster->m == 'e') {
-          int is_erratic = rand() % 2;
+        int is_erratic = rand() % 2;
 
-          if (is_erratic) {
-              int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-              int rand_y = (rand() % 2) - 1;
-
-              monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-              monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
-
-          } else if (in_line_of_sight){
-            //do tunneling stuff
-                straight(monster, d);
-
-          } else {
-                int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-                int rand_y = (rand() % 2) - 1;
-
-                monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-                monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
-
-                if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
-                    hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
-                    d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
-
-                    dijkstra_tunnel(d);
-                    dijkstra(d);
-                }
-          }
-
-      //erratic, tunneling, telepathic, smart (f) --- i do not know what to do for this one and 7 -- which part of it are you talking about?
-      //like idk what to do in general for telepathic, smart and tunneling all together so for smart we just use the shortest_path cause the function does everything
-      //for the monster to get to the pc the fastest and it looks like you got tunneling but I'm not sure what the ran_x and rand_y are for? 
-      //for erratic, he said it would either do the other characteristics or move to a random space, so i added a rand_x and rand_y
-      //for the monster to move to :P  haylee wants to update so i let her update - do we have to update in tunneling too? what in tunnelling wym 
-      //-- cause you have it in the else statement too
-    } else if (monster->m == 'f') {
-          int is_erratic = rand() % 2;
-
-          if (is_erratic) {
+        if (is_erratic) {
             int rand_x = (rand() % 2) - 1; //range from -1 to 1?
             int rand_y = (rand() % 2) - 1;
 
             monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
             monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-          }else if (in_line_of_sight){
-              shortest_path(monster, d);
-          }else {
-              int rand_x = (rand() % 2) - 1; //range from -1 to 1?
-              int rand_y = (rand() % 2) - 1;
+        } else if (in_line_of_sight){
+            //do tunneling stuff
+            straight(monster, d);
 
-              monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
-              monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+        } else {
+            int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+            int rand_y = (rand() % 2) - 1;
 
-              if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
-                  hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
-                  d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
+            monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+            monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
 
-                  dijkstra_tunnel(d);
-                  dijkstra(d);
-              }
-          }
+            if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
+                hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
+                d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
+
+                dijkstra_tunnel(d);
+                dijkstra(d);
+            }
+        }
+
+        //erratic, tunneling, telepathic, smart (f) --- i do not know what to do for this one and 7 -- which part of it are you talking about?
+        //like idk what to do in general for telepathic, smart and tunneling all together so for smart we just use the shortest_path cause the function does everything
+        //for the monster to get to the pc the fastest and it looks like you got tunneling but I'm not sure what the ran_x and rand_y are for?
+        //for erratic, he said it would either do the other characteristics or move to a random space, so i added a rand_x and rand_y
+        //for the monster to move to :P  haylee wants to update so i let her update - do we have to update in tunneling too? what in tunnelling wym
+        //-- cause you have it in the else statement too
+    } else if (monster->m == 'f') {
+        int is_erratic = rand() % 2;
+
+        if (is_erratic) {
+            int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+            int rand_y = (rand() % 2) - 1;
+
+            monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+            monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+
+        }else if (in_line_of_sight){
+            shortest_path(monster, d);
+        }else {
+            int rand_x = (rand() % 2) - 1; //range from -1 to 1?
+            int rand_y = (rand() % 2) - 1;
+
+            monster->next_pos[dim_y] = monster->position[dim_y] + rand_x;
+            monster->next_pos[dim_x] = monster->position[dim_x] + rand_y;
+
+            if (hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) <= 85) {
+                hardnessxy(monster->next_pos[dim_x], monster->next_pos[dim_y]) = 0;
+                d->map[monster->next_pos[dim_y]][monster->next_pos[dim_x]] = ter_floor_hall;
+
+                dijkstra_tunnel(d);
+                dijkstra(d);
+            }
+        }
     }
 
     //knowing which monster's turn it is
@@ -689,21 +762,21 @@ void move(monster_t *monster, dungeon_t *d, heap_t *heap) {
 }
 
 void combat(dungeon_t *d, monster_t *m) {
-  int x = m->position[dim_x];
-  int y = m->position[dim_y];
+    int x = m->position[dim_x];
+    int y = m->position[dim_y];
 
-  // if the if monster next pos has a monster in that spot
-  if (d->mons[y][x] != ' ') {
-    int i = d->mons[y][x];
-    monster_t other = d->monsters[i];
+    // if the if monster next pos has a monster in that spot
+    if (d->mons[y][x] != ' ') {
+        int i = d->mons[y][x];
+        monster_t other = d->monsters[i];
 
-    // change that other mons to ded
-    other.is_alive = false;
+        // change that other mons to ded
+        other.is_alive = false;
 
-    // make coords -1 -1
-    other.position[dim_x] = -1;
-    other.position[dim_y] = -1;
-  }
+        // make coords -1 -1
+        other.position[dim_x] = -1;
+        other.position[dim_y] = -1;
+    }
 }
 
 // cmp for moves priority queue NEED A STRUCT TO ANONYMIZE ALL CHARACTERS FOR SEQU NUMS AND NEXT_TURNS
@@ -724,11 +797,11 @@ void run_turns(dungeon_t *d) {
     static uint32_t initialized = 0;
 
     if (!initialized) {
-      initialized = 1;
-      for (i = 0; i < d->num_monsters; i++) {
-        mon[i].pos[0] = d->monsters[i].position[dim_y];
-        mon[i].pos[1] = d->monsters[i].position[dim_x];
-      }
+        initialized = 1;
+        for (i = 0; i < d->num_monsters; i++) {
+            mon[i].pos[0] = d->monsters[i].position[dim_y];
+            mon[i].pos[1] = d->monsters[i].position[dim_x];
+        }
     }
 
     //might need to put before generate monsters or in main
@@ -742,9 +815,9 @@ void run_turns(dungeon_t *d) {
 
     //WHILE THE GAME HASNT BEEN WON
     while (!game_done(&d)) {
-      if (--size != h.size) {
-        exit(1);
-      }
+        if (--size != h.size) {
+            exit(1);
+        }
         //TAKE THE TOP MONSTER OUT OF THE QUEUE AND MOVE IT
         c = heap_remove_min(&h);
         ypos = (int) c->pos[0];
@@ -762,8 +835,8 @@ void run_turns(dungeon_t *d) {
             mon[j].hn = heap_insert(&h, &mon[j]);
         }
         else {
-          heap_decrease_key_no_replace(&h, &mon[j].hn);
-          c->hn = NULL;
+            heap_decrease_key_no_replace(&h, &mon[j].hn);
+            c->hn = NULL;
         }
 
         //RENDER DUNGEON
