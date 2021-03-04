@@ -3,6 +3,7 @@
 
 # include "heap.h"
 # include "dims.h"
+# include "stdbool.h"
 
 #define DUNGEON_X              80
 #define DUNGEON_Y              21
@@ -45,6 +46,18 @@ typedef struct pc {
     bool is_alive;
 } pc_t;
 
+typedef struct monsters {
+    char m;
+    uint8_t mon_type[4];
+    pair_t position;
+    pair_t next_pos;
+    int speed;
+    uint32_t sequence;
+    uint32_t next_turn;
+    pair_t last_pos;
+    bool is_alive;
+} monster_t;
+
 typedef struct dungeon {
     uint32_t num_rooms;
     room_t *rooms;
@@ -62,6 +75,7 @@ typedef struct dungeon {
     uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
     uint8_t mons[DUNGEON_Y][DUNGEON_X];
     monster_t *monsters;
+    uint32_t num_monsters;
     pc_t pc;
 } dungeon_t;
 
