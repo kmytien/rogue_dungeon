@@ -630,7 +630,7 @@ void render_dungeon(dungeon_t *d)
             if (d->pc.position[dim_x] == p[dim_x] && d->pc.position[dim_y] == p[dim_y]) {
                 putchar('@');
             } else {
-                for (int i = 0; i < d->monsters; i++) {
+                for (int i = 0; i < d->num_monsters; i++) {
                     if (d->monsters[i].position[dim_x] == p[dim_x] && d->monsters[i].position[dim_x] == p[dim_y]) putchar(d->monsters[i].m);
                 }
                 switch (mappair(p)) {
