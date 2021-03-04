@@ -1,8 +1,8 @@
 #makefile for 1.04 pathfinding
 run: 
-	gcc heap.c heap.h rlg327.c 327_assignment1.04.c dungeon.c dungeon.h path.c path.h utils.c utils.h dims.h -o run
+	gcc heap.c heap.h rlg327.c 327_assignment1.04.c assignment_104.h dungeon.c dungeon.h path.c path.h utils.c utils.h dims.h -o run
 	
-327_assignment1.04: 327_assignment1.04.c 327_assignment1.04.h
+327_assignment1.04: 327_assignment1.04.c assignment_104.h
 	gcc 327_assignment1.04.c -o 327_assignment1.04
 	
 rlg327: rlg327.c
