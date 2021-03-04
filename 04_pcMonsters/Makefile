@@ -1,45 +1,27 @@
-#makefile for 1.04 pcMonsters
-CC = gcc
-CXX = g++
-ECHO = echo
-RM = rm -f
-
-TERM = "\"S2021\""
-
-CFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM) -pg
-CXXFLAGS = -Wall -Werror -ggdb -funroll-loops -DTERM=$(TERM)
-
-LDFLAGS = -pg
-
-BIN = rlg327
-OBJS = rlg327.o heap.o dungeon.o path.o utils.o 327_assignment1.04.o
-
-all: $(BIN) etags
-
-$(BIN): $(OBJS)
-	@$(ECHO) Linking $@
-	@$(CC) $^ -o $@ $(LDFLAGS)
-
--include $(OBJS:.o=.d)
-
-%.o: %.c
-	@$(ECHO) Compiling $<
-	@$(CC) $(CFLAGS) -MMD -MF $*.d -c $<
-
-%.o: %.cpp
-	@$(ECHO) Compiling $<
-	@$(CXX) $(CXXFLAGS) -MMD -MF $*.d -c $<
-
-.PHONY: all clean clobber etags
-
+#makefile for 1.04 pathfinding
+run: 
+	gcc heap.c heap.h rlg327.c 327_assignment1.04.c dungeon.c dungeon.h path.c path.h utils.c utils.h dims.h -o run
+	
+327_assignment1.04: 327_assignment1.04.c 327_assignment1.04.h
+	gcc 327_assignment1.04.c -o 327_assignment1.04
+	
+rlg327: rlg327.c
+	gcc rlg327.c -o rlg327
+	
+heap: heap.c heap.h
+	gcc heap.c -o heap
+	
+dungeon: dungeon.c dungeon.h
+	gcc dungeon.c -o dungeon
+	
+path: path.c path.h
+	gcc path.c -o path
+	
+utils: utils.c utils.h
+	gcc utils.c -o utils
+	
+dims: dims.h
+	gcc dims.h -o dims
+	
 clean:
-	@$(ECHO) Removing all generated files
-	@$(RM) *.o $(BIN) *.d TAGS core vgcore.* gmon.out
-
-clobber: clean
-	@$(ECHO) Removing backup files
-	@$(RM) *~ \#* *pgm
-
-etags:
-	@$(ECHO) Updating TAGS
-	@etags *.[ch]
+	rm -f 327_assignment1.04 rlg327 heap run dungeon path utils dims
