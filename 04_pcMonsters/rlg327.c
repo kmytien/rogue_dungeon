@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     time_t seed;
     struct timeval tv;
     uint32_t i;
-    uint32_t do_load, do_save, do_seed, do_image, do_save_seed, do_save_image;
+    uint32_t do_load, do_save, do_seed, do_image, do_save_seed, do_save_image, do_nummon;
     uint32_t long_arg;
     char *save_file;
     char *load_file;
@@ -36,23 +36,9 @@ int main(int argc, char *argv[])
 
     /* Default behavior: Seed with the time, generate a new dungeon, *
      * and don't write to disk.                                      */
-    do_load = do_save = do_image = do_save_seed = do_save_image = 0;
+    do_load = do_save = do_image = do_save_seed = do_save_image = do_nummon = 0;
     do_seed = 1;
     save_file = load_file = NULL;
-
-    /* The project spec requires '--load' and '--save'.  It's common  *
-     * to have short and long forms of most switches (assuming you    *
-     * don't run out of letters).  For now, we've got plenty.  Long   *
-     * forms use whole words and take two dashes.  Short forms use an *
-      * abbreviation after a single dash.  We'll add '--rand' (to     *
-     * specify a random seed), which will take an argument of it's    *
-     * own, and we'll add short forms for all three commands, '-l',   *
-     * '-s', and '-r', respectively.  We're also going to allow an    *
-     * optional argument to load to allow us to load non-default save *
-     * files.  No means to save to non-default locations, however.    *
-     * And the final switch, '--image', allows me to create a dungeon *
-     * from a PGM image, so that I was able to create those more      *
-     * interesting test dungeons for you.                             */
 
     if (argc > 1) {
         for (i = 1, long_arg = 0; i < argc; i++, long_arg = 0) {
@@ -118,7 +104,12 @@ int main(int argc, char *argv[])
                         }
                         break;
                     case 'n':
-                        if (argv[1] == "--nummon") d.num_monsters = (int) argv[2];
+                        if ((!long_arg && argv[i][2]) ||
+                            (long_arg && strcmp(argv[i], "-nummon"))) {
+                            usage(argv[0]);
+                            d.num_monsters = (uint32_t) atoi(argv[2]);
+                        }
+                        do_nummon = 1;
                         break;
                     default:
                         usage(argv[0]);
@@ -161,13 +152,13 @@ int main(int argc, char *argv[])
     printf("PC is at (y, x): %d, %d\n",
            d.pc.position[dim_y], d.pc.position[dim_x]);
 
-
+    dijkstra(&d);
+    dijkstra_tunnel(&d);
     run_turns(&d);
 
 //   render_dungeon(&d);
 
-//   dijkstra(&d);
-//   dijkstra_tunnel(&d);
+//   dijkstra(&d);   dijkstra_tunnel(&d);
 //   render_distance_map(&d);
 //   render_tunnel_distance_map(&d);
 //   render_hardness_map(&d);
