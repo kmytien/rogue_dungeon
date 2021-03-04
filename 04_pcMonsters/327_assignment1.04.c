@@ -1,89 +1,16 @@
-//include statements below
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include <math.h>
 #include <limits.h>
 
 #include "dungeon.h"
 #include "dims.h"
 #include "heap.h"
 #include "path.h"
-#include "utils.h"
-
-void combat(dungeon_t *d, monster_t *m);
-void tunneling_hardness(dungeon_t* d, int x, int y);
-
-/**
-    NOTES:
-      *** ill make seperate header file for this after we finish, the main function will be in rlg - MK ***
-      *** may interpret these however we like ***
-      - Need to move monsters around
-          - "--nummon [INTEGER]" summons an INTEGER number of monsters around (10 is reasonable) DONE
-          - Also have a hard coded default in case no --nummon
-          - Represented with letters and occasionally letters/punctuation
-          - Monsters may have 50% chance of having the following:
-                - Intelligence: understands dungeon layout and moves on shortest path, can remember last known position
-                  of previously seen PC
-                - Unintelligent: monsters move in a straight line toward PC
-                - Telepathy: always know where PC is, moves toward PC
-                - Non-Telepathic: knows where PC is if PC is in line of sight, moves toward last known position
-                - Tunneling Ability: can tunnel through rock
-                - Erratic Behavior: have a 50% chance of moving as per their other characteristics,
-                  otherwise they move to a random neighboring cell
-      - Speed
-        - Each monsters gets speed between 5 and 20
-        - PC gets speed of 10
-      - Basically whats supposed to happen in main(?) is
-        - all monsters move (based on type) towards a (stationary) pc
-        - when 2 characters land on the same space, the newcomer kills the original player on the cell
-        - the game continues until the player dies or all the monsters are dead
-        - (use usleep(3) which sleeps for an argument number of microseconds (250000ish) and when the game ends, prints win/lose status before exiting)
-**/
-
-char lose_message[12] = "you lost lol";
-char win_message[28] = "you won. which is surprising";
-
-struct tunnel {
-    heap_node_t *hn;
-    uint8_t pos[2];
-    int32_t cost;
-} tunnel_t;
-
-struct nontunnel {
-    heap_node_t *hn;
-    uint8_t pos[2];
-    int32_t cost;
-} nontunnel_t;
+#include "assignment_104.h"
 
 
-// struct player {
-//
-// } pc;
-//
-// struct nonplayer {
-//
-// } npc;
-
-
-
-typedef struct m_path {
-    heap_node_t *hn;
-    uint8_t pos[2];
-} mp_t;
-
-// struct character {
-//     pair_t position;
-//     pair_t next_pos;
-//
-//     union {
-//         struct player;
-//         struct nonplayer;
-//         bool is_alive;
-//     };
-// };
-
-// how do we figure out the number of monsters we need? (argc)
+//generates all monsters in dungeon
 void generate_monsters(dungeon_t *d, char m) {
     int i, j, type[4], x, y;
     bool valid = false;
@@ -97,6 +24,7 @@ void generate_monsters(dungeon_t *d, char m) {
 
     // generate needed amnt of monsters
     for (i = 0; i < d->num_monsters; i++) {
+
         // find monster position that is on floor and is not the pc and place it there
         while (!valid) {
             x = (rand() % 80) + 1;
@@ -199,26 +127,28 @@ void straight(monster_t *monster, dungeon_t *d) {
 
 
 //for non telepathic & non tunneling monsters if they see pc in line of sight
-//so most likely if they're in a room
 //might use Bresenham's line drawing algorithm
 int in_line_of_sight(dungeon_t *d, monster_t *monster) {
 
     int monster_y = monster->position[dim_y], monster_x = monster->position[dim_x];
+
     //if pc is left/above monster or right/below monster
     bool y_negative = false, x_negative = false;
     int x_dir, y_dir, i1, i2, i3;
+
 
     if (monster_x > d->pc.position[dim_x]) {
         x_negative = true;
         x_dir = monster_x - d->pc.position[dim_x];
     } else x_dir = d->pc.position[dim_x] - monster_x;
 
+
     if (monster_y > d->pc.position[dim_y]) {
         y_negative = true;
         y_dir = monster_y = d->pc.position[dim_y];
     } else y_dir = d->pc.position[dim_y] - monster_y;
 
-    //finishing later -mk
+
     if (y_dir > x_dir) {
         i1 = x_dir * 2;
         i2 = i1 - y_dir;
@@ -230,7 +160,6 @@ int in_line_of_sight(dungeon_t *d, monster_t *monster) {
                 return 0;
 
             //calculating coords for next pixel
-            //i do not get the math in this but this was from a tutorial for line algorithm lol -mk
             if (i2 < 0) i2 += i1;
             else {
                 i2 += i3;
@@ -238,7 +167,9 @@ int in_line_of_sight(dungeon_t *d, monster_t *monster) {
             }
         }
         return 1;
-    } else {
+    }
+
+    else {
         i1 = y_dir * 2;
         i2 = i1 - x_dir;
         i3 = i2 - x_dir;
@@ -249,7 +180,6 @@ int in_line_of_sight(dungeon_t *d, monster_t *monster) {
                 return 0;
 
             //calculating coords for next pixel
-            //i do not get the math in this but this was from a tutorial for line algorithm lol -mk
             if (i2 < 0) i2 += i1;
             else {
                 i2 += i3;
@@ -261,15 +191,15 @@ int in_line_of_sight(dungeon_t *d, monster_t *monster) {
 }
 
 
-//implementing dijkstra for tuneeling and non tunneling monsters
+//implementation for tunneling and non tunneling monsters
 void shortest_path(monster_t* monster, dungeon_t* d) {
 
-    //monster x, y positions
     int x = 0, y = 0, cost = INT_MAX;
     int monster_x = monster->next_pos[1], monster_y = monster->next_pos[0];
     int next_x, next_y;
     bool tunneling;
 
+    //looking for if monster is tunneling or not
     switch (monster->m) {
         case '4':
         case '5':
@@ -337,7 +267,7 @@ void shortest_path(monster_t* monster, dungeon_t* d) {
             next_y = monster_y - 1;
         }
 
-        //something w hardness
+        //checks hardness and changes based on rules
         if (hardnessxy(x, y) <= 85) {
             monster->next_pos[0] = next_y;
             monster->next_pos[1] = next_x;
@@ -346,7 +276,7 @@ void shortest_path(monster_t* monster, dungeon_t* d) {
         tunneling_hardness(d, next_x, next_y);
     }
 
-
+    //nontunneling monsters
     else {
         if (d->pc_distance[monster_y][monster_x] > d->pc_distance[monster_y - 1][monster_x]) {
             monster->next_pos[0]--;
@@ -386,6 +316,8 @@ void shortest_path(monster_t* monster, dungeon_t* d) {
     }
 }
 
+
+//changes hardness and updates maps
 void tunneling_hardness(dungeon_t* d, int x, int y) {
     if (hardnessxy(x, y) <= 85 && hardnessxy(x, y) != 0) {
         hardnessxy(x, y) = 0;
@@ -399,7 +331,8 @@ void tunneling_hardness(dungeon_t* d, int x, int y) {
         hardnessxy(x, y) -= 85;
 }
 
-// moves the monsters for all possibilities
+
+//moves the monsters for all possibilities
 void move(monster_t *monster, dungeon_t *d, heap_t *heap) {
 
     //remove monster from monster map
@@ -407,8 +340,7 @@ void move(monster_t *monster, dungeon_t *d, heap_t *heap) {
 
     //pc
     if (monster->m == '@') {
-        // moves towards pc if monster sees them??
-        //I think pc moves randomly and monster position depends on the pc position
+
         monster->next_pos[dim_y] = monster->position[dim_y] + d->pc.position[dim_y];
         monster->next_pos[dim_x] = monster->position[dim_x]+ d->pc.position[dim_x];
 
@@ -714,6 +646,8 @@ void move(monster_t *monster, dungeon_t *d, heap_t *heap) {
     d->mons[monster->position[dim_y]][monster->position[dim_y]] = monster->sequence;
 }
 
+
+//functions for killing monsters/pc
 void combat(dungeon_t *d, monster_t *m) {
 
     int x = m->position[dim_x];
@@ -733,7 +667,8 @@ void combat(dungeon_t *d, monster_t *m) {
     }
 }
 
-// cmp for moves priority queue NEED A STRUCT TO ANONYMIZE ALL CHARACTERS FOR SEQU NUMS AND NEXT_TURNS
+
+//cmp for moves priority queue NEED A STRUCT TO ANONYMIZE ALL CHARACTERS FOR SEQU NUMS AND NEXT_TURNS
 static int32_t character_cmp(const void *key, const void *with) {
     // if next_turns subtract to zero then return subtracted sequ numbers
     if (((monster_t *) key)->next_turn - ((monster_t *) with)->next_turn == 0)
@@ -742,9 +677,10 @@ static int32_t character_cmp(const void *key, const void *with) {
     return ((monster_t *) key)->next_turn - ((monster_t *) with)->next_turn;
 }
 
+
 //function that puts characters in the priority queue and runs the game until win/lose
 void run_turns(dungeon_t *d) {
-    
+
     //PUTS ALL MONSTERS IN A PRIORITY QUEUE BASED OFF OF THE CMP
     heap_t h;
     static mp_t *mon, *c;
