@@ -42,24 +42,11 @@ typedef struct room {
 
 typedef struct pc {
     pair_t position;
-    bool alive;
+    bool is_alive;
 } pc_t;
-
-typedef struct monster {
-    heap_node_t *hn;
-    char m;
-    uint8_t speed;
-    pair_t position;
-    pair_t next_pos;
-    uint8_t mon_type[4];
-    bool alive;
-    uint32_t sequence;
-    uint32_t next_turn;
-} monster_t;
 
 typedef struct dungeon {
     uint32_t num_rooms;
-    uint32_t num_monsters;
     room_t *rooms;
     terrain_type_t map[DUNGEON_Y][DUNGEON_X];
     /* Since hardness is usually not used, it would be expensive to pull it *
@@ -73,8 +60,9 @@ typedef struct dungeon {
     uint8_t hardness[DUNGEON_Y][DUNGEON_X];
     uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
     uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
-    pc_t pc;
+    uint8_t mons[DUNGEON_Y][DUNGEON_X];
     monster_t *monsters;
+    pc_t pc;
 } dungeon_t;
 
 void init_dungeon(dungeon_t *d);
