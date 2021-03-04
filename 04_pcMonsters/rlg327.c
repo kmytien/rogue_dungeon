@@ -6,6 +6,7 @@
 #include "dungeon.h"
 #include "path.h"
 
+
 void usage(char *name)
 {
   fprintf(stderr,
@@ -27,6 +28,7 @@ int main(int argc, char *argv[])
   char *save_file;
   char *load_file;
   char *pgm_file;
+
 
   /* Quiet a false positive from valgrind. */
   memset(&d, 0, sizeof (d));
