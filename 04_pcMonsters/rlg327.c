@@ -117,14 +117,14 @@ int main(int argc, char *argv[])
           }
           break;
 	case 'n':
-          if (argv[1] == "--nummon") d->num_monsters = (int) argv[2];
+          if (argv[1] == "--nummon") d.num_monsters = (int) argv[2];
           break;
         default:
           usage(argv[0]);
         }
       } else { /* No dash */
         usage(argv[0]);
-	d->num_monsters = NUM_MONSTERS;
+	d.num_monsters = NUM_MONSTERS;
       }
     }
   }
