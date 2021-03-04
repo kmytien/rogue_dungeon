@@ -1,27 +1,17 @@
 #ifndef ASSIGNMENT_104_H
 #define ASSIGNMENT_104_H
 
-struct tunnel {
-    heap_node_t *hn;
-    uint8_t pos[2];
-    int32_t cost;
-} tunnel_t;
+#include "dungeon.h"
+#include "heap.h"
 
-struct nontunnel {
-    heap_node_t *hn;
-    uint8_t pos[2];
-    int32_t cost;
-} nontunnel_t;
 
 typedef struct m_path {
     heap_node_t *hn;
     uint8_t pos[2];
 } mp_t;
 
-char lose_message[12] = "you lost lol";
-char win_message[28] = "you won. which is surprising";
 
-void generate_monsters(dungeon_t *d, char m);
+void generate_monsters(dungeon_t *d);
 
 bool game_done(dungeon_t *d);
 
