@@ -1,3 +1,4 @@
+03/04/21 12:30 MK: Re-did shortest_path methods and implemented changes of hardness
 03/04/21 11:00 SA: Fixed more compile errors on emacs
 03/03/21 18:30 HL SA MK: Finished up most methods including move(), run_turns(), combat() and more
 03/03/21 17:00 MK: Fixed some compile errors
