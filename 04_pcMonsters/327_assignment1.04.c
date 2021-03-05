@@ -28,10 +28,15 @@ struct nontunnel {
 
 //generates all monsters in dungeon
 void generate_monsters(dungeon_t *d) {
-    int i, j, type[4], x, y;
+    int i, j, type[4], x, y, seq;
     int num = d->num_monsters;
     bool valid = false;
     d->monsters = malloc(d->num_monsters * sizeof(int));
+
+    // // init monsters[]
+    // for (i = 0; i < 1000; i++) {
+    //     d->monsters[i]
+    // }
 
     // init mons arrays
     for (y = 1; y < 21; y++) {
@@ -45,16 +50,16 @@ void generate_monsters(dungeon_t *d) {
 
         // find monster position that is on floor and is not the pc and place it there
         while (!valid) {
-            x = (rand() % 80) + 1;
-            y = (rand() % 20) + 1;
+            x = (rand() % 79) + 1;
+            y = (rand() % 19) + 1;
 
             if (d->map[y][x] >= ter_floor && d->pc.position[dim_x] != x && d->pc.position[dim_y] != y) {
                 valid = true;
                 d->monsters[i].position[dim_x] = x;
                 d->monsters[i].position[dim_y] = y;
 
-                printf("%d\n", x);
-                printf("%d\n", y);
+                printf("\n%d ", x);
+                printf("%d ", y);
             }
         }
 
@@ -112,8 +117,9 @@ void generate_monsters(dungeon_t *d) {
             	d->monsters[i].m = 'f';
             	break;
         }
-
-        d->mons[d->monsters[i].position[dim_y]][d->monsters[i].position[dim_x]] = ++i;
+        seq = i;
+        seq++;
+        d->mons[d->monsters[i].position[dim_y]][d->monsters[i].position[dim_x]] = seq;
 
         // convert to binary
         for (j = 0; mon > 0; j++) { // type is stored in an array of 4 numbers
@@ -135,14 +141,20 @@ void generate_monsters(dungeon_t *d) {
         }
 
         // set sequence
-        d->monsters[i].sequence = i + 1;
+        d->monsters[i].sequence = seq;
 
         // set next_turns
         d->monsters[i].next_turn = 0;
         d->monsters[i].is_alive = true;
 
         valid = false;
+
+        //print central
+        // printf(" %c hex, %d xpos, %d ypos, bin %d%d%d%d, next turns %d, seq %d", d->monsters[i].m, d->monsters[i].position[dim_x], d->monsters[i].position[dim_y],
+        //         d->monsters[i].mon_type[0], d->monsters[i].mon_type[1], d->monsters[i].mon_type[2], d->monsters[i].mon_type[3], d->monsters[i].next_turn,
+        //         d->monsters[i].sequence);
     }
+    printf("end of gen");
 }
 
 //boolean decides if the game has been won or lost and prints if the game is done
@@ -758,10 +770,14 @@ void run_turns(dungeon_t *d) {
     mon = malloc(d->num_monsters * sizeof(int));
 
     generate_monsters(d);
-    printf("at run turns\n");
     d->pc.is_alive = true;
 
-    // render_dungeon(&d);
+    // for (int k = 0; k < 10; k++) {
+    //     printf("%d ", d->monsters[k].position[dim_x]);
+    //     printf("%d\n", d->monsters[k].position[dim_y]);
+    // }
+
+    render_dungeon(d);
 
     if (!initialized) {
         initialized = 1;
@@ -782,10 +798,8 @@ void run_turns(dungeon_t *d) {
     size = h.size;
 
     //WHILE THE GAME HASNT BEEN WON
-    while (!game_done(d)) {
-        if (--size != h.size)
-            exit(1);
-
+    int done = 1;
+    while (done) {
 
         //TAKE THE TOP MONSTER OUT OF THE QUEUE AND MOVE IT
         c = heap_remove_min(&h);
@@ -794,8 +808,8 @@ void run_turns(dungeon_t *d) {
         j = d->mons[ypos][xpos];
         j--;
 
-
-        move(&(d->monsters[j]), &d, &h);
+	printf("\n\nhellol\n\n");
+        move(&d->monsters[j], &d, &h);
 
         //UPDATE NEXTTURNS
         d->monsters[j].next_turn += (1000 / d->monsters[j].speed);
@@ -816,5 +830,7 @@ void run_turns(dungeon_t *d) {
 
     if (d->pc.is_alive)
     	printf("%s\n", win_message);
+
+    free(d->monsters);
 
 }
