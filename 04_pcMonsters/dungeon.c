@@ -624,15 +624,16 @@ int gen_dungeon(dungeon_t *d)
 void render_dungeon(dungeon_t *d)
 {
     pair_t p;
+    int num;
 
     for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
         for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
             if (d->pc.position[dim_x] == p[dim_x] && d->pc.position[dim_y] == p[dim_y]) {
                 putchar('@');
+            } else if (d->mons[p[dim_y]][p[dim_x]] != 0) {
+                num = (int) d->mons[p[dim_y]][p[dim_x]];
+                putchar(d->monsters[num].m);
             } else {
-                for (int i = 0; i < d->num_monsters; i++) {
-                    if (d->monsters[i].position[dim_x] == p[dim_x] && d->monsters[i].position[dim_x] == p[dim_y]) putchar(d->monsters[i].m);
-                }
                 switch (mappair(p)) {
                     case ter_wall:
                     case ter_wall_immutable:
