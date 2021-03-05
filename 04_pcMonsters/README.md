@@ -24,6 +24,8 @@
         - the game continues until the player dies or all the monsters are dead
         - (use usleep(3) which sleeps for an argument number of microseconds (250000ish) and when the game ends, prints win/lose status before exiting)
 
+Please look at the certain parts of the assignment, we were not able to figure out the priority queue in run_turns() but are pretty sure move(), shortest_path() etc are working functions. 
+
 ## Project Team Members:
 - MyTien Kien *(kmytien)*
 - Haylee Lawrence *(hayleel)*
