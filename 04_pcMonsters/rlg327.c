@@ -155,8 +155,8 @@ int main(int argc, char *argv[])
     printf("PC is at (y, x): %d, %d\n",
            d.pc.position[dim_y], d.pc.position[dim_x]);
 
-    dijkstra(&d);
-    dijkstra_tunnel(&d);
+    // dijkstra(&d);
+    // dijkstra_tunnel(&d);
     run_turns(&d);
 
 //   render_dungeon(&d);
