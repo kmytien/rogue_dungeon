@@ -751,14 +751,21 @@ void run_turns(dungeon_t *d) {
     static uint32_t initialized = 0;
     mon = malloc(d->num_monsters * sizeof(int));
 
-    generate_monsters(d);
+    generate_monsters(&d);
     d->pc.is_alive = true;
+
+    // for (int y = 0; y < 82; y++) {
+    //     for (int x )
+    // }
+    render_dungeon(&d);
 
     if (!initialized) {
         initialized = 1;
         for (i = 0; i < d->num_monsters; i++) {
             mon[i].pos[0] = d->monsters[i].position[dim_y];
+            printf("%d", d->monsters[i].position[dim_y]);
             mon[i].pos[1] = d->monsters[i].position[dim_x];
+            printf("%d", d->monsters[i].position[dim_x);
         }
     }
 
@@ -783,9 +790,10 @@ void run_turns(dungeon_t *d) {
         ypos = (int) c->pos[0];
         xpos = (int) c->pos[1];
         j = d->mons[ypos][xpos];
+        j--;
 
 
-        move(&(d->monsters[j]), d, &h);
+        move(&(d->monsters[j]), &d, &h);
 
         //UPDATE NEXTTURNS
         d->monsters[j].next_turn += (1000 / d->monsters[j].speed);
@@ -800,6 +808,7 @@ void run_turns(dungeon_t *d) {
         }
 
         //RENDER DUNGEON
+        usleep(250000);
         render_dungeon(d);
     }
 
