@@ -53,8 +53,8 @@ void generate_monsters(dungeon_t *d) {
                 d->monsters[i].position[dim_x] = x;
                 d->monsters[i].position[dim_y] = y;
 
-                printf("\n%d ", x);
-                printf("%d ", y);
+                // printf("\n%d ", x);
+                // printf("%d ", y);
             }
         }
 
@@ -149,7 +149,7 @@ void generate_monsters(dungeon_t *d) {
         //         d->monsters[i].mon_type[0], d->monsters[i].mon_type[1], d->monsters[i].mon_type[2], d->monsters[i].mon_type[3], d->monsters[i].next_turn,
         //         d->monsters[i].sequence);
     }
-    printf("end of gen");
+    // printf("end of gen");
 }
 
 //boolean decides if the game has been won or lost and prints if the game is done
@@ -771,15 +771,15 @@ void run_turns(dungeon_t *d) {
     //     printf("%d ", d->monsters[k].position[dim_x]);
     //     printf("%d\n", d->monsters[k].position[dim_y]);
     // }
-printf("\n");
-    for (int y = 0; y < DUNGEON_Y; y++) {
-        for (int x = 0; x < DUNGEON_X; x++) {
-            printf("%d", d->mons[y][x]);
-        }
-        printf("\n");
-    }
+// printf("\n");
+//     for (int y = 0; y < DUNGEON_Y; y++) {
+//         for (int x = 0; x < DUNGEON_X; x++) {
+//             printf("%d", d->mons[y][x]);
+//         }
+//         printf("\n");
+//     }
 
-    render_dungeon(d);
+    // render_dungeon(d);
 
     if (!initialized) {
         initialized = 1;
@@ -801,9 +801,9 @@ printf("\n");
 
     //WHILE THE GAME HASNT BEEN WON
     while (!game_done(d)) {
-        if (--size != h.size)
-            exit(1);
-
+        // if (--size != h.size) {
+        //     exit(1);
+        // }
 
         //TAKE THE TOP MONSTER OUT OF THE QUEUE AND MOVE IT
         c = heap_remove_min(&h);
@@ -812,21 +812,18 @@ printf("\n");
         j = d->mons[ypos][xpos];
         j--;
 
-
-        move(&(d->monsters[j]), d, &h);
-
         //UPDATE NEXTTURNS
-        d->monsters[j].next_turn += (1000 / d->monsters[j].speed);
 
         // PUT BACK IN THE HEAP IF IT IS STILL ALIVE
-        if (d->monsters[j].is_alive)
+        if (d->monsters[j].is_alive) {
             mon[j].hn = heap_insert(&h, &mon[j]);
-
+            move(&(d->monsters[j]), d, &h);
+            d->monsters[j].next_turn += (1000 / d->monsters[j].speed);
+        }
         else {
             heap_decrease_key_no_replace(&h, mon[j].hn);
             c->hn = NULL;
         }
-
         //RENDER DUNGEON
         usleep(250000);
         render_dungeon(d);
