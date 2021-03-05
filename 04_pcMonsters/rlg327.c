@@ -48,6 +48,14 @@ int main(int argc, char *argv[])
                     long_arg = 1; /* handle long and short args at the same place.  */
                 }
                 switch (argv[i][1]) {
+                    case 'n':
+                        if ((!long_arg && argv[i][2]) ||
+                            (long_arg && strcmp(argv[i], "-nummon")) ||
+                            argc < ++i + 1 /* No more arguments */) {
+                            usage(argv[0]);
+                        }
+                        do_nummon = 1;
+                        break;
                     case 'r':
                         if ((!long_arg && argv[i][2]) ||
                             (long_arg && strcmp(argv[i], "-rand")) ||
@@ -103,13 +111,6 @@ int main(int argc, char *argv[])
                             pgm_file = argv[++i];
                         }
                         break;
-                    case 'n':
-                        if ((!long_arg && argv[i][2]) ||
-                            (long_arg && strcmp(argv[i], "-nummon"))) {
-                            usage(argv[0]);
-                        }
-                        do_nummon = 1;
-                        break;
                     default:
                         usage(argv[0]);
                 }
@@ -131,13 +132,14 @@ int main(int argc, char *argv[])
 
     init_dungeon(&d);
 
+
     if (do_load) {
         read_dungeon(&d, load_file);
     } else if (do_image) {
         read_pgm(&d, pgm_file);
     } else if (do_nummon) {
         d.num_monsters = (uint32_t) atoi(argv[2]);
-    }else {
+    } else {
         gen_dungeon(&d);
         d.num_monsters = 10;
     }
