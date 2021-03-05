@@ -30,6 +30,7 @@ struct nontunnel {
 void generate_monsters(dungeon_t *d) {
     int i, j, type[4], x, y;
     bool valid = false;
+    d->monsters = malloc(d->num_monsters * sizeof(int));
 
     // init mons arrays
     for (y = 1; y < 21; y++) {
@@ -46,7 +47,7 @@ void generate_monsters(dungeon_t *d) {
             x = (rand() % 80) + 1;
             y = (rand() % 20) + 1;
 
-            if (d->map[y][x] == ter_floor && d->pc.position[dim_x] != x && d->pc.position[dim_y] != y) {
+            if (d->map[y][x] >= ter_floor && d->pc.position[dim_x] != x && d->pc.position[dim_y] != y) {
                 valid = true;
                 d->monsters[i].position[dim_x] = x;
                 d->monsters[i].position[dim_y] = y;
@@ -125,7 +126,7 @@ void generate_monsters(dungeon_t *d) {
 
         //figure out the last known position of the monster?
         if(d->monsters[i].mon_type[3] == 1){ //how does one make sure intelligence is equal to one
-            d->monsters[i].last_pos[0] = 0; //sorry idk how to do the inteligece stuff
+            d->monsters[i].last_pos[0] = 0;
             d->monsters[i].last_pos[1] = 0;
         }
 
@@ -748,6 +749,7 @@ void run_turns(dungeon_t *d) {
     static mp_t *mon, *c;
     int i, j, xpos, ypos, size;
     static uint32_t initialized = 0;
+    mon = malloc(d->num_monsters * sizeof(int));
 
     generate_monsters(d);
     d->pc.is_alive = true;
@@ -759,6 +761,7 @@ void run_turns(dungeon_t *d) {
             mon[i].pos[1] = d->monsters[i].position[dim_x];
         }
     }
+
 
     //might need to put before generate monsters or in main
     heap_init(&h, character_cmp, NULL);
@@ -773,6 +776,7 @@ void run_turns(dungeon_t *d) {
     while (!game_done(d)) {
         if (--size != h.size)
             exit(1);
+
 
         //TAKE THE TOP MONSTER OUT OF THE QUEUE AND MOVE IT
         c = heap_remove_min(&h);
