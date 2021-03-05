@@ -138,10 +138,11 @@ int main(int argc, char *argv[])
     } else if (do_image) {
         read_pgm(&d, pgm_file);
     } else if (do_nummon) {
+        printf("sdf");
         d.num_monsters = (uint32_t) atoi(argv[2]);
     } else {
         gen_dungeon(&d);
-        d.num_monsters = 10;
+        d.num_monsters = 11;
     }
 
     if (!do_load) {
@@ -154,7 +155,7 @@ int main(int argc, char *argv[])
 
     printf("PC is at (y, x): %d, %d\n",
            d.pc.position[dim_y], d.pc.position[dim_x]);
-
+printf("sdjfs");
     // dijkstra(&d);
     // dijkstra_tunnel(&d);
     run_turns(&d);
