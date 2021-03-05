@@ -33,11 +33,6 @@ void generate_monsters(dungeon_t *d) {
     bool valid = false;
     d->monsters = malloc(d->num_monsters * sizeof(int));
 
-    // // init monsters[]
-    // for (i = 0; i < 1000; i++) {
-    //     d->monsters[i]
-    // }
-
     // init mons arrays
     for (y = 1; y < 21; y++) {
         for (x = 1; x < 80; x++) {
@@ -150,7 +145,7 @@ void generate_monsters(dungeon_t *d) {
         valid = false;
 
         //print central
-        // printf(" %c hex, %d xpos, %d ypos, bin %d%d%d%d, next turns %d, seq %d", d->monsters[i].m, d->monsters[i].position[dim_x], d->monsters[i].position[dim_y],
+        // printf(" %c hex, %d xpos, %d ypos, bin %d%d%d%d, next turns %d, seq %d", d->monsters[i].m, d->monsters[i].position[dim_x], d->monsters[i].position[dim_y], 
         //         d->monsters[i].mon_type[0], d->monsters[i].mon_type[1], d->monsters[i].mon_type[2], d->monsters[i].mon_type[3], d->monsters[i].next_turn,
         //         d->monsters[i].sequence);
     }
@@ -776,6 +771,13 @@ void run_turns(dungeon_t *d) {
     //     printf("%d ", d->monsters[k].position[dim_x]);
     //     printf("%d\n", d->monsters[k].position[dim_y]);
     // }
+printf("\n");
+    for (int y = 0; y < DUNGEON_Y; y++) {
+        for (int x = 0; x < DUNGEON_X; x++) {
+            printf("%d", d->mons[y][x]);
+        }
+        printf("\n");
+    }
 
     render_dungeon(d);
 
@@ -798,8 +800,10 @@ void run_turns(dungeon_t *d) {
     size = h.size;
 
     //WHILE THE GAME HASNT BEEN WON
-    int done = 1;
-    while (done) {
+    while (!game_done(d)) {
+        if (--size != h.size)
+            exit(1);
+
 
         //TAKE THE TOP MONSTER OUT OF THE QUEUE AND MOVE IT
         c = heap_remove_min(&h);
@@ -808,8 +812,8 @@ void run_turns(dungeon_t *d) {
         j = d->mons[ypos][xpos];
         j--;
 
-	printf("\n\nhellol\n\n");
-        move(&d->monsters[j], &d, &h);
+
+        move(&(d->monsters[j]), d, &h);
 
         //UPDATE NEXTTURNS
         d->monsters[j].next_turn += (1000 / d->monsters[j].speed);
