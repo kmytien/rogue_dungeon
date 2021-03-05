@@ -1,6 +1,9 @@
 # Assignment 1.04 | Player Character & Monsters
 - This assignment is for CS 327 Spring 2021
 - We used Prof. Sheaffer's 1.03 assignment code for this assignment 
+
+Please look at the certain parts of the assignment, we were not able to figure out the priority queue in run_turns() but are pretty sure move(), shortest_path() etc are working functions. 
+
 -   *** may interpret these however we like ***
       - Need to move monsters around
           - "--nummon [INTEGER]" summons an INTEGER number of monsters around (10 is reasonable) DONE
@@ -23,8 +26,6 @@
         - when 2 characters land on the same space, the newcomer kills the original player on the cell
         - the game continues until the player dies or all the monsters are dead
         - (use usleep(3) which sleeps for an argument number of microseconds (250000ish) and when the game ends, prints win/lose status before exiting)
-
-Please look at the certain parts of the assignment, we were not able to figure out the priority queue in run_turns() but are pretty sure move(), shortest_path() etc are working functions. 
 
 ## Project Team Members:
 - MyTien Kien *(kmytien)*
