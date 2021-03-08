@@ -226,8 +226,16 @@ int main(int argc, char *argv[])
   config_pc(&d);
   gen_monsters(&d);
 
+  /* init screen */
+  initscr(); // creates stdscr
+  cbreak(); // allows us to exit the screen if something goes wrong, can also use raw() if dont want that
+  keypad(stdscr, TRUE);
+  noecho(); // dont echo any key presses (dont display what you pressed on the screen)
+  curs_set(FALSE); // dont display a cursor
+
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
     render_dungeon(&d);
+    pc_commands(&d, getch());
     do_moves(&d);
     if (delay) {
       usleep(delay);
