@@ -41,8 +41,7 @@ void pc_commands(dungeon_t *d, int key) {
     //refresh(); updates the screen
 
     pair_t dir;
-    char input = getch();
-    switch(input) {
+    switch(key) {
 
         //move pc to upper left?
         case '7':
@@ -155,18 +154,17 @@ void pc_commands(dungeon_t *d, int key) {
         //npcs still move, x and y = 0
         case '5':
         case ' ':
-        case KEY_B2;
+        case KEY_B2:
             dir[dim_y] = 0;
             dir[dim_x] = 0;
             pc_next_pos(&d, dir);
             break;
-
-        case 'Q'
+        case 'Q':
             //delete pc
-            pc_delete(*pc);
+            pc_delete(d.pc.pc);
 
             //delete dungeon
-            delete_dungeon(*d);
+            delete_dungeon(d);
             endwin(); //close stdscr
             abort();
             break; //we put break here right? I'm not sure we need a break cause of abort
@@ -182,9 +180,9 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
   static uint32_t have_seen_corner = 0;
   static uint32_t count = 0;
 
-  while(!pc_commands(&d, dir)) {
-    return 0;
-  }
+  // while(!pc_commands(&d, dir)) {
+  //   return 0;
+  // }
 
   d->pc.position[dim_x] = dir[dim_x];
   d->pc.position[dim_y] = dir[dim_y];
