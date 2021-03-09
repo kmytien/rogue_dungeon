@@ -7,6 +7,7 @@
 #include "move.h"
 #include "path.h"
 #include "npc.h"
+#include "character.h"
 
 
 /**
@@ -42,6 +43,14 @@ int pc_commands(dungeon_t *d, int key) {
 
     pair_t dir;
     char input = getch();
+    uint32_t escape_key;
+
+    do{
+      if((key == getch()) == 27) {
+        //function that displays dungeon
+      }
+    }
+
     switch(input) {
 
         //move pc to upper left?
@@ -119,37 +128,13 @@ int pc_commands(dungeon_t *d, int key) {
         //attempt to go down stairs. Works only if standing on down staircase.
         case '>':
         //if pc is going downstairs
-            //delete pc
-            pc_delete(d->pc.pc); // I think thats how you get pc from current dungeon
-            //delete current dungeon
-            delete_dungeon(&d);
-            //generate new dungeon
-            init_dungeon(&d);
-            gen_dungeon(&d);
-            //generate new pc
-            config_pc(&d);
-            //generate gen_monsters
-            gen_monsters(&d);
-            //renders dungeon
-            render_dungeon(d);
+            stairs(d);
             break;
 
         //attempt to go up stairs. Works only if standing on up staircase.
         case '<':
         //if pc is going upstairs
-            //delete pc
-            pc_delete(d->pc.pc); // I think thats how you get pc from current dungeon
-            //delete current dungeon
-            delete_dungeon(&d);
-            //generate new dungeon
-            init_dungeon(&d);
-            gen_dungeon(&d);
-            //generate new pc
-            config_pc(&d);
-            //generate gen_monsters
-            gen_monsters(&d);
-            //renders dungeon
-            render_dungeon(d);
+            stairs(d);
             break;
 
         //npcs still move, x and y = 0
@@ -160,6 +145,9 @@ int pc_commands(dungeon_t *d, int key) {
             dir[dim_x] = 0;
             pc_next_pos(&d, dir);
             break;
+
+        case 'm':
+          create_monster_list(d);
 
         case 'Q':
             //delete pc
@@ -177,25 +165,173 @@ int pc_commands(dungeon_t *d, int key) {
 }
 
 
-uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
-{
+int stairs(dungeon_t *d) {
+    //delete pc
+    pc_delete(d->pc.pc); // I think thats how you get pc from current dungeon
+    //delete current dungeon
+    delete_dungeon(&d);
+    //generate new dungeon
+    init_dungeon(&d);
+    gen_dungeon(&d);
+    //generate new pc
+    config_pc(&d);
+    //generate gen_monsters
+    gen_monsters(&d);
+    //renders dungeon
+    render_dungeon(d);
+}
+
+
+//pc next position
+uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
   static uint32_t have_seen_corner = 0;
   static uint32_t count = 0;
 
-  while(!pc_commands(&d, dir)) {
+  while(!pc_commands(&d, dir)) { // this is gonna be an issue --probably :'(
     return 0;
   }
 
   d->pc.position[dim_x] = dir[dim_x];
   d->pc.position[dim_y] = dir[dim_y];
 
-  // if (target_is_valid &&
-  //     (d->pc.position[dim_x] == d->rooms[target_room].position[dim_x]) &&
-  //     (d->pc.position[dim_y] == d->rooms[target_room].position[dim_y])) {
-  //   target_is_valid = 0;
-  // }
-
-  //dir[dim_y] = dir[dim_x] = 0;
-
   return 0;
+}
+
+
+//creating a list of all the monsters
+void create_monster_list(dungeon_t *d) {
+
+    character_t *monsters;
+    uint32_t slot = 0;
+    monsters = malloc(d->num_monsters * sizeof(*monsters));
+
+    for (int i = 0; i < DUNGEON_Y; i++) {
+        for (int j = 0; i < DUNGEON_X; j++) {
+            if (d->character[i][j] != d->pc && d->character[i][j] != NULL) {
+                monsters[slot] = d->character[i][j];
+                slot++;
+            }
+        }
+    }
+
+    display_monster_list(d, monster, slot);
+    free(monsters);
+}
+
+
+//code to scroll down the monster list
+void scroll_monster_list(dungeon_t *d, uint32_t count){
+
+    uint32_t num = 0;
+
+    switch(getch()) {
+        case KEY_UP:
+            if (num) num--;
+            break;
+
+        case KEY_DOWN:
+            if (num < (count - 10)) num++;
+            break;
+
+        case 27:
+          return;
+    }
+}
+
+
+//io to display the list on terminal
+//Display a list of monsters in the dungeon, with their symbol and position relative to the PC (e.g.: “c, 2 north and 14 west”).
+void display_monster_list(dungeon_t *d, character_t *monsters){
+    char(*x)[40];
+    uint32_t count = (d->num_monsters * sizeof(*monsters));
+
+    char north_south[6];
+    char west_east[5];
+
+    x = malloc(count * sizeof(*x));
+
+    mvprintw(1, 19, "%-40s", " ");
+    snprintf(x[0], 40, "You know of %d monsters:", count);
+
+    mvprintw(2, 19, "%-40s", x);
+    mvprintw(3, 19, "%-40s", " ");
+
+    uint32_t i;
+    int pc_x = d->pc.position[dim_x], pc_y = d->pc.position[dim_y];
+    int mx, my;
+    int NS_dir, WE_dir;
+
+    for (i = 0; i < count; i++) {
+        //print how far away from pc the monster is
+        mx = monsters[i]->position[dim_x];
+        my = monsters[i]->position[dim_y];
+
+        if (pc_x - mx >= 0) west_east = "WEST";
+        else west_east = "EAST";
+        WE_dir = pc_x - mx;
+
+        if (pc_y - my >= 0) north_south = "NORTH";
+        else north_south = "SOUTH";
+        NS_dir = pc_y - my;
+
+        //print ------------------------------------------------- idk how to do this
+        //mvprintw(x, y(index of where you want it to be on terminal), 40 char from x array , message or value you want to print);
+        mvprintw(i + 4, 19, "%-40s", x[i]);
+    }
+    
+    if (count <= 10) {
+        mvprintw(count + 4, 19, "%-40s", " ");
+        mvprintw(count + 5, 19, "%-40s", "Press the escape button to continue.");
+        //as long as user doesn't hit escape continue to else
+    } else {
+        mvprintw(18, 19, "%-40s", " ");
+        mvprintw(19, 19, "%-40s", "Arrows allow you to scroll, press the escape button to continue.");
+        scroll_monster_list(d, count);
+    }
+    free(x);
+}
+
+// new render dungeon that prints to the ncurse screen
+void render_dungeon(dungeon_t *d)
+{
+  pair_t p;
+
+  putchar('\n');
+  for (p[dim_y] = 0; p[dim_y] < DUNGEON_Y; p[dim_y]++) {
+    for (p[dim_x] = 0; p[dim_x] < DUNGEON_X; p[dim_x]++) {
+      if (charpair(p)) {
+        mvaddch(charpair(p)->symbol);
+      } else {
+        switch (mappair(p)) {
+        case ter_wall:
+        case ter_wall_immutable:
+          mvaddch(p[dim_y] + 1, p[dim_x], ' ');
+          break;
+        case ter_floor:
+        case ter_floor_room:
+          mvaddch(p[dim_y] + 1, p[dim_x],'.');
+          break;
+        case ter_floor_hall:
+          mvaddch(p[dim_y] + 1, p[dim_x],'#');
+          break;
+        case ter_debug:
+          mvaddch(p[dim_y] + 1, p[dim_x],'*');
+          fprintf(stderr, "Debug character at %d, %d\n", p[dim_y], p[dim_x]);
+          break;
+        case ter_stairs_up:
+          mvaddch(p[dim_y] + 1, p[dim_x],'<');
+          break;
+        case ter_stairs_down:
+          mvaddch(p[dim_y] + 1, p[dim_x],'>');
+          break;
+        default:
+          mvaddch(p[dim_y] + 1, p[dim_x], '0');
+        }
+      }
+    }
+    mvaddch(p[dim_y] + 1, p[dim_x],'\n');
+  }
+  mvaddch('\n');
+  mvaddch('\n');
+  refresh();
 }
