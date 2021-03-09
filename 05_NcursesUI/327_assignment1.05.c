@@ -47,7 +47,8 @@ int pc_commands(dungeon_t *d, int key) {
 
     do{
       if((key == getch()) == 27) {
-        //function that displays dungeon
+          display_render_dungeon(d);
+          return;
       }
     }
 
@@ -278,7 +279,7 @@ void display_monster_list(dungeon_t *d, character_t *monsters){
         //mvprintw(x, y(index of where you want it to be on terminal), 40 char from x array , message or value you want to print);
         mvprintw(i + 4, 19, "%-40s", x[i]);
     }
-    
+
     if (count <= 10) {
         mvprintw(count + 4, 19, "%-40s", " ");
         mvprintw(count + 5, 19, "%-40s", "Press the escape button to continue.");
@@ -292,7 +293,7 @@ void display_monster_list(dungeon_t *d, character_t *monsters){
 }
 
 // new render dungeon that prints to the ncurse screen
-void render_dungeon(dungeon_t *d)
+void display_render_dungeon(dungeon_t *d)
 {
   pair_t p;
 
