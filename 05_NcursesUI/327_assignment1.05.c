@@ -35,13 +35,14 @@
 
 
 //feel free to change the name for this, not really sure if this is needed, its just me trying to figure out ncurses
-void pc_commands(dungeon_t *d, int key) {
+int pc_commands(dungeon_t *d, int key) {
     //getch(); pauses to wait for an input, have to press enter i think?
     //printw(...); prints stuff to the screen
     //refresh(); updates the screen
 
     pair_t dir;
-    switch(key) {
+    char input = getch();
+    switch(input) {
 
         //move pc to upper left?
         case '7':
@@ -49,7 +50,7 @@ void pc_commands(dungeon_t *d, int key) {
         case KEY_HOME:
             dir[dim_y] = -1;
             dir[dim_x] = -1;
-            pc_next_pos(&d, dir);
+            pc_next_pos(d, dir);
             break;
 
         //move pc one cell up
@@ -58,7 +59,7 @@ void pc_commands(dungeon_t *d, int key) {
         case KEY_UP:
             dir[dim_y] = -1;
             dir[dim_x] = 0;
-            pc_next_pos(&d, dir);
+            pc_next_pos(d, dir);
             break;
 
         //move pc to upper right
@@ -67,16 +68,16 @@ void pc_commands(dungeon_t *d, int key) {
         case KEY_PPAGE:
             dir[dim_y] = -1;
             dir[dim_x] = 1;
-            pc_next_pos(&d, dir);
+            pc_next_pos(d, dir);
             break;
 
         //move pc one cell to right
         case '6':
-        case '1':
+        case 'l':
         case KEY_RIGHT:
             dir[dim_y] = 0;
             dir[dim_x] = 1;
-            pc_next_pos(&d, dir);
+            pc_next_pos(d, dir);
             break;
 
         //move pc one cell to lower right
@@ -85,7 +86,7 @@ void pc_commands(dungeon_t *d, int key) {
         case KEY_NPAGE:
             dir[dim_y] = 1;
             dir[dim_x] = 1;
-            pc_next_pos(&d, dir);
+            pc_next_pos(d, dir);
             break;
 
         //move pc one cell DOWN
@@ -94,7 +95,7 @@ void pc_commands(dungeon_t *d, int key) {
         case KEY_DOWN:
             dir[dim_y] = 1;
             dir[dim_x] = 0;
-            pc_next_pos(&d, dir);
+            pc_next_pos(d, dir);
             break;
 
         //move pc one cell to lower left
@@ -103,7 +104,7 @@ void pc_commands(dungeon_t *d, int key) {
         case KEY_END:
             dir[dim_y] = 1;
             dir[dim_x] = -1;
-            pc_next_pos(&d, dir);
+            pc_next_pos(d, dir);
             break;
 
         //move pc one cell to the left
@@ -112,7 +113,7 @@ void pc_commands(dungeon_t *d, int key) {
         case KEY_LEFT:
             dir[dim_y] = 0;
             dir[dim_x] = -1;
-            pc_next_pos(&d, dir);
+            pc_next_pos(d, dir);
             break;
 
         //attempt to go down stairs. Works only if standing on down staircase.
@@ -159,9 +160,10 @@ void pc_commands(dungeon_t *d, int key) {
             dir[dim_x] = 0;
             pc_next_pos(&d, dir);
             break;
+
         case 'Q':
             //delete pc
-            pc_delete(d.pc.pc);
+            pc_delete(d->pc.pc);
 
             //delete dungeon
             delete_dungeon(d);
@@ -180,9 +182,9 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir)
   static uint32_t have_seen_corner = 0;
   static uint32_t count = 0;
 
-  // while(!pc_commands(&d, dir)) {
-  //   return 0;
-  // }
+  while(!pc_commands(&d, dir)) {
+    return 0;
+  }
 
   d->pc.position[dim_x] = dir[dim_x];
   d->pc.position[dim_y] = dir[dim_y];
