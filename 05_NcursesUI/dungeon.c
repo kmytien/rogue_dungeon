@@ -9,6 +9,7 @@
 #include <sys/time.h>
 #include <assert.h>
 #include <errno.h>
+#include <curses.h>
 
 #include "heap.h"
 #include "dungeon.h"
@@ -1008,8 +1009,7 @@ int read_dungeon(dungeon_t *d, char *file)
 
   fread(semantic, sizeof (DUNGEON_SAVE_SEMANTIC) - 1, 1, f);
   semantic[sizeof (DUNGEON_SAVE_SEMANTIC) - 1] = '\0';
-  if (strncmp(semantic, DUNGEON_SAVE_SEMANTIC,
-	      sizeof (DUNGEON_SAVE_SEMANTIC) - 1)) {
+  if (strncmp(semantic, DUNGEON_SAVE_SEMANTIC, sizeof (DUNGEON_SAVE_SEMANTIC) - 1)) {
     fprintf(stderr, "Not an RLG327 save file.\n");
     exit(-1);
   }
