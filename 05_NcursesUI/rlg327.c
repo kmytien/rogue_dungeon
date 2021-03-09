@@ -3,13 +3,14 @@
 #include <sys/time.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <ncurses.h>
+#include <curses.h>
 
 #include "dungeon.h"
 #include "pc.h"
 #include "npc.h"
 #include "move.h"
 #include "utils.h"
+
 
 const char *victory =
   "\n                                       o\n"
