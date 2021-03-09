@@ -10,6 +10,7 @@
 #include "npc.h"
 #include "move.h"
 #include "utils.h"
+#include "assignment_105.h"
 
 
 const char *victory =
