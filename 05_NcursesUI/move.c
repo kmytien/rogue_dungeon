@@ -13,6 +13,7 @@
 #include "utils.h"
 #include "path.h"
 #include "event.h"
+#include "assignment_105.h"
 
 void do_combat(dungeon_t *d, character_t *atk, character_t *def)
 {
@@ -95,6 +96,9 @@ void do_moves(dungeon_t *d)
     heap_insert(&d->events, update_event(d, e, 1000 / c->speed));
   }
 
+
+  display_render_dungeon(d);
+  
   if (pc_is_alive(d) && e->c == &d->pc) {
     c = e->c;
     d->time = e->time;
@@ -103,17 +107,7 @@ void do_moves(dungeon_t *d)
      * and recreated every time we leave and re-enter this function.    */
     e->c = NULL;
     event_delete(e);
-    pc_next_pos(d, next);
-    next[dim_x] += c->position[dim_x];
-    next[dim_y] += c->position[dim_y];
-    if (mappair(next) <= ter_floor) {
-      mappair(next) = ter_floor_hall;
-      hardnesspair(next) = 0;
-    }
-    move_character(d, c, next);
-
-    dijkstra(d);
-    dijkstra_tunnel(d);
+    pc_commands(d);
   }
 }
 
