@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "dungeon.h"
 #include "assignment_105.h"
+#include "npc.h"
 
 
 /**
@@ -42,13 +43,13 @@ int stairs(dungeon_t *d) {
     //delete current dungeon
     delete_dungeon(d);
     //generate new dungeon
-    init_dungeon(&d);
-    gen_dungeon(&d);
+    init_dungeon(d);
+    gen_dungeon(d);
     //generate new pc
-    config_pc(&d);
+    config_pc(d);
     d->character[d->pc.position[dim_y]][d->pc.position[dim_x]] = &d->pc;
     //generate gen_monsters
-    gen_monsters(&d);
+    gen_monsters(d);
     
     //renders dungeon
     //display_render_dungeon(&d);
@@ -163,11 +164,11 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
             case KEY_B2:
                 dir[dim_y] = 0;
                 dir[dim_x] = 0;
-                pc_next_pos(&d, dir);
+                pc_next_pos(d, dir);
                 cont = true;
                 break;
             case 'm':
-                create_monster_list(&d);
+                create_monster_list(d);
                 break;
 
             case 'Q':
