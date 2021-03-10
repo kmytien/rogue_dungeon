@@ -14,56 +14,10 @@
 
 
 const char *victory =
-  "\n                                       o\n"
-  "                                      $\"\"$o\n"
-  "                                     $\"  $$\n"
-  "                                      $$$$\n"
-  "                                      o \"$o\n"
-  "                                     o\"  \"$\n"
-  "                oo\"$$$\"  oo$\"$ooo   o$    \"$    ooo\"$oo  $$$\"o\n"
-  "   o o o o    oo\"  o\"      \"o    $$o$\"     o o$\"\"  o$      \"$  "
-  "\"oo   o o o o\n"
-  "   \"$o   \"\"$$$\"   $$         $      \"   o   \"\"    o\"         $"
-  "   \"o$$\"    o$$\n"
-  "     \"\"o       o  $          $\"       $$$$$       o          $  ooo"
-  "     o\"\"\n"
-  "        \"o   $$$$o $o       o$        $$$$$\"       $o        \" $$$$"
-  "   o\"\n"
-  "         \"\"o $$$$o  oo o  o$\"         $$$$$\"        \"o o o o\"  "
-  "\"$$$  $\n"
-  "           \"\" \"$\"     \"\"\"\"\"            \"\"$\"            \""
-  "\"\"      \"\"\" \"\n"
-  "            \"oooooooooooooooooooooooooooooooooooooooooooooooooooooo$\n"
-  "             \"$$$$\"$$$$\" $$$$$$$\"$$$$$$ \" \"$$$$$\"$$$$$$\"  $$$\""
-  "\"$$$$\n"
-  "              $$$oo$$$$   $$$$$$o$$$$$$o\" $$$$$$$$$$$$$$ o$$$$o$$$\"\n"
-  "              $\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\""
-  "\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"$\n"
-  "              $\"                                                 \"$\n"
-  "              $\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\"$\""
-  "$\"$\"$\"$\"$\"$\"$\"$\n"
-  "                                   You win!\n\n";
+  "You win!";
 
 const char *tombstone =
-  "\n\n\n\n                /\"\"\"\"\"/\"\"\"\"\"\"\".\n"
-  "               /     /         \\             __\n"
-  "              /     /           \\            ||\n"
-  "             /____ /   Rest in   \\           ||\n"
-  "            |     |    Pieces     |          ||\n"
-  "            |     |               |          ||\n"
-  "            |     |   A. Luser    |          ||\n"
-  "            |     |               |          ||\n"
-  "            |     |     * *   * * |         _||_\n"
-  "            |     |     *\\/* *\\/* |        | TT |\n"
-  "            |     |     *_\\_  /   ...\"\"\"\"\"\"| |"
-  "| |.\"\"....\"\"\"\"\"\"\"\".\"\"\n"
-  "            |     |         \\/..\"\"\"\"\"...\"\"\""
-  "\\ || /.\"\"\".......\"\"\"\"...\n"
-  "            |     |....\"\"\"\"\"\"\"........\"\"\"\"\""
-  "\"^^^^\".......\"\"\"\"\"\"\"\"..\"\n"
-  "            |......\"\"\"\"\"\"\"\"\"\"\"\"\"\"\"......"
-  "..\"\"\"\"\"....\"\"\"\"\"..\"\"...\"\"\".\n\n"
-  "            You're dead.  Better luck in the next life.\n\n\n";
+  "You're dead.  Better luck in the next life.";
 
 void usage(char *name)
 {
@@ -221,7 +175,7 @@ int main(int argc, char *argv[])
   initscr(); // creates stdscr
   cbreak(); // allows us to exit the screen if something goes wrong, can also use raw() if dont want that
   keypad(stdscr, TRUE);
-  noecho(); // dont echo any key presses (dont display what you pressed on the screen)
+  //noecho(); // dont echo any key presses (dont display what you pressed on the screen)
   curs_set(FALSE); // dont display a cursor
 
   if (do_load) {
@@ -246,7 +200,7 @@ int main(int argc, char *argv[])
   }
 
   display_render_dungeon(&d);
-
+	
   if (do_save) {
     if (do_save_seed) {
        /* 10 bytes for number, plus dot, extention and null terminator. */
@@ -276,7 +230,8 @@ int main(int argc, char *argv[])
          "You avenged the cruel and untimely murders of %u "
          "peaceful dungeon residents.\n",
          d.pc.kills[kill_direct], d.pc.kills[kill_avenged]);
-
+	
+  endwin();
   pc_delete(d.pc.pc);
 
   delete_dungeon(&d);
