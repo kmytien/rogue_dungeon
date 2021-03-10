@@ -3,7 +3,7 @@
 
 #include "dungeon.h"
 
-int pc_commands(dungeon_t *d, int key);
+int pc_commands(dungeon_t *d);
 
 int stairs(dungeon_t *d);
 
