@@ -9,7 +9,6 @@
 #include "utils.h"
 #include "dungeon.h"
 #include "assignment_105.h"
-#include "npc.h"
 
 
 /**
@@ -37,60 +36,19 @@
 **/
 
 
-//feel free to change the name for this, not really sure if this is needed, its just me trying to figure out ncurses
-int pc_commands(dungeon_t *d) {
-    //getch(); pauses to wait for an input, have to press enter i think?
-    //printw(...); prints stuff to the screen
-    //refresh(); updates the screen
-
-    pair_t dir;
-    char input = getch();
-    uint32_t escape_key;
-    bool cont = true;
-    //do {
-    //  if((key == getch()) == 27) {
-    //      display_render_dungeon(d);
-    //      return;
-    //  }
-    //} while();
-    while (cont) {
-        switch(input) {
-
-            case 'm':
-                create_monster_list(d);
-                cont = false;
-                break;
-
-            case 'Q':
-                //delete pc
-                pc_delete(d->pc.pc);
-
-                //delete dungeon
-                delete_dungeon(d);
-                endwin(); //close stdscr
-                abort();
-                break; //we put break here right? I'm not sure we need a break cause of abort
-
-            default:
-                return 0;
-        }
-    }
-}
-
-
 int stairs(dungeon_t *d) {
     //delete pc
     pc_delete(d->pc.pc); // I think thats how you get pc from current dungeon
     //delete current dungeon
     delete_dungeon(d);
     //generate new dungeon
-    init_dungeon(d);
-    gen_dungeon(d);
+    init_dungeon(&d);
+    gen_dungeon(&d);
     //generate new pc
-    config_pc(d);
+    config_pc(&d);
     d->character[d->pc.position[dim_y]][d->pc.position[dim_x]] = &d->pc;
     //generate gen_monsters
-    gen_monsters(d);
+    gen_monsters(&d);
     
     //renders dungeon
     //display_render_dungeon(&d);
@@ -205,21 +163,35 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
             case KEY_B2:
                 dir[dim_y] = 0;
                 dir[dim_x] = 0;
-                pc_next_pos(d, dir);
+                pc_next_pos(&d, dir);
                 cont = true;
                 break;
+            case 'm':
+                create_monster_list(&d);
+                break;
+
+            case 'Q':
+                //delete pc
+                pc_delete(d->pc.pc);
+
+                //delete dungeon
+                delete_dungeon(d);
+                endwin(); //close stdscr
+                abort();
+                break; //we put break here right? I'm not sure we need a break cause of abort
+            
             default:
-                mvprintw(1, 19, "%-40s", "ERROR: Please press a valid key.");
+                mvprintw(0, 0, "%-40s", "ERROR: Please press a valid key.");
                 break;
         }
     }
 
-   pair_t next_pos;
-   d->pc.position[dim_x] += dir[dim_x];
-   d->pc.position[dim_y] += dir[dim_y];
-   next_pos[dim_y] = d->pc.position[dim_y];
-   next_pos[dim_x] = d->pc.position[dim_x];
-   move_character(d, &d->pc, next_pos);
+//   pair_t next_pos;
+//   d->pc.position[dim_x] += dir[dim_x];
+//   d->pc.position[dim_y] += dir[dim_y];
+//   next_pos[dim_y] = d->pc.position[dim_y];
+//   next_pos[dim_x] = d->pc.position[dim_x];
+//   move_character(d, &d->pc, next_pos);
 
   return 0;
 }
@@ -286,11 +258,11 @@ void display_monster_list(dungeon_t *d, character_t **monsters){
 
     x = malloc(count * sizeof(*x));
 
-    mvprintw(2, 19, "%-40s", " ");
+    mvprintw(1, 19, "%-40s", " ");
     snprintf(x[0], 40, "You know of %d monsters:", count);
 
-    mvprintw(3, 19, "%-40s", x);
-    mvprintw(4, 19, "%-40s", " ");
+    mvprintw(2, 19, "%-40s", x);
+    mvprintw(3, 19, "%-40s", " ");
 
     uint32_t i;
     int pc_x = d->pc.position[dim_x], pc_y = d->pc.position[dim_y];
