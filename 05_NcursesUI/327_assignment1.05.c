@@ -214,12 +214,12 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
         }
     }
 
-//   pair_t next_pos;
-//   d->pc.position[dim_x] += dir[dim_x];
-//   d->pc.position[dim_y] += dir[dim_y];
-//   next_pos[dim_y] = d->pc.position[dim_y];
-//   next_pos[dim_x] = d->pc.position[dim_x];
-//   move_character(d, &d->pc, next_pos);
+   pair_t next_pos;
+   d->pc.position[dim_x] += dir[dim_x];
+   d->pc.position[dim_y] += dir[dim_y];
+   next_pos[dim_y] = d->pc.position[dim_y];
+   next_pos[dim_x] = d->pc.position[dim_x];
+   move_character(d, &d->pc, next_pos);
 
   return 0;
 }
