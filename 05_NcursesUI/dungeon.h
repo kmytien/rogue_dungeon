@@ -75,6 +75,7 @@ typedef struct dungeon {
    * information from the current event.                                   */
   uint32_t time;
   uint32_t is_new;
+  int is_stairs;
 } dungeon_t;
 
 void init_dungeon(dungeon_t *d);
