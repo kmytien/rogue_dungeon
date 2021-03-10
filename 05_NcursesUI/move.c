@@ -115,7 +115,7 @@ void do_moves(dungeon_t *d)
       mappair(next) = ter_floor_hall;
       hardnesspair(next) = 0;
     }
-    if (d->is_stairs == 1) move_character(d, c, next);
+    if (d->is_stairs == 0) move_character(d, c, next);
   }
 }
 
