@@ -58,10 +58,9 @@ int stairs(dungeon_t *d) {
 
 //pc next position
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
-    static uint32_t have_seen_corner = 0;
     static uint32_t count = 0;
 
-    mvprintw(0, 0, "%-40s", "Press a key to move the PC in a direction.");
+    mvprintw(0, 20, "%-40s", "Press a key to move the PC in a direction.");
 
     int input = getch();
     bool cont = false;
@@ -148,6 +147,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
                     d->is_stairs = 1;
                 }
                 break;
+                
             case '<':
             //if pc is going upstairs
                 if (d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_up) {
@@ -164,9 +164,10 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
             case KEY_B2:
                 dir[dim_y] = 0;
                 dir[dim_x] = 0;
-                pc_next_pos(d, dir);
+                //pc_next_pos(d, dir);
                 cont = true;
                 break;
+                
             case 'm':
                 create_monster_list(d);
                 break;
@@ -182,7 +183,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
                 break; //we put break here right? I'm not sure we need a break cause of abort
             
             default:
-                mvprintw(0, 0, "%-40s", "ERROR: Please press a valid key.");
+                mvprintw(0, 20, "%-40s", "	ERROR: Please press a valid key.	");
                 break;
         }
     }
@@ -214,7 +215,7 @@ void create_monster_list(dungeon_t *d) {
         }
     }
 
-    display_monster_list(d, monsters);
+    display_monster_list(d, monsters, slot);
     display_render_dungeon(d);
     free(monsters);
 }
@@ -243,22 +244,25 @@ void scroll_monster_list(dungeon_t *d, uint32_t count){
             case 27:
               foo = false;
               return;
+              break;
         }
+        
+        refresh();
     }
 }
 
 
 //io to display the list on terminal
 //Display a list of monsters in the dungeon, with their symbol and position relative to the PC (e.g.: “c, 2 north and 14 west”).
-void display_monster_list(dungeon_t *d, character_t **monsters){
+void display_monster_list(dungeon_t *d, character_t **monsters, uint32_t slot){
     char(*x)[40];
-    uint32_t count = (d->num_monsters * sizeof(*monsters));
+    uint32_t count = slot;
 
     char *north_south;
     char *west_east;
 
     x = malloc(count * sizeof(*x));
-
+    
     mvprintw(1, 19, "%-40s", " ");
     snprintf(x[0], 40, "You know of %d monsters:", count);
 
@@ -277,13 +281,13 @@ void display_monster_list(dungeon_t *d, character_t **monsters){
 
         if (pc_x - mx >= 0) west_east = "WEST";
         else west_east = "EAST";
-        WE_dir = pc_x - mx;
+        WE_dir = abs(pc_x - mx);
 
         if (pc_y - my >= 0) north_south = "NORTH";
         else north_south = "SOUTH";
-        NS_dir = pc_y - my;
+        NS_dir = abs(pc_y - my);
 
-        mvprintw(i + 4, 19, "The monster %c is %d %s and %d %s",
+        mvprintw(i + 4, 19, "The monster %c is %3d %s and %3d %s",
                  monsters[i]->symbol, NS_dir, north_south, WE_dir, west_east);
 
         if (count < 11) mvprintw(i + 4, 19, "%-40s", x[i]);
@@ -297,8 +301,8 @@ void display_monster_list(dungeon_t *d, character_t **monsters){
 
     else {
         mvprintw(18, 19, "%-40s", " ");
-        mvprintw(19, 19, "%-40s", "Arrows allow you to scroll, press the escape button to continue.");
-        scroll_monster_list(d, count);
+        mvprintw(19, 19, "%-40s", "Arrows to scroll & ESC to go back");
+        scroll_monster_list(d, count);	    
     }
 
     free(x);
