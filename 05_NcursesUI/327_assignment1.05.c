@@ -55,101 +55,6 @@ int pc_commands(dungeon_t *d) {
     while (cont) {
         switch(input) {
 
-            //move pc to upper left?
-            case '7':
-            case 'y':
-            case KEY_HOME:
-                dir[dim_y] = -1;
-                dir[dim_x] = -1;
-                pc_next_pos(d, dir);
-                break;
-
-            //move pc one cell up
-            case '8':
-            case 'k':
-            case KEY_UP:
-                dir[dim_y] = -1;
-                dir[dim_x] = 0;
-                pc_next_pos(d, dir);
-                break;
-
-            //move pc to upper right
-            case '9':
-            case 'u':
-            case KEY_PPAGE:
-                dir[dim_y] = -1;
-                dir[dim_x] = 1;
-                pc_next_pos(d, dir);
-                break;
-
-            //move pc one cell to right
-            case '6':
-            case 'l':
-            case KEY_RIGHT:
-                dir[dim_y] = 0;
-                dir[dim_x] = 1;
-                pc_next_pos(d, dir);
-                break;
-
-            //move pc one cell to lower right
-            case '3':
-            case 'n':
-            case KEY_NPAGE:
-                dir[dim_y] = 1;
-                dir[dim_x] = 1;
-                pc_next_pos(d, dir);
-                break;
-
-            //move pc one cell DOWN
-            case '2':
-            case 'j':
-            case KEY_DOWN:
-                dir[dim_y] = 1;
-                dir[dim_x] = 0;
-                pc_next_pos(d, dir);
-                break;
-
-            //move pc one cell to lower left
-            case '1':
-            case 'b':
-            case KEY_END:
-                dir[dim_y] = 1;
-                dir[dim_x] = -1;
-                pc_next_pos(d, dir);
-                break;
-
-            //move pc one cell to the left
-            case '4':
-            case 'h':
-            case KEY_LEFT:
-                dir[dim_y] = 0;
-                dir[dim_x] = -1;
-                pc_next_pos(d, dir);
-                break;
-
-            //attempt to go down stairs. Works only if standing on down staircase.
-            case '>':
-            //if pc is going downstairs
-                stairs(d);
-                break;
-
-            //attempt to go up stairs. Works only if standing on up staircase.
-            case '<':
-            //if pc is going upstairs
-                stairs(d);
-                break;
-
-            //npcs still move, x and y = 0
-            case '5':
-            case ' ':
-            case '.':
-            case KEY_B2:
-                dir[dim_y] = 0;
-                dir[dim_x] = 0;
-                pc_next_pos(&d, dir);
-                cont = false;
-                break;
-
             case 'm':
                 create_monster_list(d);
                 cont = false;
@@ -193,19 +98,127 @@ int stairs(dungeon_t *d) {
 
 //pc next position
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
-  static uint32_t have_seen_corner = 0;
-  static uint32_t count = 0;
+    static uint32_t have_seen_corner = 0;
+    static uint32_t count = 0;
 
-  while(!pc_commands(d)) { // this is gonna be an issue --probably :'(
-    return 0;
-  }
+    mvprintw(0, 0, "%-40s", "Press a key to move the PC in a direction.");
 
-  pair_t next_pos;
-  d->pc.position[dim_x] += dir[dim_x];
-  d->pc.position[dim_y] += dir[dim_y];
-  next_pos[dim_y] = d->pc.position[dim_y];
-  next_pos[dim_x] = d->pc.position[dim_x];
-  move_character(d, &d->pc, next_pos);
+    int input = getch();
+    bool cont = false;
+
+    while (!cont) {
+        switch (input) {
+            //move pc to upper left?
+            case '7':
+            case 'y':
+            case KEY_HOME:
+                dir[dim_y] = -1;
+                dir[dim_x] = -1;
+                cont = true;
+                break;
+
+            //move pc one cell up
+            case '8':
+            case 'k':
+            case KEY_UP:
+                dir[dim_y] = -1;
+                dir[dim_x] = 0;
+                cont = true;
+                break;
+
+            //move pc to upper right
+            case '9':
+            case 'u':
+            case KEY_PPAGE:
+                dir[dim_y] = -1;
+                dir[dim_x] = 1;
+                cont = true;
+                break;
+
+            //move pc one cell to right
+            case '6':
+            case 'l':
+            case KEY_RIGHT:
+                dir[dim_y] = 0;
+                dir[dim_x] = 1;
+                cont = true;
+                break;
+
+            //move pc one cell to lower right
+            case '3':
+            case 'n':
+            case KEY_NPAGE:
+                dir[dim_y] = 1;
+                dir[dim_x] = 1;
+                cont = true;
+                break;
+
+            //move pc one cell DOWN
+            case '2':
+            case 'j':
+            case KEY_DOWN:
+                dir[dim_y] = 1;
+                dir[dim_x] = 0;
+                cont = true;
+                break;
+
+            //move pc one cell to lower left
+            case '1':
+            case 'b':
+            case KEY_END:
+                dir[dim_y] = 1;
+                dir[dim_x] = -1;
+                cont = true;
+                break;
+
+            //move pc one cell to the left
+            case '4':
+            case 'h':
+            case KEY_LEFT:
+                dir[dim_y] = 0;
+                dir[dim_x] = -1;
+                cont = true;
+                break;
+
+            //attempt to go down stairs. Works only if standing on down staircase.
+            case '>':
+                if (d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_up) {
+                    stairs(d);
+                    cont = true;
+                    d->is_stairs = 1;
+                }
+                break;
+            case '<':
+            //if pc is going upstairs
+                if (d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_up) {
+                    stairs(d);
+                    cont = true;
+                    d->is_stairs = 1;
+                }
+                break;
+
+            //npcs still move, x and y = 0
+            case '5':
+            case ' ':
+            case '.':
+            case KEY_B2:
+                dir[dim_y] = 0;
+                dir[dim_x] = 0;
+                pc_next_pos(&d, dir);
+                cont = true;
+                break;
+            default:
+                mvprintw(0, 0, "%-40s", "ERROR: Please press a valid key.");
+                break;
+        }
+    }
+
+//   pair_t next_pos;
+//   d->pc.position[dim_x] += dir[dim_x];
+//   d->pc.position[dim_y] += dir[dim_y];
+//   next_pos[dim_y] = d->pc.position[dim_y];
+//   next_pos[dim_x] = d->pc.position[dim_x];
+//   move_character(d, &d->pc, next_pos);
 
   return 0;
 }
