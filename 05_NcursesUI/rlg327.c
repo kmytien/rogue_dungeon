@@ -217,6 +217,13 @@ int main(int argc, char *argv[])
 
   init_dungeon(&d);
 
+  /* init screen */
+  initscr(); // creates stdscr
+  cbreak(); // allows us to exit the screen if something goes wrong, can also use raw() if dont want that
+  keypad(stdscr, TRUE);
+  noecho(); // dont echo any key presses (dont display what you pressed on the screen)
+  curs_set(FALSE); // dont display a cursor
+
   if (do_load) {
     read_dungeon(&d, load_file);
   } else if (do_image) {
@@ -228,24 +235,17 @@ int main(int argc, char *argv[])
   /* Ignoring PC position in saved dungeons.  Not a bug. */
   config_pc(&d);
   gen_monsters(&d);
-
-  /* init screen */
-  initscr(); // creates stdscr
-  cbreak(); // allows us to exit the screen if something goes wrong, can also use raw() if dont want that
-  keypad(stdscr, TRUE);
-  noecho(); // dont echo any key presses (dont display what you pressed on the screen)
-  curs_set(FALSE); // dont display a cursor
+  display_render_dungeon(&d);
 
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
-    render_dungeon(&d);
-    pc_commands(&d, getch());
     do_moves(&d);
+    //pc_commands(&d);
     if (delay) {
       usleep(delay);
     }
   }
 
-  render_dungeon(&d);
+  display_render_dungeon(&d);
 
   if (do_save) {
     if (do_save_seed) {
