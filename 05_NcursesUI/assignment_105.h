@@ -12,7 +12,7 @@ void create_monster_list(dungeon_t *d);
 
 void scroll_monster_list(dungeon_t *d, character_t **monsters, uint32_t count);
 
-void print_monster_list(dungeon_t *d, character_t **monsters, uint32_t begin);
+void print_monster_list(dungeon_t *d, character_t **monsters, uint32_t begin, uint32_t end);
 
 void display_monster_list (dungeon_t *d, character_t **monsters, uint32_t slot);
 
