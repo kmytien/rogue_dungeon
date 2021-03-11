@@ -97,7 +97,7 @@ void do_moves(dungeon_t *d)
   }
 
 
-  display_render_dungeon(d);
+  display_nc_dungeon(d);
   
   if (pc_is_alive(d) && e->c == &d->pc) {
     c = e->c;
@@ -108,9 +108,10 @@ void do_moves(dungeon_t *d)
     e->c = NULL;
     event_delete(e);
     d->is_stairs = 0;
-    pc_next_pos(d, next);
+    key_inputs(d, next);
     next[dim_x] += c->position[dim_x];
     next[dim_y] += c->position[dim_y];
+    
     if (mappair(next) <= ter_floor) {
       mappair(next) = ter_floor_hall;
       hardnesspair(next) = 0;
