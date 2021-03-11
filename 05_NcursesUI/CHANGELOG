@@ -1,3 +1,5 @@
+03/10/21 18:00 MK: Fixed printing of monster list and implemented esc function for monster list
+03/10/21 12:00 SA HL: Fixed warning bugs and fixed movement of pc
 03/09/21 20:00 MK: Fixed a couple of bugs that cuased segmentation fault - right now, the bug is that the pc cannot move
 03/09/21 15:00 HL SA MK: Finished most functions for assignment 1.05 - implemented monsters list and display of dungeon
 03/08/21 15:00 HL SA MK: Created and outlined code for assignment 1.05 - made function for inputs and staircase
