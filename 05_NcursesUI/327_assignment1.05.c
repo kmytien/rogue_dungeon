@@ -12,7 +12,15 @@
 #include "npc.h"
 
 
+/**
+	CS 327: Assignment 1.05 - NCurses UI
+	By: MyTien Kien, Sanjana Amatya, Haylee Lawrence
+**/
+
+
+//stairs function that regenerates a different dungeon when going up or down stairs
 int stairs(dungeon_t *d) {
+
     //delete pc
     pc_delete(d->pc.pc); 
     
@@ -32,8 +40,8 @@ int stairs(dungeon_t *d) {
 }
 
 
-//pc next position
-uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
+//all key inputs
+uint32_t key_inputs(dungeon_t *d, pair_t dir) {
     static uint32_t count = 0;
 
     mvprintw(0, 20, "%s", "Press a key to move the PC in a direction.");
@@ -116,13 +124,14 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
                 cont = true;
                 break;
 
-            //attempt to go down stairs. Works only if standing on down staircase.
             case '>':
+            //if pc is going downstairs
                 if (d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_down) {
                     stairs(d);
                     cont = true;
                     d->is_stairs = 1;
                 }
+                
                 break;
                 
             case '<':
@@ -132,9 +141,10 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
                     cont = true;
                     d->is_stairs = 1;
                 }
+                
                 break;
 
-            //npcs still move, x and y = 0
+            //npcs still move, pc stays still
             case '5':
             case ' ':
             case '.':
@@ -185,12 +195,43 @@ void create_monster_list(dungeon_t *d) {
     }
 	
     display_monster_list(d, monsters, slot);
-    display_render_dungeon(d);
+    display_nc_dungeon(d);
     free(monsters);
 }
 
 
-//code to scroll down the monster list
+//io to display the list on terminal
+//display a list of monsters in the dungeon, with their symbol and position relative to the PC (e.g.: “c, 2 north and 14 west”).
+void display_monster_list (dungeon_t *d, character_t **monsters, uint32_t slot){
+    uint32_t count = slot;
+	char *spaces = "                                           ";
+    
+    mvprintw(3, 18, "%s", spaces);
+    mvprintw(4, 18, "  You know of %d monsters:                  ", count);
+    mvprintw(5, 18, "%s", spaces);
+    
+    print_list(d, monsters, 0, count);
+	
+    if (count > 10) {
+        mvprintw(16, 18, "%s", spaces);
+        mvprintw(17, 18, "%s", "  Arrows to scroll & ESC to go back        ");
+        mvprintw(18, 18, "%s", spaces);
+        scroll_monster_list(d, monsters, count);	    
+    }
+    
+    else {
+        mvprintw(count + 6, 18, "%s", spaces);
+        mvprintw(count + 7, 18, "%s", "  Press the escape button to continue        ");
+        mvprintw(count + 8, 18, "%s", spaces);
+        print_list(d, monsters, 0, count);
+        
+        //as long as user doesn't hit escape continue to else
+        while(getch() != 27);
+    }
+}
+
+
+//scrolling through monster list
 void scroll_monster_list(dungeon_t *d, character_t **monsters, uint32_t count){
 
     uint32_t i, num = 10;
@@ -202,28 +243,32 @@ void scroll_monster_list(dungeon_t *d, character_t **monsters, uint32_t count){
             case KEY_UP:
                 if (num > 10) {
                 	num--;
-                	print_monster_list(d, monsters, num - 10, num);
+                	print_list(d, monsters, num - 10, num);
                 }
+                
                 break;
 
             case KEY_DOWN:
                 if (num < count) { 
                 	num++;
-                	print_monster_list(d, monsters, num - 10, num);
+                	print_list(d, monsters, num - 10, num);
                 }
+                
                 break;
 
             case 27:
               foo = false;
               break;
         }
+        
     } while (foo);
     
     return;
 }
 
 
-void print_monster_list(dungeon_t *d, character_t **monsters, uint32_t begin, uint32_t end) {
+//prints the monster list
+void print_list(dungeon_t *d, character_t **monsters, uint32_t begin, uint32_t end) {
     char *north_south;
     char *west_east;
     
@@ -252,40 +297,9 @@ void print_monster_list(dungeon_t *d, character_t **monsters, uint32_t begin, ui
 }
 
 
-//io to display the list on terminal
-//Display a list of monsters in the dungeon, with their symbol and position relative to the PC (e.g.: “c, 2 north and 14 west”).
-void display_monster_list (dungeon_t *d, character_t **monsters, uint32_t slot){
-    uint32_t count = slot;
-	char *spaces = "                                           ";
-    
-    mvprintw(3, 18, "%s", spaces);
-    mvprintw(4, 18, "  You know of %d monsters:                  ", count);
-    mvprintw(5, 18, "%s", spaces);
-    
-    print_monster_list(d, monsters, 0, count);
-	
-    if (count > 10) {
-        mvprintw(16, 18, "%s", spaces);
-        mvprintw(17, 18, "%s", "  Arrows to scroll & ESC to go back        ");
-        mvprintw(18, 18, "%s", spaces);
-        scroll_monster_list(d, monsters, count);	    
-    }
-    
-    else {
-        mvprintw(count + 6, 18, "%s", spaces);
-        mvprintw(count + 7, 18, "%s", "  Press the escape button to continue        ");
-        mvprintw(count + 8, 18, "%s", spaces);
-        print_monster_list(d, monsters, 0, count);
-        
-        //as long as user doesn't hit escape continue to else
-        while(getch() != 27);
-    }
-}
-
-
 //new render dungeon that prints to the ncurse screen
 //used sheaffer's render_dungeon and just changed putchar to mvaddch
-void display_render_dungeon(dungeon_t *d) {
+void display_nc_dungeon(dungeon_t *d) {
     pair_t p;
     clear();
 
