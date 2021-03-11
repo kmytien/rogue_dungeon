@@ -164,13 +164,6 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
         }
     }
 
-//   pair_t next_pos;
-//   d->pc.position[dim_x] += dir[dim_x];
-//   d->pc.position[dim_y] += dir[dim_y];
-//   next_pos[dim_y] = d->pc.position[dim_y];
-//   next_pos[dim_x] = d->pc.position[dim_x];
-//   move_character(d, &d->pc, next_pos);
-
   return 0;
 }
 
@@ -198,81 +191,92 @@ void create_monster_list(dungeon_t *d) {
 
 
 //code to scroll down the monster list
-void scroll_monster_list(dungeon_t *d, uint32_t count){
+void scroll_monster_list(dungeon_t *d, character_t **monsters, uint32_t count){
 
-    uint32_t num = 0;
+    uint32_t i, num = 10;
     bool foo = true;
 
-    while (foo) {
-    
+    do {
         switch(getch()) {
+        
             case KEY_UP:
-                if (num) num--;
+                if (num > 10) {
+                	num--;
+                	print_monster_list(d, monsters, num - 10);
+                }
                 break;
 
             case KEY_DOWN:
-                if (num < (count - 10)) num++;
+                if (num <= count) { 
+                	num++;
+                	print_monster_list(d, monsters, num - 10);
+                }
                 break;
 
             case 27:
               foo = false;
               return;
         }
-    }
+    } while (foo);
+}
+
+
+void print_monster_list(dungeon_t *d, character_t **monsters, uint32_t begin) {
+	char *north_south;
+    char *west_east;
+    
+    uint32_t i, line;
+	int mx, my;
+    int NS_dir, WE_dir;
+    int pc_x = d->pc.position[dim_x], pc_y = d->pc.position[dim_y];
+	
+	for (i = begin; i < begin + 10; i++, line++) {
+		
+	    //print how far away from pc the monster is
+	    mx = monsters[i]->position[dim_x];
+	    my = monsters[i]->position[dim_y];
+
+	    if (pc_x - mx >= 0) west_east = "WEST";
+	    else west_east = "EAST";
+	    WE_dir = abs(pc_x - mx);
+
+	    if (pc_y - my >= 0) north_south = "NORTH";
+	    else north_south = "SOUTH";
+	    NS_dir = abs(pc_y - my);
+			
+		mvprintw(line + 6, 18, "  The monster %c is %3d %s and %3d %s  ",
+			     monsters[i]->symbol, NS_dir, north_south, WE_dir, west_east);
+	}
 }
 
 
 //io to display the list on terminal
 //Display a list of monsters in the dungeon, with their symbol and position relative to the PC (e.g.: “c, 2 north and 14 west”).
-void display_monster_list(dungeon_t *d, character_t **monsters, uint32_t slot){
+void display_monster_list (dungeon_t *d, character_t **monsters, uint32_t slot){
     uint32_t count = slot;
 
-    char *north_south;
-    char *west_east;
+	char *spaces = "                                           ";
     
-    mvprintw(1, 19, "%-40s", " ");
-    mvprintw(2, 19, "You know of %d monsters:		", count);
-    mvprintw(3, 19, "%-40s", " ");
-
-    uint32_t i;
-    int pc_x = d->pc.position[dim_x], pc_y = d->pc.position[dim_y];
-    int mx, my;
-    int NS_dir, WE_dir;
-
-    for (i = 0; i < count; i++) {
+    mvprintw(3, 18, "%s", spaces);
+    mvprintw(4, 18, " You know of %d monsters:                  ", count);
+    mvprintw(5, 18, "%s", spaces);
     
-        //print how far away from pc the monster is
-        mx = monsters[i]->position[dim_x];
-        my = monsters[i]->position[dim_y];
-
-        if (pc_x - mx >= 0) west_east = "WEST";
-        else west_east = "EAST";
-        WE_dir = abs(pc_x - mx);
-
-        if (pc_y - my >= 0) north_south = "NORTH";
-        else north_south = "SOUTH";
-        NS_dir = abs(pc_y - my);
-
-        mvprintw(i + 4, 19, "The monster %c is %3d %s and %3d %s",
-                 monsters[i]->symbol, NS_dir, north_south, WE_dir, west_east);
-
-        //if (count < 11) mvprintw(i + 4, 19, "%-40s", x[i]);
-    }
-	
-	
+    print_monster_list(d, monsters, 0);
 	
     if (count < 11) {
-        mvprintw(count + 4, 19, "%-40s", " ");
-        mvprintw(count + 5, 19, "%-40s", "Press the escape button to continue.");
+        mvprintw(count + 4, 19, "%s", spaces);
+        mvprintw(count + 5, 19, "%-40s", " Press the escape button to continue ");
         //as long as user doesn't hit escape continue to else
     }
 
     else {
-        mvprintw(18, 19, "%-40s", " ");
-        mvprintw(19, 19, "%-40s", "Arrows to scroll & ESC to go back");
-        scroll_monster_list(d, count);	    
+        mvprintw(17, 18, "%s", spaces);
+        mvprintw(18, 18, "%-40s", "  Arrows to scroll & ESC to go back        ");
+        mvprintw(19, 18, "%s", spaces);
+        scroll_monster_list(d, monsters, count);	    
     }
 }
+
 
 //new render dungeon that prints to the ncurse screen
 //used sheaffer's render_dungeon and just changed putchar to mvaddch
