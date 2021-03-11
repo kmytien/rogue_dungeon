@@ -118,7 +118,7 @@ uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
 
             //attempt to go down stairs. Works only if standing on down staircase.
             case '>':
-                if (d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_up) {
+                if (d->map[d->pc.position[dim_y]][d->pc.position[dim_x]] == ter_stairs_down) {
                     stairs(d);
                     cont = true;
                     d->is_stairs = 1;
