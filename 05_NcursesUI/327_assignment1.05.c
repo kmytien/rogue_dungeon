@@ -36,11 +36,11 @@ int stairs(dungeon_t *d) {
 uint32_t pc_next_pos(dungeon_t *d, pair_t dir) {
     static uint32_t count = 0;
 
-    mvprintw(0, 20, "%-40s", "Press a key to move the PC in a direction.");
+    mvprintw(0, 20, "%s", "Press a key to move the PC in a direction.");
 
     int input; 
     bool cont = false;
-
+    
     while (!cont) {
         switch (input = getch()) {
         
@@ -183,7 +183,7 @@ void create_monster_list(dungeon_t *d) {
             }
         }
     }
-
+	
     display_monster_list(d, monsters, slot);
     display_render_dungeon(d);
     free(monsters);
@@ -207,7 +207,7 @@ void scroll_monster_list(dungeon_t *d, character_t **monsters, uint32_t count){
                 break;
 
             case KEY_DOWN:
-                if (num <= count) { 
+                if (num < count) { 
                 	num++;
                 	print_monster_list(d, monsters, num - 10, num);
                 }
@@ -215,22 +215,24 @@ void scroll_monster_list(dungeon_t *d, character_t **monsters, uint32_t count){
 
             case 27:
               foo = false;
-              return;
+              break;
         }
     } while (foo);
+    
+    return;
 }
 
 
 void print_monster_list(dungeon_t *d, character_t **monsters, uint32_t begin, uint32_t end) {
-	char *north_south;
+    char *north_south;
     char *west_east;
     
     uint32_t i, line = 0;
-	int mx, my;
+    int mx, my;
     int NS_dir, WE_dir;
     int pc_x = d->pc.position[dim_x], pc_y = d->pc.position[dim_y];
 	
-	for (i = begin; i < end || line <= 10; i++, line++) {
+	for (i = begin, line = 0; i < end && line < 10; i++, line++) {
 		
 	    //print how far away from pc the monster is
 	    mx = monsters[i]->position[dim_x];
@@ -243,9 +245,9 @@ void print_monster_list(dungeon_t *d, character_t **monsters, uint32_t begin, ui
 	    if (pc_y - my >= 0) north_south = "NORTH";
 	    else north_south = "SOUTH";
 	    NS_dir = abs(pc_y - my);
-			
-		mvprintw(line + 6, 18, "  The monster %c is %3d %s and %3d %s  ",
-			     monsters[i]->symbol, NS_dir, north_south, WE_dir, west_east);
+		
+	    mvprintw(line + 6, 18, "  The monster %c is %3d %s and %3d %s  ",
+		     monsters[i]->symbol, NS_dir, north_south, WE_dir, west_east);
 	}
 }
 
@@ -254,26 +256,25 @@ void print_monster_list(dungeon_t *d, character_t **monsters, uint32_t begin, ui
 //Display a list of monsters in the dungeon, with their symbol and position relative to the PC (e.g.: “c, 2 north and 14 west”).
 void display_monster_list (dungeon_t *d, character_t **monsters, uint32_t slot){
     uint32_t count = slot;
-
 	char *spaces = "                                           ";
     
     mvprintw(3, 18, "%s", spaces);
-    mvprintw(4, 18, " You know of %d monsters:                  ", count);
+    mvprintw(4, 18, "  You know of %d monsters:                  ", count);
     mvprintw(5, 18, "%s", spaces);
     
     print_monster_list(d, monsters, 0, count);
 	
-    if (count < 11) {
-        mvprintw(count + 4, 19, "%s", spaces);
-        mvprintw(count + 5, 19, "%s", " Press the escape button to continue ");
-        //as long as user doesn't hit escape continue to else
-    }
-
-    else {
-        mvprintw(17, 18, "%s", spaces);
-        mvprintw(18, 18, "%s", "  Arrows to scroll & ESC to go back        ");
-        mvprintw(19, 18, "%s", spaces);
+    if (count > 10) {
+        mvprintw(16, 18, "%s", spaces);
+        mvprintw(17, 18, "%s", "  Arrows to scroll & ESC to go back        ");
+        mvprintw(18, 18, "%s", spaces);
         scroll_monster_list(d, monsters, count);	    
+    }
+    
+    else {
+        mvprintw(count + 2, 18, "%s", spaces);
+        mvprintw(count + 3, 18, "%s", "  Press the escape button to continue        ");
+        //as long as user doesn't hit escape continue to else
     }
 }
 
