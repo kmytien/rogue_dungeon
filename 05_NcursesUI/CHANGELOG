@@ -1,10 +1,5 @@
-Current Issues (3/10/21 22:00)
-  - monsters list wont show up if 10 or less monsters
-  - segmentation fault when calling m at a random time?
-  - cleaning up code (mk might rename some methods to make stuff make more sense)
-  - check if all keys work
-
-03/10/21 09:00 MK: Fixed monsters list so we can scroll without getting a segmentation fault 
+03/11/21 10:45 HL MK: Testing and fixing a few bugs, cleaning up code
+03/11/21 09:00 MK: Fixed monsters list so we can scroll without getting a segmentation fault 
 03/10/21 22:00 SA HL MK: SA & HL fixed printing lose and win message, MK fixed another issue with reprinting monsters list
 03/10/21 20:00 MK: Fixed stairs and regenerating dungeons correctly
 03/10/21 18:00 MK: Fixed printing of monster list and implemented esc function for monster list
