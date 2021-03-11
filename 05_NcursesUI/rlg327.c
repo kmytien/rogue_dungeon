@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
   /* Ignoring PC position in saved dungeons.  Not a bug. */
   config_pc(&d);
   gen_monsters(&d);
-  display_render_dungeon(&d);
+  display_nc_dungeon(&d);
 
   while (pc_is_alive(&d) && dungeon_has_npcs(&d)) {
     do_moves(&d);
@@ -246,7 +246,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  display_render_dungeon(&d);
+  display_nc_dungeon(&d);
 	
   if (do_save) {
     if (do_save_seed) {
@@ -271,6 +271,8 @@ int main(int argc, char *argv[])
       free(save_file);
     }
   }
+  
+  /*
   endwin();
 
   printf("%s", pc_is_alive(&d) ? victory : tombstone);
@@ -278,7 +280,13 @@ int main(int argc, char *argv[])
          "You avenged the cruel and untimely murders of %u "
          "peaceful dungeon residents.\n",
          d.pc.kills[kill_direct], d.pc.kills[kill_avenged]);
-	
+  */
+  
+  clear();
+  printw(pc_is_alive(&d) ? victory : tombstone);
+  refresh();
+  if (getch()) endwin();
+  
   pc_delete(d.pc.pc);
 
   delete_dungeon(&d);
