@@ -272,9 +272,13 @@ void display_monster_list (dungeon_t *d, character_t **monsters, uint32_t slot){
     }
     
     else {
-        mvprintw(count + 2, 18, "%s", spaces);
-        mvprintw(count + 3, 18, "%s", "  Press the escape button to continue        ");
+        mvprintw(count + 6, 18, "%s", spaces);
+        mvprintw(count + 7, 18, "%s", "  Press the escape button to continue        ");
+        mvprintw(count + 8, 18, "%s", spaces);
+        print_monster_list(d, monsters, 0, count);
+        
         //as long as user doesn't hit escape continue to else
+        while(getch() != 27);
     }
 }
 
