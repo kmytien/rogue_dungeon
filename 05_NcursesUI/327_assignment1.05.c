@@ -202,14 +202,14 @@ void scroll_monster_list(dungeon_t *d, character_t **monsters, uint32_t count){
             case KEY_UP:
                 if (num > 10) {
                 	num--;
-                	print_monster_list(d, monsters, num - 10);
+                	print_monster_list(d, monsters, num - 10, num);
                 }
                 break;
 
             case KEY_DOWN:
                 if (num <= count) { 
                 	num++;
-                	print_monster_list(d, monsters, num - 10);
+                	print_monster_list(d, monsters, num - 10, num);
                 }
                 break;
 
@@ -221,16 +221,16 @@ void scroll_monster_list(dungeon_t *d, character_t **monsters, uint32_t count){
 }
 
 
-void print_monster_list(dungeon_t *d, character_t **monsters, uint32_t begin) {
+void print_monster_list(dungeon_t *d, character_t **monsters, uint32_t begin, uint32_t end) {
 	char *north_south;
     char *west_east;
     
-    uint32_t i, line;
+    uint32_t i, line = 0;
 	int mx, my;
     int NS_dir, WE_dir;
     int pc_x = d->pc.position[dim_x], pc_y = d->pc.position[dim_y];
 	
-	for (i = begin; i < begin + 10; i++, line++) {
+	for (i = begin; i < end || line <= 10; i++, line++) {
 		
 	    //print how far away from pc the monster is
 	    mx = monsters[i]->position[dim_x];
@@ -261,17 +261,17 @@ void display_monster_list (dungeon_t *d, character_t **monsters, uint32_t slot){
     mvprintw(4, 18, " You know of %d monsters:                  ", count);
     mvprintw(5, 18, "%s", spaces);
     
-    print_monster_list(d, monsters, 0);
+    print_monster_list(d, monsters, 0, count);
 	
     if (count < 11) {
         mvprintw(count + 4, 19, "%s", spaces);
-        mvprintw(count + 5, 19, "%-40s", " Press the escape button to continue ");
+        mvprintw(count + 5, 19, "%s", " Press the escape button to continue ");
         //as long as user doesn't hit escape continue to else
     }
 
     else {
         mvprintw(17, 18, "%s", spaces);
-        mvprintw(18, 18, "%-40s", "  Arrows to scroll & ESC to go back        ");
+        mvprintw(18, 18, "%s", "  Arrows to scroll & ESC to go back        ");
         mvprintw(19, 18, "%s", spaces);
         scroll_monster_list(d, monsters, count);	    
     }
