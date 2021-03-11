@@ -1,3 +1,4 @@
+03/10/21 20:00 MK: Fixed stairs and regenerating dungeons correctly
 03/10/21 18:00 MK: Fixed printing of monster list and implemented esc function for monster list
 03/10/21 12:00 SA HL: Fixed warning bugs and fixed movement of pc
 03/09/21 20:00 MK: Fixed a couple of bugs that cuased segmentation fault - right now, the bug is that the pc cannot move
