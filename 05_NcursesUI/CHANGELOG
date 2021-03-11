@@ -1,5 +1,5 @@
 Current Issues (3/10/21 22:00)
-  - segmentation fault when i scroll down passed max list of monsters (assuming its the same for scrolling up) - is this okay?
+  - monsters list wont show up if 0 or less monsters
   - segmentation fault when calling m at a random time?
   - cleaning up code (mk might rename some methods to make stuff make more sense)
   - check if all keys work
