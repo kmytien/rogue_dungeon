@@ -224,6 +224,7 @@ int main(int argc, char *argv[])
       free(save_file);
     }
   }
+  endwin();
 
   printf("%s", pc_is_alive(&d) ? victory : tombstone);
   printf("You defended your life in the face of %u deadly beasts.\n"
@@ -231,7 +232,6 @@ int main(int argc, char *argv[])
          "peaceful dungeon residents.\n",
          d.pc.kills[kill_direct], d.pc.kills[kill_avenged]);
 	
-  endwin();
   pc_delete(d.pc.pc);
 
   delete_dungeon(&d);
