@@ -1,3 +1,11 @@
+Current Issues (3/10/21 22:00)
+  - segmentation fault when i scroll down passed max list of monsters (assuming its the same for scrolling up) - is this okay?
+  - cleaning up code (mk might rename some methods to make stuff make more sense)
+  - check if all keys work
+  - change code a bit more so it doesnt look too much alike to others
+
+
+03/10/21 22:00 SA HL MK: SA & HL fixed printing lose and win message, MK fixed another issue with reprinting monsters list
 03/10/21 20:00 MK: Fixed stairs and regenerating dungeons correctly
 03/10/21 18:00 MK: Fixed printing of monster list and implemented esc function for monster list
 03/10/21 12:00 SA HL: Fixed warning bugs and fixed movement of pc
