@@ -39,6 +39,22 @@
   - pc.c
   - pc.h
   - rlg327.c
-  - utils.c
+  - utils.c  DONE
   - utils.h
 **/
+
+/* CREATE NEW MAP */
+// - create another map that shows what the character has seen
+//     - character can see/remember a 3x3 radius around them 
+//     - this includes monsters (ie IF they are in the remembered areas)
+
+// updates new discovered_t dungeon
+void update_discovered(dungeon_t *d) {
+  //for 3x3 radius, update the discovered map MAKE SURE NOT TO DELETE REMEMBERED STUFF
+}
+
+// new render_dungeon USE THIS ONE FOR ALL EXCEPT WHEN TOGGLING FOW
+void render_fov(dungeon_t *d) {
+}
+
+/* FOW COMMAND AND TELEPORTING COMMAND */
