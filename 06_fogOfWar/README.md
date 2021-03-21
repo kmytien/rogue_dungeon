@@ -1,4 +1,4 @@
-# Assignment 1.05 | Fog of War
+# Assignment 1.06 | Fog of War
 - This assignment is for CS 327 Spring 2021
 - We used Prof. Sheaffer's 1.05 assignment code for this assignment 
 
