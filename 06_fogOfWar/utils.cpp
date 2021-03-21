@@ -1,11 +1,10 @@
-#include <string.h>
+#include <cstring>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <errno.h>
-#include <stdio.h>
+#include <cerrno>
+#include <cstdio>
 
 #include "utils.h"
-
 int makedirectory(char *dir)
 {
   char *slash;
