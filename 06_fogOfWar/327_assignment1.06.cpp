@@ -17,7 +17,27 @@
       
   ALL NEW CODE TO BE WRITTEN IN C++
   
-  I THINK WE SHOULD SPLIT UP WORK AT THE BEGINNING/BE MORE CLEAR ABT WHAT PARTS WE ARE WORKING ON SO THAT IT IS EASIER TO CREATE AND THEN TEST CHUNKS ALSO SO WE DONT ALL END UP
-  CODING STUFF THAT IS EITHER REPETETIVE OR CONTRADICTORY :) AND IF SOMEONE COMPLETES ONE PART THEY CAN HELP ANOTHER PERSON SINCE WE ALL WORK AT THE SAME TIME. LMK WHAT YALL
-  THINK OF THIS :)) -H
+  Files to be switched to C++ IM NOT SURE WHAT NEEDS TO BE CHANGED AND WHAT DOESNT
+  - makefile
+  - character.c 
+  - character.h
+  - dims.h
+  - dungeon.c
+  - dungeon.h
+  - event.c
+  - heap.c HEAP.C CAN STAY .C BUT WHAT ABT HEAP.H???
+  - heap.h
+  - io.c
+  - io.h
+  - move.c
+  - move.h
+  - npc.c
+  - npc.h
+  - path.c
+  - path.h
+  - pc.c
+  - pc.h
+  - rlg327.c
+  - utils.c
+  - utils.h
 **/
