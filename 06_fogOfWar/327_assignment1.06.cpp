@@ -25,8 +25,9 @@
   - dims.h
   - dungeon.c
   - dungeon.h
-  - event.c
-  - heap.c HEAP.C CAN STAY .C BUT WHAT ABT HEAP.H???
+  - event.c  DONE
+  - event.h  
+  - heap.c
   - heap.h
   - io.c
   - io.h
@@ -40,7 +41,7 @@
   - pc.h
   - rlg327.c
   - utils.c  DONE
-  - utils.h
+  - utils.h  DONE?
 **/
 
 /* CREATE NEW MAP */
