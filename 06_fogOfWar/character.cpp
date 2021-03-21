@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "character.h"
 #include "heap.h"
@@ -13,7 +13,7 @@ void character_delete(void *v)
   character_t *c;
 
   if (v) {
-    c = v;
+    c = (character_t *) v;
 
     if (c->npc) {
       npc_delete(c->npc);
