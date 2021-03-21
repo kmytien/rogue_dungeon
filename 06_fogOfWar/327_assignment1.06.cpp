@@ -17,9 +17,10 @@
       
   ALL NEW CODE TO BE WRITTEN IN C++
   
-  Files to be switched to C++ IM NOT SURE WHAT NEEDS TO BE CHANGED AND WHAT DOESNT
-  - makefile
-  - character.c 
+  Files to be switched to C++ IM NOT SURE WHAT NEEDS TO BE CHANGED AND WHAT DOESNT (idk if the .h files need to be changed???)
+        also none of the ones with DONE next to them have been tested, i can do that after everything is switched over :) -H 
+  - makefile  DONE
+  - character.c  DONE
   - character.h
   - dims.h
   - dungeon.c
