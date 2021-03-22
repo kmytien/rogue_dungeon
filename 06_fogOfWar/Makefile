@@ -1,42 +1,42 @@
 #need -lncurses to make
 run: 
-	g++ heap.c heap.h rlg327.c 327_assignment1.06.c dungeon.c dungeon.h path.c path.h utils.c utils.h dims.h character.c character.h event.c event.h move.c move.h npc.c npc.h pc.c pc.h -o run -lncurses
+	g++ heap.c heap.h rlg327.cpp 327_assignment1.06.cpp dungeon.cpp dungeon.h path.cpp path.h utils.cpp utils.h dims.h character.cpp character.h event.cpp event.h move.cpp move.h npc.cpp npc.h pc.cpp pc.h -o run -lncurses
 	
-327_assignment1.06: 327_assignment1.06.cpp
-	g++ 327_assignment1.06.cpp -o 327_assignment1.06
+327_assignment1.06: 327_assignment1.06.cpppp
+	g++ 327_assignment1.06.cpppp -o 327_assignment1.06
 	
-rlg327: rlg327.c
-	g++ rlg327.c -o rlg327
+rlg327: rlg327.cpp
+	g++ rlg327.cpp -o rlg327
 	
 heap: heap.c heap.h
 	g++ heap.c -o heap
 	
-dungeon: dungeon.c dungeon.h
-	g++ dungeon.c -o dungeon
+dungeon: dungeon.cpp dungeon.h
+	g++ dungeon.cpp -o dungeon
 	
-path: path.c path.h
-	g++ path.c -o path
+path: path.cpp path.h
+	g++ path.cpp -o path
 	
-utils: utils.c utils.h
-	g++ utils.c -o utils
+utils: utils.cpp utils.h
+	g++ utils.cpp -o utils
 	
 dims: dims.h
 	g++ dims.h -o dims
 
-character: character.c character.h
-	g++ character.c -o character
+character: character.cpp character.h
+	g++ character.cpp -o character
   
-event: event.c event.h
-	g++ event.c -o event
+event: event.cpp event.h
+	g++ event.cpp -o event
   
-move: move.c move.h
-	g++ move.c -o move
+move: move.cpp move.h
+	g++ move.cpp -o move
   
-npc: npc.c npc.h
-	g++ npc.c -o npc
+npc: npc.cpp npc.h
+	g++ npc.cpp -o npc
   
-pc: pc.c pc.h
-	g++ pc.c -o pc
+pc: pc.cpp pc.h
+	g++ pc.cpp -o pc
 	
 clean:
 	rm -f 327_assignment1.06 rlg327 heap run dungeon path utils dims character event move npc pc
