@@ -197,7 +197,7 @@ static character_t *io_nearest_visible_monster(dungeon_t *d)
   return n;
 }
 
-void io_display(dungeon_t *d)
+void io_display_nf(dungeon_t *d)
 {
   uint32_t y, x;
   character_t *c;
@@ -259,12 +259,23 @@ void io_display(dungeon_t *d)
     mvprintw(22, 55, "NONE.");
     attroff(COLOR_PAIR(COLOR_BLUE));
   }
-           
+
 
   io_print_message_queue(0, 0);
 
   refresh();
 }
+
+
+void io_display_f(dungeon_t *d)
+{
+  uint32_t y, x;
+  character_t *c;
+  clear();
+
+  
+}
+
 
 void io_display_monster_list(dungeon_t *d)
 {
@@ -437,7 +448,7 @@ static void io_list_monsters(dungeon_t *d)
   free(c);
 
   /* And redraw the dungeon */
-  io_display(d);
+  io_display_nf(d);
 }
 
 void io_handle_input(dungeon_t *d)
@@ -521,7 +532,7 @@ void io_handle_input(dungeon_t *d)
     case 's':
       /* New command.  Return to normal display after displaying some   *
        * special screen.                                                */
-      io_display(d);
+      io_display_nf(d);
       fail_code = 1;
       break;
     case 'L':
@@ -557,6 +568,12 @@ void io_handle_input(dungeon_t *d)
       io_queue_message("Have fun!  And happy printing!");
       fail_code = 0;
       break;
+
+    case 'f':
+
+      fail_code = 1;
+      break;
+
     default:
       /* Also not in the spec.  It's not always easy to figure out what *
        * key code corresponds with a given keystroke.  Print out any    *
