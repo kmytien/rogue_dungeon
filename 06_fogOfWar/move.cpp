@@ -129,7 +129,7 @@ void do_moves(dungeon_t *d)
     /* The PC always goes first one a tie, so we don't use new_event().  *
      * We generate one manually so that we can set the PC sequence       *
      * number to zero.                                                   */
-    e = malloc(sizeof (*e));
+    e = (event_t*)malloc(sizeof (*e));
     e->type = event_character_turn;
     /* Hack: New dungeons are marked.  Unmark and ensure PC goes at d->time, *
      * otherwise, monsters get a turn before the PC.                         */
