@@ -273,7 +273,7 @@ void io_display_f(dungeon_t *d)
   character_t *c;
   clear();
 
-  
+
 }
 
 
@@ -288,7 +288,7 @@ void io_display_monster_list(dungeon_t *d)
 
 uint32_t io_teleport_pc(dungeon_t *d)
 {
-  /* Just for fun. */
+  /* Just for fun.
   pair_t dest;
 
   do {
@@ -308,6 +308,79 @@ uint32_t io_teleport_pc(dungeon_t *d)
 
   dijkstra(d);
   dijkstra_tunnel(d);
+
+  */
+
+  pair_t teleport;
+  teleport[dim_y] = d->pc->position[dim_y];
+  teleport[dim_x] = d->pc->position[dim_x];
+
+  int input, out = 0;
+  while (!out) {
+      switch (input = getch()) {
+        case '7':
+        case 'y':
+        case KEY_HOME:
+          teleport[dim_y]--;
+          teleport[dim_x]--;
+          break;
+        case '8':
+        case 'k':
+        case KEY_UP:
+          teleport[dim_y]--;
+          break;
+        case '9':
+        case 'u':
+        case KEY_PPAGE:
+          teleport[dim_y]--;
+          teleport[dim_x]++;
+          break;
+        case '6':
+        case 'l':
+        case KEY_RIGHT:
+          teleport[dim_x]++;
+          break;
+        case '3':
+        case 'n':
+        case KEY_NPAGE:
+          teleport[dim_y]++;
+          teleport[dim_x]++;
+          break;
+        case '2':
+        case 'j':
+        case KEY_DOWN:
+          teleport[dim_y]++;
+          break;
+        case '1':
+        case 'b':
+        case KEY_END:
+          teleport[dim_y]++;
+          teleport[dim_x]--;
+          break;
+        case '4':
+        case 'h':
+        case KEY_LEFT:
+          teleport[dim_x]--;
+          break;
+        case 'r': //random
+          while (mappair(teleport) <= ter_floor || charpair(teleport)) {
+            teleport[dim_x] = rand_range(1, DUNGEON_X - 2);
+            teleport[dim_y] = rand_range(1, DUNGEON_Y - 2);
+          }
+          out = 1;
+          break;
+        case 'g':
+          out = 1;
+          break;
+      }
+  }
+
+  d->pc->position[dim_y] = teleport[dim_y];
+  d->pc->position[dim_x] = teleport[dim_x];
+
+  dijkstra(d);
+  dijkstra_tunnel(d);
+  io_display_f(d);
 
   return 0;
 }
@@ -570,7 +643,7 @@ void io_handle_input(dungeon_t *d)
       break;
 
     case 'f':
-
+      //toggling fog
       fail_code = 1;
       break;
 
