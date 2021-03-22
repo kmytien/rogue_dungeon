@@ -145,7 +145,7 @@ void do_moves(dungeon_t *d)
   }
 
   while (pc_is_alive(d) &&
-         (e = heap_remove_min(&d->events)) &&
+         (e = (event_t *) heap_remove_min(&d->events)) &&
          ((e->type != event_character_turn) || (e->c != &d->pc))) {
     d->time = e->time;
     if (e->type == event_character_turn) {
