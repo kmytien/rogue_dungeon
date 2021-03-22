@@ -22,6 +22,8 @@
       - press g then g, the movement keys will move a targeted pointer (*) and the second g teleports the pc to that location
       - press g then r, sends the pc to a random location
       *** can be teleported into rock (not immutable), however, if SURROUNDED by rock, cannot tunnel (unless they teleport)
+  - need to make 2 maps -> map where stuff is visible for pc and map that has past terrain (terrain that pc has already stepped on)
+  - need to fix all errors in converted cpp files
 
   ALL NEW CODE TO BE WRITTEN IN C++
 
