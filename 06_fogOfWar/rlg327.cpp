@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
   if (do_save) {
     if (do_save_seed) {
        /* 10 bytes for number, plus dot, extention and null terminator. */
-      save_file = malloc(18);
+      save_file = (char*)malloc(18);
       sprintf(save_file, "%ld.rlg327", seed);
     }
     if (do_save_image) {
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
 	do_save_image = 0;
       } else {
 	/* Extension of 3 characters longer than image extension + null. */
-	save_file = malloc(strlen(pgm_file) + 4);
+	save_file = (char*)malloc(strlen(pgm_file) + 4);
 	strcpy(save_file, pgm_file);
 	strcpy(strchr(save_file, '.') + 1, "rlg327");
       }
