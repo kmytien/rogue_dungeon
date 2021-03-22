@@ -27,6 +27,7 @@
 
   Files to be switched to C++ IM NOT SURE WHAT NEEDS TO BE CHANGED AND WHAT DOESNT (idk if the .h files need to be changed???)
         also none of the ones with DONE next to them have been tested, i can do that after everything is switched over :) -H
+        - all c files are supposed to be cpp (besides heap) but i didnt test them yet (i think they should be fine tho) -MyT
   - makefile  DONE
   - character.c  DONE
   - character.h
