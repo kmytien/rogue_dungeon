@@ -47,7 +47,8 @@ typedef struct room {
   pair_t size;
 } room_t;
 
-typedef struct dungeon {
+class dungeon_t {
+  public:
   uint32_t num_rooms;
   room_t *rooms;
   terrain_type_t map[DUNGEON_Y][DUNGEON_X];
@@ -76,14 +77,14 @@ typedef struct dungeon {
   uint32_t time;
   uint32_t is_new;
   uint32_t quit;
-} dungeon_t;
 
-void init_dungeon(dungeon_t *d);
-void new_dungeon(dungeon_t *d);
-void delete_dungeon(dungeon_t *d);
-int gen_dungeon(dungeon_t *d);
-int write_dungeon(dungeon_t *d, char *file);
-int read_dungeon(dungeon_t *d, char *file);
-int read_pgm(dungeon_t *d, char *pgm);
+  void init_dungeon(dungeon_t *d);
+  void new_dungeon(dungeon_t *d);
+  void delete_dungeon(dungeon_t *d);
+  int gen_dungeon(dungeon_t *d);
+  int write_dungeon(dungeon_t *d, char *file);
+  int read_dungeon(dungeon_t *d, char *file);
+  int read_pgm(dungeon_t *d, char *pgm);
+};
 
 #endif
