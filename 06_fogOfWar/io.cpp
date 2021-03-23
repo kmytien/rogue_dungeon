@@ -286,9 +286,7 @@ void io_display_monster_list(dungeon_t *d)
   getch();
 }
 
-uint32_t io_teleport_pc(dungeon_t *d)
-{
-  /* Just for fun.
+uint32_t io_randomTeleport_pc(dungeon_t *d){
   pair_t dest;
 
   do {
@@ -308,8 +306,13 @@ uint32_t io_teleport_pc(dungeon_t *d)
 
   dijkstra(d);
   dijkstra_tunnel(d);
+  io_display_f(d);
 
-  */
+
+}
+
+uint32_t io_teleport_pc(dungeon_t *d)
+{
 
   pair_t teleport;
   teleport[dim_y] = d->pc->position[dim_y];
@@ -363,15 +366,21 @@ uint32_t io_teleport_pc(dungeon_t *d)
           teleport[dim_x]--;
           break;
         case 'r': //random
-          while (mappair(teleport) <= ter_floor || charpair(teleport)) {
+          /*while (mappair(teleport) <= ter_floor || charpair(teleport)) {
             teleport[dim_x] = rand_range(1, DUNGEON_X - 2);
             teleport[dim_y] = rand_range(1, DUNGEON_Y - 2);
           }
           out = 1;
-          break;
+          break;*/
+          io_randomTeleport_pc(d);
         case 'g':
-          out = 1;
-          break;
+          /*out = 1;
+          break;*/
+          dijkstra(d);
+  	  dijkstra_tunnel(d);
+  	  d->pc.symbol = '@';
+  	  io_display_f(d);
+          
       }
   }
 
