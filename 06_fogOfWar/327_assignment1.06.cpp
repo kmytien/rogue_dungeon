@@ -60,18 +60,126 @@
 //     - character can see/remember a 3x3 radius around them
 //     - this includes monsters (ie IF they are in the remembered areas)
 
-// updates new discovered_t dungeon
-void update_discovered(dungeon_t *d, character_t *view, character_t *display) {
-  //for 3x3 radius, update the discovered map MAKE SURE NOT TO DELETE REMEMBERED STUFF
-  //bresenham's line drawing algorithm : used to generate lines quickly
 
-  
+//need to put these in dungeon.h
+terrain_type discovered[DUNGEON_Y][DUNGEON_X];
+uint8_t visible[DUNGEON_Y][DUNGEON_X];
+
+//on the piazza, sheaffer said to start off by initializing terrain map to all rock
+//then i initialized the visible map to 0 (meaning not visible)
+void init_maps(dungeon_t *d) {
+    int y, x;
+
+    for (y = 0; y < DUNGEON_Y; y++) {
+        for (x = 0; x < DUNGEON_X; x++) {
+            discovered[y][x] = ter_wall; //this is rock right aka a space?
+            visible[y][x] = 0; //nothing is visible right now
+        }
+    }
+}
+
+
+//radius of whats visible to pc
+void update_sight(dungeon_t *d) {
+
+    int pc_visual = 3;
+    pair_t x, y; //storing starting (dim_x) and end point (dim_y) for x/y ranges
+
+    //if pc is in the first 3 columns
+    if (d->pc->position[dim_x] - pc_visual <= 1) x[dim_x] = 0;
+    else x[dim_x] = d->pc->position[dim_x] - pc_visual;
+
+    //else pc is in at least the fourth column
+    if (d->pc->position[dim_y] - pc_visual <= 1) x[dim_y] = 0;
+    else x[dim_y] = d->pc->position[dim_y] - pc_visual;
+
+    //if pc is in the first three rows
+    if (d->pc->position[dim_x] - pc_visual <= 1) y[dim_x] = 0;
+    else y[dim_x] = d->pc->position[dim_x] - pc_visual;
+
+    //if pc is in at least the fourth row
+    if (d->pc->position[dim_y] - pc_visual <= 1) y[dim_y] = 0;
+    else y[dim_y] = d->pc->position[dim_y] - pc_visual;
+
+    //will come back to this -MyT
 
 
 }
 
-// new render_dungeon USE THIS ONE FOR ALL EXCEPT WHEN TOGGLING FOW
-void render_fov(dungeon_t *d) {
+
+//insert in bresenham's line algorithm for observing terrain
+//decided to use bresenham's line algorithm because we're just checking in a straight line
+int update_maps(dungeon_t *d, pair_t *f, pair_t *t) {
+
+    bool y_negative = false, x_negative = false;
+    pair_t from, to;
+    int x_dir, y_dir, i1, i2, i3;
+
+    from[dim_x] = f[dim_x];
+    from[dim_y] = f[dim_y];
+    to[dim_x] = t[dim_x];
+    to[dim_y] = t[dim_y];
+
+    if (to[dim_x] > from[dim_x]) {
+        x_negative = true;
+        x_dir = to[dim_x] - from[dim_x];
+    } else x_dir = from[dim_x] - from[dim_x];
+
+
+    if (to[dim_y] > from[dim_y]) {
+        y_negative = true;
+        y_dir = to[dim_y] - from[dim_y];
+    } else y_dir = from[dim_y] - from[dim_y];
+
+
+    if (y_dir > x_dir) {
+        i1 = x_dir * 2;
+        i2 = i1 - y_dir;
+        i3 = i2 - y_dir;
+
+        for (int i = 0; i < y_dir + 1; i++) {
+            if ((mappair(from) < ter_floor) && (i != y_dir))
+                return 0;
+
+            //update visibility and terrain for from
+            d->discovered[from[dim_y]][from[dim_x]] = mappair(from);
+            d->visible[from[dim_y]][from[dim_x]] = 1;
+            //anything else? **
+
+            //calculating coords for next pixel
+            if (i2 < 0) i2 += i1;
+            else {
+                i2 += i3;
+                from[dim_x]++;
+            }
+        }
+        return 1;
+    }
+
+    else {
+        i1 = y_dir * 2;
+        i2 = i1 - x_dir;
+        i3 = i2 - x_dir;
+
+        for (int i = 0; i < x_dir + 1; i++) {
+            if ((mappair(from) < ter_floor) && (i != x_dir))
+                return 0;
+
+            //update visibility and terrain for from
+            d->discovered[from[dim_y]][from[dim_x]] = mappair(from);
+            d->visible[from[dim_y]][from[dim_x]] = 1;
+            //anything else? **
+
+            //calculating coords for next pixel
+            if (i2 < 0) i2 += i1;
+            else {
+                i2 += i3;
+                from[dim_y]++;
+            }
+        }
+        return 1;
+    }
 }
 
-/* FOW COMMAND AND TELEPORTING COMMAND */
+
+//teleport and fog enabler IN IO.CPP! - not finished yet -M
