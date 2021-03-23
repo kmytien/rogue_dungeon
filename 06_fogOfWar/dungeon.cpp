@@ -99,7 +99,7 @@ static void dijkstra_corridor(dungeon_t *d, pair_t from, pair_t to)
     }
   }
 
-  while ((p = heap_remove_min(&h))) {
+  while ((p = (corridor_path_t*)heap_remove_min(&h))) {
     p->hn = NULL;
 
     if ((p->pos[dim_y] == to[dim_y]) && p->pos[dim_x] == to[dim_x]) {
@@ -198,7 +198,7 @@ static void dijkstra_corridor_inv(dungeon_t *d, pair_t from, pair_t to)
     }
   }
 
-  while ((p = heap_remove_min(&h))) {
+  while ((p = (corridor_path_t*)heap_remove_min(&h))) {
     p->hn = NULL;
 
     if ((p->pos[dim_y] == to[dim_y]) && p->pos[dim_x] == to[dim_x]) {
@@ -597,7 +597,7 @@ static int make_rooms(dungeon_t *d)
   for (i = MIN_ROOMS; i < MAX_ROOMS && rand_under(5, 8); i++)
     ;
   d->num_rooms = i;
-  d->rooms = (dungeon_t*)malloc(sizeof (*d->rooms) * d->num_rooms);
+  d->rooms = (room_t*)malloc(sizeof (*d->rooms) * d->num_rooms);
   
   for (i = 0; i < d->num_rooms; i++) {
     d->rooms[i].size[dim_x] = ROOM_MIN_X;
@@ -804,7 +804,7 @@ int write_dungeon(dungeon_t *d, char *file)
   if (!file) {
     if (!(home = getenv("HOME"))) {
       fprintf(stderr, "\"HOME\" is undefined.  Using working directory.\n");
-      home = ".";
+      home = (char*)".";
     }
 
     len = (strlen(home) + strlen(SAVE_DIR) + strlen(DUNGEON_SAVE_FILE) +
@@ -913,7 +913,7 @@ int read_rooms(dungeon_t *d, FILE *f)
 
   fread(&p, 2, 1, f);
   d->num_rooms = be16toh(p);
-  d->rooms = (dungeon_t*)malloc(sizeof (*d->rooms) * d->num_rooms);
+  d->rooms = (room_t*)malloc(sizeof (*d->rooms) * d->num_rooms);
 
   for (i = 0; i < d->num_rooms; i++) {
     fread(&p, 1, 1, f);
@@ -976,7 +976,7 @@ int read_dungeon(dungeon_t *d, char *file)
   if (!file) {
     if (!(home = getenv("HOME"))) {
       fprintf(stderr, "\"HOME\" is undefined.  Using working directory.\n");
-      home = ".";
+      home = (char*)".";
     }
 
     len = (strlen(home) + strlen(SAVE_DIR) + strlen(DUNGEON_SAVE_FILE) +
@@ -1091,7 +1091,7 @@ int read_pgm(dungeon_t *d, char *pgm)
       }
     }
   }
-  d->rooms = (dungeon_t*)malloc(sizeof (*d->rooms) * d->num_rooms);
+  d->rooms = (room_t*)malloc(sizeof (*d->rooms) * d->num_rooms);
 
   for (i = 0, y = 0; y < DUNGEON_Y - 2; y++) {
     for (x = 0; x < DUNGEON_X - 2; x++) {
