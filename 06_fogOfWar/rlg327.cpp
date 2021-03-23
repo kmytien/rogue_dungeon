@@ -214,14 +214,14 @@ int main(int argc, char *argv[])
   config_pc(&d);
   gen_monsters(&d);
 
-  io_display(&d);
+  io_display_f(&d);
   if (!do_load && !do_image) {
     io_queue_message("Seed is %u.", seed);
   }
   while (pc_is_alive(&d) && dungeon_has_npcs(&d) && !d.quit) {
     do_moves(&d);
   }
-  io_display(&d);
+  io_display_f(&d);
 
   io_reset_terminal();
 
