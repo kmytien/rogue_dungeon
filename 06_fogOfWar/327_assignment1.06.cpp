@@ -65,16 +65,7 @@ void update_discovered(dungeon_t *d, character_t *view, character_t *display) {
   //for 3x3 radius, update the discovered map MAKE SURE NOT TO DELETE REMEMBERED STUFF
   //bresenham's line drawing algorithm : used to generate lines quickly
 
-  pair_t first, second;
-
-  first[dim_x] = view->position[dim_x];
-  first[dim_y] = view->position[dim_y];
-  second[dim_x] = display->position[dim_x];
-  second[dim_y] = display->position[dim_y];
-
-  if((abs{first[dim_x] - second[dim_x]) > VISUAL_RANGE) || (abs{first[dim_y] - second[dim_y]) > VISUAL_RANGE) {
-    return 0;
-  }
+  
 
 
 }
