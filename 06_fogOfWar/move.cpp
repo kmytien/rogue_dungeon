@@ -19,36 +19,36 @@ void do_combat(dungeon_t *d, character_t *atk, character_t *def)
 {
   int can_see_atk, can_see_def;
   char *organs[] = {
-    "liver",                   /*  0 */
-    "pancreas",                /*  1 */
-    "heart",                   /*  2 */
-    "eye",                     /*  3 */
-    "arm",                     /*  4 */
-    "leg",                     /*  5 */
-    "intestines",              /*  6 */
-    "gall bladder",            /*  7 */
-    "lungs",                   /*  8 */
-    "hand",                    /*  9 */
-    "foot",                    /* 10 */
-    "spinal cord",             /* 11 */
-    "pituitary gland",         /* 12 */
-    "thyroid",                 /* 13 */
-    "tongue",                  /* 14 */
-    "bladder",                 /* 15 */
-    "diaphram",                /* 16 */
-    "stomach",                 /* 17 */
-    "pharynx",                 /* 18 */
-    "esophagus",               /* 19 */
-    "trachea",                 /* 20 */
-    "urethra",                 /* 21 */
-    "spleen",                  /* 22 */
-    "ganglia",                 /* 23 */
-    "ear",                     /* 24 */
-    "subcutaneous tissue"      /* 25 */
-    "cerebellum",              /* 26 */ /* Brain parts begin here */
-    "hippocampus",             /* 27 */
-    "frontal lobe",            /* 28 */
-    "brain",                   /* 29 */
+    (char*)"liver",                   /*  0 */
+    (char*)"pancreas",                /*  1 */
+    (char*)"heart",                   /*  2 */
+    (char*)"eye",                     /*  3 */
+    (char*)"arm",                     /*  4 */
+    (char*)"leg",                     /*  5 */
+    (char*)"intestines",              /*  6 */
+    (char*)"gall bladder",            /*  7 */
+    (char*)"lungs",                   /*  8 */
+    (char*)"hand",                    /*  9 */
+    (char*)"foot",                    /* 10 */
+    (char*)"spinal cord",             /* 11 */
+    (char*)"pituitary gland",         /* 12 */
+    (char*)"thyroid",                 /* 13 */
+    (char*)"tongue",                  /* 14 */
+    (char*)"bladder",                 /* 15 */
+    (char*)"diaphram",                /* 16 */
+    (char*)"stomach",                 /* 17 */
+    (char*)"pharynx",                 /* 18 */
+    (char*)"esophagus",               /* 19 */
+    (char*)"trachea",                 /* 20 */
+    (char*)"urethra",                 /* 21 */
+    (char*)"spleen",                  /* 22 */
+    (char*)"ganglia",                 /* 23 */
+    (char*)"ear",                     /* 24 */
+    (char*)"subcutaneous tissue",      /* 25 */
+    (char*)"cerebellum",              /* 26 */ /* Brain parts begin here */
+    (char*)"hippocampus",             /* 27 */
+    (char*)"frontal lobe",            /* 28 */
+    (char*)"brain",                   /* 29 */
   };
   int part;
 
@@ -167,7 +167,7 @@ void do_moves(dungeon_t *d)
     heap_insert(&d->events, update_event(d, e, 1000 / c->speed));
   }
 
-  io_display(d);
+  io_display_f(d);
   if (pc_is_alive(d) && e->c == &d->pc) {
     c = e->c;
     d->time = e->time;
@@ -243,13 +243,13 @@ uint32_t move_pc(dungeon_t *d, uint32_t dir)
   pair_t next;
   uint32_t was_stairs = 0;
   char *wallmsg[] = {
-    "There's a wall in the way.",
-    "BUMP!",
-    "Ouch!",
-    "You stub your toe.",
-    "You can't go that way.",
-    "You admire the engravings.",
-    "Are you drunk?"
+    (char*)"There's a wall in the way.",
+    (char*)"BUMP!",
+    (char*)"Ouch!",
+    (char*)"You stub your toe.",
+    (char*)"You can't go that way.",
+    (char*)"You admire the engravings.",
+    (char*)"Are you drunk?"
   };
 
   next[dim_y] = d->pc.position[dim_y];
@@ -314,7 +314,7 @@ uint32_t move_pc(dungeon_t *d, uint32_t dir)
   } else if (mappair(next) < ter_floor) {
     io_queue_message(wallmsg[rand() % (sizeof (wallmsg) /
                                        sizeof (wallmsg[0]))]);
-    io_display(d);
+    io_display_f(d);
   }
 
   return 1;
