@@ -67,7 +67,7 @@ void gen_monsters(dungeon_t *d)
     m->alive = 1;
     m->sequence_number = ++d->character_sequence_number;
     m->pc = NULL;
-    m->npc = (character_t*)malloc(sizeof (*m->npc));
+    m->npc = (npc_t*)malloc(sizeof (*m->npc));
     m->npc->characteristics = rand() & 0x0000000f;
     /*    m->npc->characteristics = 0xf;*/
     m->symbol = symbol[m->npc->characteristics];
