@@ -24,9 +24,7 @@
       *** can be teleported into rock (not immutable), however, if SURROUNDED by rock, cannot tunnel (unless they teleport)
   - need to make 2 maps -> map where stuff is visible for pc and map that has past terrain (terrain that pc has already stepped on)
   - need to fix all errors in converted cpp files
-
   ALL NEW CODE TO BE WRITTEN IN C++
-
   Files to be switched to C++ IM NOT SURE WHAT NEEDS TO BE CHANGED AND WHAT DOESNT (idk if the .h files need to be changed???)
         also none of the ones with DONE next to them have been tested, i can do that after everything is switched over :) -H
         - all c files are supposed to be cpp (besides heap) but i didnt test them yet (i think they should be fine tho) -MyT
@@ -82,15 +80,15 @@ void init_maps(dungeon_t *d) {
 //radius of whats visible to pc
 void update_sight(dungeon_t *d) {
 
-    int pc_visual = 3;
-    pair_t x, y; //storing starting (dim_x) and end point (dim_y) for x/y ranges
+    int i, j, pc_visual = 3;
+    pair_t x, y, pc_location = d->pc->position; //storing starting (dim_x) and end point (dim_y) for x/y ranges
 
     //if pc is in the first 3 columns
     if (d->pc->position[dim_x] - pc_visual <= 1) x[dim_x] = 0;
     else x[dim_x] = d->pc->position[dim_x] - pc_visual;
 
     //else pc is in at least the fourth column
-    if (d->pc->position[dim_y] - pc_visual <= 1) x[dim_y] = 0;
+    if (d->pc->position[dim_y] + pc_visual > DUNGEON_X) x[dim_y] = 0;
     else x[dim_y] = d->pc->position[dim_y] - pc_visual;
 
     //if pc is in the first three rows
@@ -98,12 +96,28 @@ void update_sight(dungeon_t *d) {
     else y[dim_x] = d->pc->position[dim_x] - pc_visual;
 
     //if pc is in at least the fourth row
-    if (d->pc->position[dim_y] - pc_visual <= 1) y[dim_y] = 0;
+    if (d->pc->position[dim_y] + pc_visual > DUNGEON_Y) y[dim_y] = 0;
     else y[dim_y] = d->pc->position[dim_y] - pc_visual;
 
-    //will come back to this -MyT
 
+    pair_t foo;
+    for (i = x[dim_x]; i <= x[dim_y]; i++) {
+        foo[dim_x] = i;
+        foo[dim_y] = y[dim_x];
+        update_maps(d, pc_location, foo);
 
+        foo[dim_y] = y[dim_y];
+        update_maps(d, pc_location, foo);
+    }
+
+    for (j = y[dim_x]; j <= y[dim_y]; j++) {
+        foo[dim_x] = j;
+        foo[dim_y] = x[dim_x];
+        update_maps(d, pc_location, foo);
+
+        foo[dim_y] = x[dim_y];
+        update_maps(d, pc_location, foo);
+    }
 }
 
 
@@ -123,13 +137,13 @@ int update_maps(dungeon_t *d, pair_t *f, pair_t *t) {
     if (to[dim_x] > from[dim_x]) {
         x_negative = true;
         x_dir = to[dim_x] - from[dim_x];
-    } else x_dir = from[dim_x] - from[dim_x];
+    } else x_dir = from[dim_x] - to[dim_x];
 
 
     if (to[dim_y] > from[dim_y]) {
         y_negative = true;
         y_dir = to[dim_y] - from[dim_y];
-    } else y_dir = from[dim_y] - from[dim_y];
+    } else y_dir = from[dim_y] - to[dim_y];
 
 
     if (y_dir > x_dir) {
@@ -180,6 +194,3 @@ int update_maps(dungeon_t *d, pair_t *f, pair_t *t) {
         return 1;
     }
 }
-
-
-//teleport and fog enabler IN IO.CPP! - not finished yet -M
