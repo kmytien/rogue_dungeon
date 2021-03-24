@@ -76,7 +76,7 @@ void usage(char *name)
 
 int main(int argc, char *argv[])
 {
-  dungeon_t d;
+  dungeon d;
   time_t seed;
   struct timeval tv;
   uint32_t i;
@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
   printf("You defended your life in the face of %u deadly beasts.\n"
          "You avenged the cruel and untimely murders of %u "
          "peaceful dungeon residents.\n",
-         d.pc.kills[kill_direct], d.pc.kills[kill_avenged]);
+         d.c.kills[kill_direct], d.c.kills[kill_avenged]);
 
   pc_delete(d.pc.pc);
 
