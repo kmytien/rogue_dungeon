@@ -5,6 +5,7 @@
 #include "npc.h"
 #include "pc.h"
 #include "dungeon.h"
+#include "assignment_106.h"
 
 /**
   NOTES:
@@ -194,3 +195,6 @@ int update_maps(dungeon_t *d, pair_t *f, pair_t *t) {
         return 1;
     }
 }
+
+
+//teleport and fog enabler IN IO.CPP! - not finished yet -M
