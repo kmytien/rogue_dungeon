@@ -24,7 +24,7 @@ void init_maps(dungeon_t *d) {
 //radius of whats visible to pc
 void update_sight(dungeon_t *d) {
 
-    int i, j, pc_visual = 3;
+    int i, j, pc_visual = 2;
     pair_t x, y, pc_location; //storing starting (dim_x) and end point (dim_y) for x/y ranges
 
     pc_location[dim_x] = d->pc.position[dim_x];
