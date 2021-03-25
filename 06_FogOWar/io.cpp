@@ -335,7 +335,7 @@ uint32_t io_teleport_pc(dungeon_t *d) {
   mvaddch(teleport[dim_y] + 1, teleport[dim_x], '*');
   refresh();
 
-  int input, out = 0;
+  int input, t_x, t_y, out = 0;
   while (!out) {
  
   		int cursor_x = teleport[dim_x];
@@ -346,46 +346,62 @@ uint32_t io_teleport_pc(dungeon_t *d) {
         case '7':
         case 'y':
         case KEY_HOME:
-          teleport[dim_y]--;
-          teleport[dim_x]--;
+        	t_y = -1;
+        	t_x = -1;
+          //teleport[dim_y]--;
+          //teleport[dim_x]--;
           break;
         case '8':
         case 'k':
         case KEY_UP:
-          teleport[dim_y]--;
+        	t_y = -1;
+        	t_x = 0;
+          //teleport[dim_y]--;
           break;
         case '9':
         case 'u':
         case KEY_PPAGE:
-          teleport[dim_y]--;
-          teleport[dim_x]++;
+        	t_y = -1;
+        	t_x = 1;
+          //teleport[dim_y]--;
+          //teleport[dim_x]++;
           break;
         case '6':
         case 'l':
         case KEY_RIGHT:
-          teleport[dim_x]++;
+        	t_y = 0;
+        	t_x = 1;
+          //teleport[dim_x]++;
           break;
         case '3':
         case 'n':
         case KEY_NPAGE:
-          teleport[dim_y]++;
-          teleport[dim_x]++;
+        	t_y = 1;
+        	t_x = 1;
+          //teleport[dim_y]++;
+          //teleport[dim_x]++;
           break;
         case '2':
         case 'j':
         case KEY_DOWN:
-          teleport[dim_y]++;
+        	t_y = 1;
+        	t_x = 0;
+          //teleport[dim_y]++;
           break;
         case '1':
         case 'b':
         case KEY_END:
-          teleport[dim_y]++;
-          teleport[dim_x]--;
+        	t_y = 1;
+        	t_x = -1;
+          //teleport[dim_y]++;
+          //teleport[dim_x]--;
           break;
         case '4':
         case 'h':
         case KEY_LEFT:
-          teleport[dim_x]--;
+        	t_y = 0;
+        	t_x = -1;
+          //teleport[dim_x]--;
           break;
         case 'r': //random
           while (mappair(teleport) <= ter_floor || charpair(teleport)) {
@@ -403,27 +419,30 @@ uint32_t io_teleport_pc(dungeon_t *d) {
   		switch (mappair(teleport)) {
   				case ter_wall:
 				  case ter_wall_immutable:
-				     mvaddch(cursor_y, cursor_x, ' ');
+				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], ' ');
 				     break;
 				  case ter_floor:
 				  case ter_floor_room:
-				     mvaddch(cursor_y, cursor_x, '.');
+				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '.');
 				     break;
 				  case ter_floor_hall:
-				     mvaddch(cursor_y, cursor_x, '#');
+				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '#');
 				     break;
 				  case ter_debug:
-				     mvaddch(cursor_y, cursor_x, '*');
+				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '-');
 				     break;
 				  case ter_stairs_up:
-				     mvaddch(cursor_y, cursor_x, '<');
+				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '<');
 				     break;
 				  case ter_stairs_down:
-				     mvaddch(cursor_y, cursor_x, '>');
+				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '>');
 				     break;
 				  default:
 				  	 break;
   		}      
+      
+      teleport[dim_y] += t_y;
+      teleport[dim_x] += t_x;
       
       mvaddch(teleport[dim_y] + 1, teleport[dim_x], '*');
       refresh();
