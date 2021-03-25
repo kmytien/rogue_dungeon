@@ -1,3 +1,5 @@
+03/25/21 10:00 MK: Fixed a few bugs regarding teleport and fog of war, updating README and CHANGELOG
+03/24/21 15:30 SA HL MK: Fixed some linker errors, implemented bresenheim's line algorithm and update_sight
 03/23/21 16:00 MK: Created and worked on update_maps, and also update_visibility
 03/23/21 16:00 SA MK: Implemented teleport and fog method - still WIP
 03/23/21 15:00 MK SA HL: Created init_maps method, created maps for terrain and visibility, still converting to cpp and fixing errors
