@@ -1,4 +1,0 @@
-03/23/21 16:00 MK: Created and worked on update_maps, and also update_visibility
-03/23/21 16:00 SA MK: Implemented teleport and fog method - still WIP
-03/23/21 15:00 MK SA HL: Created init_maps method, created maps for terrain and visibility, still converting to cpp and fixing errors
-03/22/21 15:00 MK SA HL: Created beginning functions, fixed errors, converted to cpp
