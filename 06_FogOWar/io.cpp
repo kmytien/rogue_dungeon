@@ -210,7 +210,7 @@ void io_display_f(dungeon_t *d) {
           
           //updates pc and monster characters when in visible range
           if (d->visible[dy][dx] && d->character[dy][dx]) 
-              		mvaddch(dy + 1, dx, d->character[dy][dx]->symbol);
+              mvaddch(dy + 1, dx, d->character[dy][dx]->symbol);
           
           //updates fog of war map and keeps the terrain we've already seen  	
           else {
@@ -329,79 +329,90 @@ uint32_t io_teleport_pc(dungeon_t *d) {
   pair_t teleport;
   teleport[dim_y] = d->pc.position[dim_y];
   teleport[dim_x] = d->pc.position[dim_x];
+
 	
 	//we decided to display the no fog when we teleport
   io_display_nf(d);
   mvaddch(teleport[dim_y] + 1, teleport[dim_x], '*');
   refresh();
-
+	
+	
+	
   int input, t_x, t_y, out = 0;
   while (!out) {
- 
-  		int cursor_x = teleport[dim_x];
-  		int cursor_y = teleport[dim_y] + 1;
+  
+  		bool inbounds_x_down = teleport[dim_x] > 1;
+  		bool inbounds_x_up = teleport[dim_x] < 78;
+			bool inbounds_y_down = teleport[dim_y] > 1;
+			bool inbounds_y_up = teleport[dim_y] < 19;
+  		t_x = 0;
+  		t_y = 0;
   		
   		//keys for moving the asterisk
       switch (input = getch()) {
         case '7':
         case 'y':
         case KEY_HOME:
-        	t_y = -1;
-        	t_x = -1;
-          //teleport[dim_y]--;
-          //teleport[dim_x]--;
+        	if (inbounds_x_down && inbounds_y_down) {
+		      	t_y = -1;
+		      	t_x = -1;
+        	}
           break;
         case '8':
         case 'k':
         case KEY_UP:
-        	t_y = -1;
-        	t_x = 0;
-          //teleport[dim_y]--;
+        	if (inbounds_y_down) {
+        		t_y = -1;
+        		t_x = 0;
+        	}
           break;
         case '9':
         case 'u':
         case KEY_PPAGE:
-        	t_y = -1;
-        	t_x = 1;
-          //teleport[dim_y]--;
-          //teleport[dim_x]++;
+        	if (inbounds_x_up && inbounds_y_down) {
+        		t_y = -1;
+        		t_x = 1;
+          }
           break;
         case '6':
         case 'l':
         case KEY_RIGHT:
-        	t_y = 0;
-        	t_x = 1;
-          //teleport[dim_x]++;
+        	if (inbounds_x_up) {
+        		t_y = 0;
+        		t_x = 1;
+        	}
           break;
         case '3':
         case 'n':
         case KEY_NPAGE:
-        	t_y = 1;
-        	t_x = 1;
-          //teleport[dim_y]++;
-          //teleport[dim_x]++;
+        	if (inbounds_x_up && inbounds_y_up) {
+        		t_y = 1;
+        		t_x = 1;
+          }
           break;
         case '2':
         case 'j':
         case KEY_DOWN:
-        	t_y = 1;
-        	t_x = 0;
-          //teleport[dim_y]++;
+        	if (inbounds_y_up) {
+        		t_y = 1;
+        		t_x = 0;
+        	}
           break;
         case '1':
         case 'b':
         case KEY_END:
-        	t_y = 1;
-        	t_x = -1;
-          //teleport[dim_y]++;
-          //teleport[dim_x]--;
+        	if (inbounds_x_up && inbounds_y_down) {
+        		t_y = 1;
+        		t_x = -1;
+          }
           break;
         case '4':
         case 'h':
         case KEY_LEFT:
-        	t_y = 0;
-        	t_x = -1;
-          //teleport[dim_x]--;
+        	if (inbounds_x_down) {
+        		t_y = 0;
+        		t_x = -1;
+        	}
           break;
         case 'r': //random
           while (mappair(teleport) <= ter_floor || charpair(teleport)) {
@@ -452,7 +463,7 @@ uint32_t io_teleport_pc(dungeon_t *d) {
 	move_character(d, &d->pc, teleport);
   d->pc.position[dim_y] = teleport[dim_y];
   d->pc.position[dim_x] = teleport[dim_x];
-
+	
 	//updates fog of war
   update_sight(d);
   dijkstra(d);
