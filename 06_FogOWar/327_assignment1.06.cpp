@@ -7,74 +7,21 @@
 #include "dungeon.h"
 #include "assignment_106.h"
 
-/**
-  NOTES:
-  - Convert everything to c++
-    - make all files cpp files
-    - create a c++ makefile
-    - all major structs should be converted to classes
-      - Make npc and pc inheritors of the character class
-  - create another map that shows what the character has seen
-    - character can see/remember a 3x3 radius around them
-    - this includes monsters (ie IF they are in the remembered areas)
-  - add FOW and teleporting debug commands
-    - use f to toggle fog of war view (whatever that means)
-    - use g to toggle teleport mode
-      - press g then g, the movement keys will move a targeted pointer (*) and the second g teleports the pc to that location
-      - press g then r, sends the pc to a random location
-      *** can be teleported into rock (not immutable), however, if SURROUNDED by rock, cannot tunnel (unless they teleport)
-  - need to make 2 maps -> map where stuff is visible for pc and map that has past terrain (terrain that pc has already stepped on)
-  - need to fix all errors in converted cpp files
-  ALL NEW CODE TO BE WRITTEN IN C++
-  Files to be switched to C++ IM NOT SURE WHAT NEEDS TO BE CHANGED AND WHAT DOESNT (idk if the .h files need to be changed???)
-        also none of the ones with DONE next to them have been tested, i can do that after everything is switched over :) -H
-        - all c files are supposed to be cpp (besides heap) but i didnt test them yet (i think they should be fine tho) -MyT
-  - makefile  DONE
-  - character.c  DONE
-  - character.h
-  - dims.h
-  - dungeon.c
-  - dungeon.h
-  - event.c  DONE
-  - event.h
-  - heap.c
-  - heap.h
-  - io.c
-  - io.h
-  - move.c
-  - move.h
-  - npc.c
-  - npc.h
-  - path.c
-  - path.h
-  - pc.c
-  - pc.h
-  - rlg327.c
-  - utils.c  DONE
-  - utils.h  DONE?
-**/
-
-/* CREATE NEW MAP */
-// - create another map that shows what the character has seen
-//     - character can see/remember a 3x3 radius around them
-//     - this includes monsters (ie IF they are in the remembered areas)
-
-//on the piazza, sheaffer said to start off by initializing terrain map to all rock
-//then i initialized the visible map to 0 (meaning not visible)
+  
+//initialization of both maps (terrain and visibility for fog of war)
 void init_maps(dungeon_t *d) {
     int y, x;
 
     for (y = 0; y < DUNGEON_Y; y++) {
         for (x = 0; x < DUNGEON_X; x++) {
-            d->discovered[y][x] = ter_wall; //this is rock right aka a space?
-            d->visible[y][x] = 0; //nothing is visible right now
+            d->discovered[y][x] = ter_wall; 
+            d->visible[y][x] = 0; 
         }
     }
 }
 
 
 //radius of whats visible to pc
-
 void update_sight(dungeon_t *d) {
 
     int i, j, pc_visual = 3;
@@ -83,14 +30,15 @@ void update_sight(dungeon_t *d) {
     pc_location[dim_x] = d->pc.position[dim_x];
     pc_location[dim_y] = d->pc.position[dim_y];
 
-
+		//resets visibility
 		for (int k = 0; k < DUNGEON_Y; k++) {
 			for (int m = 0; m < DUNGEON_X; m++) {
 					d->visible[k][m] = 0;
 			}
 		}
 
-
+		//the following tells us the range for x and y (of the illuminated box)
+		//if pc is in the first 3 columns
     if (pc_location[dim_x] - pc_visual < 0) x[dim_x] = 0;
 		else x[dim_x] = pc_location[dim_x] - pc_visual;
 
@@ -105,9 +53,8 @@ void update_sight(dungeon_t *d) {
 		//if pc is in at least the fourth row
 		if (pc_location[dim_y] + pc_visual > DUNGEON_Y - 1) y[dim_y] = DUNGEON_Y - 1;
 		else y[dim_y] = pc_location[dim_y] + pc_visual;
-		//mvprintw(30, 0, "%d %d %d %d Play Coords -> %d %d", x[dim_x], x[dim_y], y[dim_x], y[dim_y], pc_location[dim_x], pc_location[dim_y]);
 
-		
+		//goes through the bresenheim's line algorithm and updates terrain/visibility as necessary
     pair_t foo;
     for (i = x[dim_x]; i <= x[dim_y]; i++) {
         foo[dim_x] = i;
@@ -129,8 +76,8 @@ void update_sight(dungeon_t *d) {
 }
 
 
-//insert in bresenham's line algorithm for observing terrain
-//decided to use bresenham's line algorithm because we're just checking in a straight line
+//used sheaffer's suggestion to use bresenheim's line algorithm 
+//(we just copied/pasted our line algorithm from 1.04 and modified it)
 int update_maps(dungeon_t *d, pair_t f, pair_t t) {
 
     bool y_negative = false, x_negative = false;
@@ -165,7 +112,7 @@ int update_maps(dungeon_t *d, pair_t f, pair_t t) {
             //update visibility and terrain for from
             d->discovered[from[dim_y]][from[dim_x]] = mappair(from);
             d->visible[from[dim_y]][from[dim_x]] = 1;
-            //anything else? **
+            
 						if (y_negative) from[dim_y]--;
             else from[dim_y]++;
                 
@@ -193,7 +140,6 @@ int update_maps(dungeon_t *d, pair_t f, pair_t t) {
             //update visibility and terrain for from
             d->discovered[from[dim_y]][from[dim_x]] = mappair(from);
             d->visible[from[dim_y]][from[dim_x]] = 1;
-            //anything else? **
 
 						if (x_negative) from[dim_x]--;
             else from[dim_x]++;
@@ -209,6 +155,3 @@ int update_maps(dungeon_t *d, pair_t f, pair_t t) {
         return 1;
     }
 }
-
-
-//teleport and fog enabler IN IO.CPP! - not finished yet -M
