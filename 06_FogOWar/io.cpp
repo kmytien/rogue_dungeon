@@ -198,7 +198,7 @@ static character_t *io_nearest_visible_monster(dungeon_t *d)
   return n;
 }
 
-
+//fog of war map
 void io_display_f(dungeon_t *d) {
 
   uint32_t dy, dx, i, j;
@@ -208,9 +208,11 @@ void io_display_f(dungeon_t *d) {
   for (dy = 0; dy < DUNGEON_Y; dy++) {
       for (dx = 0; dx < DUNGEON_X; dx++) {
           
+          //updates pc and monster characters when in visible range
           if (d->visible[dy][dx] && d->character[dy][dx]) 
               		mvaddch(dy + 1, dx, d->character[dy][dx]->symbol);
-              	
+          
+          //updates fog of war map and keeps the terrain we've already seen  	
           else {
              switch (d->discovered[dy][dx]) {
 				        case ter_wall:
@@ -242,7 +244,7 @@ void io_display_f(dungeon_t *d) {
     refresh();
 }
 
-
+//this was sheaffers 1.05 display method, and we just kept it for no fog map
 void io_display_nf(dungeon_t *d)
 {
   uint32_t y, x;
@@ -276,8 +278,8 @@ void io_display_nf(dungeon_t *d)
           mvaddch(y + 1, x, '>');
           break;
         default:
- /* Use zero as an error symbol, since it stands out somewhat, and it's *
-  * not otherwise used.                                                 */
+			 /* Use zero as an error symbol, since it stands out somewhat, and it's *
+				* not otherwise used.                                                 */
           mvaddch(y + 1, x, '0');
         }
       }
@@ -321,45 +323,25 @@ void io_display_monster_list(dungeon_t *d)
   getch();
 }
 
-uint32_t io_teleport_pc(dungeon_t *d)
-{
+//teleport method for pc
+uint32_t io_teleport_pc(dungeon_t *d) {
 
   pair_t teleport;
   teleport[dim_y] = d->pc.position[dim_y];
   teleport[dim_x] = d->pc.position[dim_x];
 	
+	//we decided to display the no fog when we teleport
   io_display_nf(d);
   mvaddch(teleport[dim_y] + 1, teleport[dim_x], '*');
   refresh();
 
   int input, out = 0;
   while (!out) {
-  		//need to update so star isnt repeating -- something wrong with this switch
-  		switch (mappair(teleport)) {
-  				case ter_wall:
-				  case ter_wall_immutable:
-				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], ' ');
-				     break;
-				  case ter_floor:
-				  case ter_floor_room:
-				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '.');
-				     break;
-				  case ter_floor_hall:
-				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '#');
-				     break;
-				  case ter_debug:
-				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '*');
-				     break;
-				  case ter_stairs_up:
-				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '<');
-				     break;
-				  case ter_stairs_down:
-				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '>');
-				     break;
-				  default:
-				     mvaddch(teleport[dim_y] + 1, teleport[dim_x], '0');
-  		}
+ 
+  		int cursor_x = teleport[dim_x];
+  		int cursor_y = teleport[dim_y] + 1;
   		
+  		//keys for moving the asterisk
       switch (input = getch()) {
         case '7':
         case 'y':
@@ -417,14 +399,42 @@ uint32_t io_teleport_pc(dungeon_t *d)
           break;
       }
       
+      //updates so that the * isn't repeating, and replaces the terrain back to what it was
+  		switch (mappair(teleport)) {
+  				case ter_wall:
+				  case ter_wall_immutable:
+				     mvaddch(cursor_y, cursor_x, ' ');
+				     break;
+				  case ter_floor:
+				  case ter_floor_room:
+				     mvaddch(cursor_y, cursor_x, '.');
+				     break;
+				  case ter_floor_hall:
+				     mvaddch(cursor_y, cursor_x, '#');
+				     break;
+				  case ter_debug:
+				     mvaddch(cursor_y, cursor_x, '*');
+				     break;
+				  case ter_stairs_up:
+				     mvaddch(cursor_y, cursor_x, '<');
+				     break;
+				  case ter_stairs_down:
+				     mvaddch(cursor_y, cursor_x, '>');
+				     break;
+				  default:
+				  	 break;
+  		}      
+      
       mvaddch(teleport[dim_y] + 1, teleport[dim_x], '*');
       refresh();
   }
 
+	//updates pc character
 	move_character(d, &d->pc, teleport);
   d->pc.position[dim_y] = teleport[dim_y];
   d->pc.position[dim_x] = teleport[dim_x];
 
+	//updates fog of war
   update_sight(d);
   dijkstra(d);
   dijkstra_tunnel(d);
