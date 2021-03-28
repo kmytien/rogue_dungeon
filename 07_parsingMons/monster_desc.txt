@@ -37,4 +37,30 @@ SPEED 10+10d2
 RRTY 20
 END
 
-
+Junior Barbarian
+This is a junior barbarian. He--or is it she? You can't tell for sure--
+looks like... it should still be in barbarian school. The barbarians are
+putting them in the dungeons young these days. It's wearing dirty, tattered
+cloth armor and wielding a wooden sword. You have a hard time feeling
+intimidated.
+p
+BLUE
+7+1d4
+SMART
+12+2d6
+0+1d4
+100
+Amazon Lich Queen
+She was a powerful Amazon warrior in life. Death at the hands of the undead
+hordes was followed by her resurrection through dark, necromantic arts. Her
+power in life didn't approach her undead glory. Clad in night-black robes
+that don't move in the wind, her incorporeal form commands the power of death
+over life. You may just be her next victim. You fear for your soul as you
+quake before her malevolent majesty.
+p
+BLACK
+10+10d2
+SMART PASS
+2999+1d1001
+30+5d9
+20
