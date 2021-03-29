@@ -59,25 +59,25 @@ public:
     void print_monsters(){
         // PRINT THE MONSTERS
         cout << name << endl;
+        cout << desc << endl;
         cout << symbol << endl;
         cout << color << endl;
-        cout << desc << "." << endl;
         cout << speed << endl;
+        cout << ability << endl;
         cout << hp << endl;
         cout << damage << endl;
         cout << rrty << endl;
-        cout << ability << endl;
         cout << "\n\n" << endl;
 
-        name.erase();
-        desc.erase();
-        color.erase();
-        ability.erase();
-        speed.erase();
-        hp.erase();
-        damage.erase();
-        symbol.erase();
-        rrty.erase();
+        // name.erase();
+        // desc.erase();
+        // color.erase();
+        // ability.erase();
+        // speed.erase();
+        // hp.erase();
+        // damage.erase();
+        // symbol.erase();
+        // rrty.erase();
     }
 };
 
@@ -126,7 +126,7 @@ int parse_monsters() {
 
       // SYMB p
       s = "";
-      getline(mfile, s, '\n');
+      getline(mfile, s, ' ');
       if (s != "SYMB") break;
       getline(mfile, s, '\n');
       md.symbol = s;
@@ -148,9 +148,11 @@ int parse_monsters() {
       s = "";
       getline(mfile, s, '\n'); // not sure about this
       if (s != "DESC") break;
-      getline(mfile, s, '.');
-      mfile.get();
-      md.desc = s;
+      s = "";
+      while (s != ".") {
+        getline(mfile, s, '\n');
+        md.desc += s + "\n";
+      }
 
       // SPEED 7+1d4
       s = "";
