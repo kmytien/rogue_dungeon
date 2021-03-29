@@ -113,30 +113,32 @@ int parse_monsters() {
   //read the data
   while (mfile) {
       // BEGIN MONSTER
-      s = "";
       getline(mfile, s, '\n');
       if (s != "BEGIN MONSTER") break; //HOPEFULLY THIS GOES TO THE NEXT BEGIN MONSTER??
+      cout << s << endl;
 
       // NAME Junior Barbarian
-      s = "";
+      //s = "";
       getline(mfile, s, ' ');
+      while (!done)
       if (s != "NAME") break;
       getline(mfile, s, '\n');
       md.name = s;
+      cout << s << endl;
 
       // SYMB p
-      s = "";
       getline(mfile, s, ' ');
       if (s != "SYMB") break;
       getline(mfile, s, '\n');
       md.symbol = s;
+      cout << s << endl;
 
       // COLOR BLUE
-      s = "";
       getline(mfile, s, ' ');
       if (s != "COLOR") break;
       getline(mfile, s, '\n');
       md.color = s;
+      cout << s << endl;
 
       // DESC
       // This is a junior barbarian. He--or is it she? You can't tell for sure--
@@ -145,54 +147,55 @@ int parse_monsters() {
       // cloth armor and wielding a wooden sword. You have a hard time feeling
       // intimidated.
       // .
-      s = "";
       getline(mfile, s, '\n'); // not sure about this
       if (s != "DESC") break;
-      s = "";
       while (s != ".") {
         getline(mfile, s, '\n');
+        if(s == ".") break;
         md.desc += s + "\n";
+        cout << s << endl;
       }
 
       // SPEED 7+1d4
-      s = "";
       getline(mfile, s, ' ');
       if (s != "SPEED") break;
       getline(mfile, s, '\n');
       md.speed = s;
+      cout << s << endl;
 
       // DAM 0+1d4
-      s = "";
       getline(mfile, s, ' ');
       if (s != "DAM") break;
       getline(mfile, s, '\n');
       md.damage = s;
+      cout << s << endl;
 
       // HP 12+2d6
-      s = "";
       getline(mfile, s, ' ');
       if (s != "HP") break;
       getline(mfile, s, '\n');
       md.hp = s;
+      cout << s << endl;
 
       // RRTY 100
-      s = "";
       getline(mfile, s, ' ');
+      cout << s << endl;
       if (s != "RRTY") break;
       getline(mfile, s, '\n');
       md.rrty = s;
+      cout << s << endl;
 
       // ABIL SMART
-      s = "";
       getline(mfile, s, ' ');
       if (s != "ABIL") break;
       getline(mfile, s, '\n');
       md.ability = s;
+      cout << s << endl;
 
       // END
-      s = "";
       getline(mfile, s, '\n');
       if (s != "END") break;
+      cout << s << endl;
 
       md.print_monsters();
   }
