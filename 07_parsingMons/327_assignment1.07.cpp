@@ -57,27 +57,27 @@ public:
     string rrty;
 
     void print_monsters(){
-      // PRINT THE MONSTERS
-      cout << name << endl;
-      cout << symbol << endl;
-      cout << color << endl;
-      cout << desc << "." << endl;
-      cout << speed << endl;
-      cout << hp << endl;
-      cout << damage << endl;
-      cout << rrty << endl;
-      cout << ability << endl;
-      cout << endl;
+        // PRINT THE MONSTERS
+        cout << name << endl;
+        cout << symbol << endl;
+        cout << color << endl;
+        cout << desc << "." << endl;
+        cout << speed << endl;
+        cout << hp << endl;
+        cout << damage << endl;
+        cout << rrty << endl;
+        cout << ability << endl;
+        cout << "\n\n" << endl;
 
-      name.erase();
-      desc.erase();
-      color.erase();
-      ability.erase();
-      speed.erase();
-      hp.erase();
-      damage.erase();
-      symbol.erase();
-      rrty.erase();
+        name.erase();
+        desc.erase();
+        color.erase();
+        ability.erase();
+        speed.erase();
+        hp.erase();
+        damage.erase();
+        symbol.erase();
+        rrty.erase();
     }
 };
 
@@ -104,6 +104,7 @@ int parse_monsters() {
 
   getline(mfile, s, '\n');
   mfile.get();
+
   if (s != "RLG327 MONSTER DESCRIPTION 1") {
       cout << "File is in wrong format." << endl;
       return -1; //can we compare strings like this? i thought we used .compare()
@@ -111,87 +112,87 @@ int parse_monsters() {
 
   //read the data
   while (mfile) {
-    // BEGIN MONSTER
-    s = "";
-    getline(mfile, s, '\n');
-    if (s != "BEGIN MONSTER") break; //HOPEFULLY THIS GOES TO THE NEXT BEGIN MONSTER??
+      // BEGIN MONSTER
+      s = "";
+      getline(mfile, s, '\n');
+      if (s != "BEGIN MONSTER") break; //HOPEFULLY THIS GOES TO THE NEXT BEGIN MONSTER??
 
-    // NAME Junior Barbarian
-    s = "";
-    getline(mfile, s, ' ');
-    if (s != "NAME") break;
-    getline(mfile, s, '\n');
-    md.name = s;
+      // NAME Junior Barbarian
+      s = "";
+      getline(mfile, s, ' ');
+      if (s != "NAME") break;
+      getline(mfile, s, '\n');
+      md.name = s;
 
-    // SYMB p
-    s = "";
-    getline(mfile, s, '\n');
-    if (s != "SYMB") break;
-    getline(mfile, s, '\n');
-    md.symbol = s;
+      // SYMB p
+      s = "";
+      getline(mfile, s, '\n');
+      if (s != "SYMB") break;
+      getline(mfile, s, '\n');
+      md.symbol = s;
 
-    // COLOR BLUE
-    s = "";
-    getline(mfile, s, ' ');
-    if (s != "COLOR") break;
-    getline(mfile, s, '\n');
-    md.color = s;
+      // COLOR BLUE
+      s = "";
+      getline(mfile, s, ' ');
+      if (s != "COLOR") break;
+      getline(mfile, s, '\n');
+      md.color = s;
 
-    // DESC
-    // This is a junior barbarian. He--or is it she? You can't tell for sure--
-    // looks like... it should still be in barbarian school. The barbarians are
-    // putting them in the dungeons young these days. It's wearing dirty, tattered
-    // cloth armor and wielding a wooden sword. You have a hard time feeling
-    // intimidated.
-    // .
-    s = "";
-    getline(mfile, s, '\n'); // not sure about this
-    if (s != "DESC") break;
-    getline(mfile, s, '.');
-    mfile.get();
-    md.desc = s;
+      // DESC
+      // This is a junior barbarian. He--or is it she? You can't tell for sure--
+      // looks like... it should still be in barbarian school. The barbarians are
+      // putting them in the dungeons young these days. It's wearing dirty, tattered
+      // cloth armor and wielding a wooden sword. You have a hard time feeling
+      // intimidated.
+      // .
+      s = "";
+      getline(mfile, s, '\n'); // not sure about this
+      if (s != "DESC") break;
+      getline(mfile, s, '.');
+      mfile.get();
+      md.desc = s;
 
-    // SPEED 7+1d4
-    s = "";
-    getline(mfile, s, ' ');
-    if (s != "SPEED") break;
-    getline(mfile, s, '\n');
-    md.speed = s;
+      // SPEED 7+1d4
+      s = "";
+      getline(mfile, s, ' ');
+      if (s != "SPEED") break;
+      getline(mfile, s, '\n');
+      md.speed = s;
 
-    // DAM 0+1d4
-    s = "";
-    getline(mfile, s, ' ');
-    if (s != "DAM") break;
-    getline(mfile, s, '\n');
-    md.damage = s;
+      // DAM 0+1d4
+      s = "";
+      getline(mfile, s, ' ');
+      if (s != "DAM") break;
+      getline(mfile, s, '\n');
+      md.damage = s;
 
-    // HP 12+2d6
-    s = "";
-    getline(mfile, s, ' ');
-    if (s != "HP") break;
-    getline(mfile, s, '\n');
-    md.hp = s;
+      // HP 12+2d6
+      s = "";
+      getline(mfile, s, ' ');
+      if (s != "HP") break;
+      getline(mfile, s, '\n');
+      md.hp = s;
 
-    // RRTY 100
-    s = "";
-    getline(mfile, s, ' ');
-    if (s != "RRTY") break;
-    getline(mfile, s, '\n');
-    md.rrty = s;
+      // RRTY 100
+      s = "";
+      getline(mfile, s, ' ');
+      if (s != "RRTY") break;
+      getline(mfile, s, '\n');
+      md.rrty = s;
 
-    // ABIL SMART
-    s = "";
-    getline(mfile, s, ' ');
-    if (s != "ABIL") break;
-    getline(mfile, s, '\n');
-    md.ability = s;
+      // ABIL SMART
+      s = "";
+      getline(mfile, s, ' ');
+      if (s != "ABIL") break;
+      getline(mfile, s, '\n');
+      md.ability = s;
 
-    // END
-    s = "";
-    getline(mfile, s, '\n');
-    if (s != "END") break;
+      // END
+      s = "";
+      getline(mfile, s, '\n');
+      if (s != "END") break;
 
-    md.print_monsters();
+      md.print_monsters();
   }
 
   mfile.close();
@@ -199,7 +200,7 @@ int parse_monsters() {
 }
 
 int main(int argc, char *argv[]) {
-    cout << parse_monsters() << endl;
+    parse_monsters();
     return 0;
 }
 
