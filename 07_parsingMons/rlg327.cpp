@@ -11,7 +11,6 @@
 #include <ncurses.h>
 #include <sys/stat.h>
 #include <cstring>
-#include <string>
 
 #include "dungeon.h"
 #include "pc.h"
@@ -83,9 +82,12 @@ void usage(char *name)
   exit(-1);
 }
 
+/* ----- START OF OUR CODE ----- */
+
 using namespace std;
 
 class dice{
+public:
 	int base;
 	int number;
 	int sides;
@@ -102,22 +104,35 @@ public:
     dice hp;
     dice damage;
     string symbol;
-    string rrty;
+    int rrty;
 
     //printing monsters
     void print_monsters(){
-        cout << name << desc << symbol << color << speed << ability << hp << damage << rrty << endl;
+        cout << name << desc << symbol << color << ability << rrty << endl;
+        cout << speed.base << "+" << speed.number << "d" << speed.sides << endl;
+        cout << hp.base << "+" << hp.number << "d" << hp.sides << endl;
+        cout << damage.base << "+" << damage.number << "d" << damage.sides << endl << endl;
 
         //resetting monster description variables
         name.erase();
         desc.erase();
         color.erase();
         ability.erase();
-        speed.erase();
-        hp.erase();
-        damage.erase();
+
+        speed.base = 0;
+        speed.number = 0;
+        speed.sides = 0;
+
+        hp.base = 0;
+        hp.number = 0;
+        hp.sides = 0;
+
+        damage.base = 0;
+        damage.number = 0;
+        damage.sides = 0;
+
         symbol.erase();
-        rrty.erase();
+        rrty = 0;
     }
 };
 
@@ -154,11 +169,11 @@ int parse_monsters() {
     //while we are not at the EOF
     while (mfile) {
 
-        //looking for "BEGIN MONSTER"
-        getline(mfile, s, '\n');
-        if (s != "BEGIN MONSTER") break;
-
-        //peeks at next beginning character
+      //looking for "BEGIN MONSTER"
+      getline(mfile, s, '\n');
+      if (s != "BEGIN MONSTER") break;
+				
+      //peeks at next beginning character
     	c = mfile.peek();
 
         //while the next beginnign character is NOT "E" - so if next word is NOT "END"
@@ -170,13 +185,13 @@ int parse_monsters() {
       		  //checking for name
       		  if (c == 'N') {
         	  	getline(mfile, s, ' ');
-        		getline(mfile, s, '\n');
-        		md.name = s + "\n";
+        			getline(mfile, s, '\n');
+        			md.name = s + "\n";
       	 	  }
 
       	 	  //checking for symbol and speed
       	 	  else if (c == 'S') {
-        	 	getline(mfile, s, ' ');
+        	 		getline(mfile, s, ' ');
 
                 	//case for symbol
         		 if (s == "SYMB") {
@@ -186,8 +201,15 @@ int parse_monsters() {
 
                 	//case for speed
         		else if (s == "SPEED") {
-          			getline(mfile, s, '\n');
-          			md.speed = s + "\n";
+
+                if(md.speed.base == 0 || md.speed.number == 0 || md.speed.sides == 0){
+                  getline(mfile, s, '+');
+                  md.speed.base = stoi(s);
+                  getline(mfile, s, 'd');
+                  md.speed.number = stoi(s);
+                  getline(mfile, s, '\n');
+                  md.speed.sides = stoi(s);
+                }
         		}
       		  }
 
@@ -204,36 +226,51 @@ int parse_monsters() {
         		mfile.get(c); //whatever next letter is extracted
 
                 	//case for description
-        		if (c == 'E') {
-          		        getline(mfile, s, '\n');
-          	                getline(mfile, s, '\n');
+				    		if (c == 'E') {
+				   		        getline(mfile, s, '\n');
+				              getline(mfile, s, '\n');
 
-          		        while (s != ".") {
-          				md.desc += s + "\n";
-          				getline(mfile, s, '\n');
-          		        }
-        	  	}
+				      		    while (s != ".") {
+				      					md.desc += s + "\n";
+				      					getline(mfile, s, '\n');
+				      		    }
+				    	  	}
 
-                	//case for damage
-        		else if (c == 'A') {
-          			getline(mfile, s, ' ');
-          			getline(mfile, s, '\n');
-          			md.damage = s + "\n";
-        		}
+				            	//case for damage
+				    		else if (c == 'A') {
+				    			getline(mfile, s, ' ');
+				    			
+				          if(md.damage.base == 0 || md.damage.number == 0 || md.damage.sides == 0){
+						          getline(mfile, s, '+'); 
+						          md.damage.base = stoi(s);
+						          getline(mfile, s, 'd');
+						          md.damage.number = stoi(s);
+						          getline(mfile, s, '\n');
+						          md.damage.sides = stoi(s);
+				          }
+				          
+				    		}
       		  }
 
       		  //checking for hp
       		  else if (c == 'H') {
-        		getline(mfile, s, ' ');
-        		getline(mfile, s, '\n');
-        		md.hp = s + "\n";
+      		  	getline(mfile, s, ' ');
+      		  	
+              if(md.hp.base == 0 || md.hp.number == 0 || md.hp.sides == 0){
+                getline(mfile, s, '+');
+                md.hp.base = stoi(s);
+                getline(mfile, s, 'd');
+                md.hp.number = stoi(s);
+                getline(mfile, s, '\n');
+                md.hp.sides = stoi(s);
+              }
       		  }
 
       		  //checking for rarity
       		  else if (c == 'R') {
         		getline(mfile, s, ' ');
        			getline(mfile, s, '\n');
-        		md.rrty = s + "\n";
+        		md.rrty = stoi(s);
       		  }
 
       		  //checking for abilities - check if parses more than one word
@@ -261,10 +298,11 @@ int parse_monsters() {
 }
 
 int main(int argc, char *argv[])
-{	
+{
+	
   parse_monsters();
   return 0;
-	
+
 /* ---------- START OF ACTUAL CODE ---------- */
   dungeon d;
   time_t seed;
@@ -275,10 +313,10 @@ int main(int argc, char *argv[])
   char *save_file;
   char *load_file;
   char *pgm_file;
-  
+
   /* Quiet a false positive from valgrind. */
   memset(&d, 0, sizeof (d));
-  
+
   /* Default behavior: Seed with the time, generate a new dungeon, *
    * and don't write to disk.                                      */
   do_load = do_save = do_image = do_save_seed = do_save_image = 0;
@@ -299,7 +337,7 @@ int main(int argc, char *argv[])
    * And the final switch, '--image', allows me to create a dungeon *
    * from a PGM image, so that I was able to create those more      *
    * interesting test dungeons for you.                             */
- 
+
  if (argc > 1) {
     for (i = 1, long_arg = 0; i < argc; i++, long_arg = 0) {
       if (argv[i][0] == '-') { /* All switches start with a dash */
