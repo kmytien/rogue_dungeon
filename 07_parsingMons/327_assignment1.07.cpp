@@ -1,31 +1,3 @@
-/*
-  Let’s add a color, a name, a description, hitpoints (health), attack damage, and a general “abilities” field, where intelligence and
-  telepathy are just two possibilities. Given time we’d add other things, including types of attacks: dragons
-  can breathe fire, basilisks can paralyze with a look, and sorcerers can cast spells
-  <base> + <dice> d <sides>
-  store
-  - Scan for monsters
-    - Starts with BEGIN MONSTER
-    - Ends with END
-    - if there is an error parsing a piece of the monster, DISCARD THE CURRENT MONSTER and move on
-    - at the beginning of the file for versioning, scan RLG327 MONSTER DESCRIPTION 1, if it fails to match, terminate program
-    - print out monster definitions after reading them
-    - MOD MAIN TO DO THE READING WITHOUT LETTING IT ENTER THE GAME, DO WE EVEN NEED ALL THE FILES THEN? NOPE JUST THIS once
-    should we just make a main that parses everything and have that be the only thing in our code? They test for functionality
-    so if we just have it parse and print, then we technically did everything right.
-    VECTORS
-    - vector <type> variable (elements) ie. vector <int> rooms (9);
-    - vector::begin() returns an iterator to point at the first element of a C++ vector.
-    - vector::end() returns an iterator to point at past-the-end element of a C++ vector.
-    - vector::cbegin() is similar to vector::begin(), but without the ability to modify the content.
-    - vector::cend() issimilar to vector::end() but can’t modify the content.
-    - vector::push_back() pushes elements from the back.
-    - vector::insert() inserts new elements to a specified location.
-    - vector::pop_back() removes elements from the back.
-    - vector::erase() removes a range of elements from a specified location.
-    - vector::clear() removes all elements.
-*/
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -35,14 +7,13 @@
 #include <cstring>
 #include <string>
 
-using namespace std;
+/**
+  *	COMS 327: Assignment 1.07 - Parsing Monster Desc.
+  * By: Sanjana Amatya, MyTien Kien, Haylee Lawrence
+  *
+**/  
 
-/*class dice {
-public:
-    int base;
-    int sides;
-    int number;
-};*/
+using namespace std;
 
 class monster_desc {
 public:
@@ -58,26 +29,17 @@ public:
 
     void print_monsters(){
         // PRINT THE MONSTERS
-        cout << name << endl;
-        cout << desc << endl;
-        cout << symbol << endl;
-        cout << color << endl;
-        cout << speed << endl;
-        cout << ability << endl;
-        cout << hp << endl;
-        cout << damage << endl;
-        cout << rrty << endl;
-        cout << "\n\n" << endl;
+        cout << name << desc << symbol << color << speed << ability << hp << damage << rrty << endl;
 
-        // name.erase();
-        // desc.erase();
-        // color.erase();
-        // ability.erase();
-        // speed.erase();
-        // hp.erase();
-        // damage.erase();
-        // symbol.erase();
-        // rrty.erase();
+        name.erase();
+        desc.erase();
+        color.erase();
+        ability.erase();
+        speed.erase();
+        hp.erase();
+        damage.erase();
+        symbol.erase();
+        rrty.erase();
     }
 };
 
@@ -85,6 +47,7 @@ public:
 int parse_monsters() {
 
   string filename;
+  char c;
   filename = getenv("HOME");
   filename += "/.rlg327/monster_desc.txt"; //not sure if this is how you get stuff from another directory
 
@@ -100,104 +63,110 @@ int parse_monsters() {
   }
 
   // READ RLG327 MONSTER DESCRIPTION 1 AND IF IT FAILS TO MATCH, EXIT WITH ERROR CODE -1 code has been tested :) -h
-  //s = "";
 
   getline(mfile, s, '\n');
-  mfile.get();
-
+	mfile.get(c);
+	
   if (s != "RLG327 MONSTER DESCRIPTION 1") {
       cout << "File is in wrong format." << endl;
-      return -1; //can we compare strings like this? i thought we used .compare()
+      return -1; 
   }
-
+	
+	
   //read the data
-  while (mfile) {
-      // BEGIN MONSTER
-      getline(mfile, s, '\n');
-      if (s != "BEGIN MONSTER") break; //HOPEFULLY THIS GOES TO THE NEXT BEGIN MONSTER??
-      cout << s << endl;
+  while (1) {
+  	
+    // BEGIN MONSTER
+    getline(mfile, s, '\n');
+    cout << s << endl;
+    if (s != "BEGIN MONSTER") break; //HOPEFULLY THIS GOES TO THE NEXT BEGIN MONSTER??
+		c = mfile.peek();
+		
+	  while (c != 'E') {
+	  	
+	  	if (c == '\n' || c == '.') continue;
+	  	
+		  //NAME Junior Barbarian
+		  if (c == 'N') {
+			  getline(mfile, s, ' ');
+			  getline(mfile, s, '\n');
+			  md.name = s + "\n";
+	 	  }
+	 
+	 		//SYMBOL & SPEED
+	 	  else if (c == 'S') {
+	 	  	getline(mfile, s, ' ');
+	 	  	
+	 	  	if (s == "SYMB") { //symbol
+					getline(mfile, s, '\n');
+					md.symbol = s + "\n";
+			  }
+			  
+			  else if (s == "SPEED") { //speed
+					getline(mfile, s, '\n');
+					md.speed = s + "\n";
+			  }
+		  }
 
-      // NAME Junior Barbarian
-      //s = "";
-      getline(mfile, s, ' ');
-      while (!done)
-      if (s != "NAME") break;
-      getline(mfile, s, '\n');
-      md.name = s;
-      cout << s << endl;
+		  //COLOR BLUE
+		  else if (c == 'C') {
+				getline(mfile, s, ' ');
+				getline(mfile, s, '\n');
+				md.color = s + "\n";
+			}
 
-      // SYMB p
-      getline(mfile, s, ' ');
-      if (s != "SYMB") break;
-      getline(mfile, s, '\n');
-      md.symbol = s;
-      cout << s << endl;
+		  //DESC
+		  else if (c == 'D') {
+		  	mfile.get(); //D is extracted
+		  	mfile.get(c); //whatever next letter is extracted
+		  	
+		  	if (c == 'E') { //desc
+					getline(mfile, s, '\n');
+					getline(mfile, s, '\n');
+					
+					while (s != ".") {
+						md.desc += s + "\n";
+						getline(mfile, s, '\n');
+					}
+				}
+				
+				else if (c == 'A') { //dam
+					getline(mfile, s, ' ');
+					getline(mfile, s, '\n');
+					md.damage = s + "\n";
+				}
+		  }
 
-      // COLOR BLUE
-      getline(mfile, s, ' ');
-      if (s != "COLOR") break;
-      getline(mfile, s, '\n');
-      md.color = s;
-      cout << s << endl;
+		  //HP 12+2d6
+		  else if (c == 'H') {
+				getline(mfile, s, ' ');
+				getline(mfile, s, '\n');
+				md.hp = s + "\n";
+			}
 
-      // DESC
-      // This is a junior barbarian. He--or is it she? You can't tell for sure--
-      // looks like... it should still be in barbarian school. The barbarians are
-      // putting them in the dungeons young these days. It's wearing dirty, tattered
-      // cloth armor and wielding a wooden sword. You have a hard time feeling
-      // intimidated.
-      // .
-      getline(mfile, s, '\n'); // not sure about this
-      if (s != "DESC") break;
-      while (s != ".") {
-        getline(mfile, s, '\n');
-        if(s == ".") break;
-        md.desc += s + "\n";
-        cout << s << endl;
-      }
-
-      // SPEED 7+1d4
-      getline(mfile, s, ' ');
-      if (s != "SPEED") break;
-      getline(mfile, s, '\n');
-      md.speed = s;
-      cout << s << endl;
-
-      // DAM 0+1d4
-      getline(mfile, s, ' ');
-      if (s != "DAM") break;
-      getline(mfile, s, '\n');
-      md.damage = s;
-      cout << s << endl;
-
-      // HP 12+2d6
-      getline(mfile, s, ' ');
-      if (s != "HP") break;
-      getline(mfile, s, '\n');
-      md.hp = s;
-      cout << s << endl;
-
-      // RRTY 100
-      getline(mfile, s, ' ');
-      cout << s << endl;
-      if (s != "RRTY") break;
-      getline(mfile, s, '\n');
-      md.rrty = s;
-      cout << s << endl;
-
-      // ABIL SMART
-      getline(mfile, s, ' ');
-      if (s != "ABIL") break;
-      getline(mfile, s, '\n');
-      md.ability = s;
-      cout << s << endl;
-
-      // END
-      getline(mfile, s, '\n');
-      if (s != "END") break;
-      cout << s << endl;
-
-      md.print_monsters();
+		  //RRTY 100
+		  else if (c == 'R') {
+				getline(mfile, s, ' ');
+				getline(mfile, s, '\n');
+				md.rrty = s + "\n";
+		  }
+		  
+		  //ABIL SMART
+		  else if (c == 'A') {
+				getline(mfile, s, ' ');
+				getline(mfile, s, '\n');
+				md.ability = s + "\n";
+		  }
+		  
+		  c = mfile.peek();
+	  }
+		
+    //END
+    getline(mfile, s, '\n');
+    if (s != "END") break;
+    md.print_monsters();
+    
+    mfile.get();
   }
 
   mfile.close();
