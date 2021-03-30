@@ -1,3 +1,5 @@
+3/30/2021 16:00 MK SA HL: Testing, fixed some errors, putting in tar file
+3/30/2021 16:30 HL SA: Worked on implementing dice, changing values to int/dice etc...
 3/30/2021 9:30 MK: Added in comments, cleaned up code
 3/29/2021 20:00 MK: Finished rewriting parsing method, testing works
 3/29/2021: 16:00 HL SA MK: Finished making classes, implementing parsing methods and printing methods - started testing
