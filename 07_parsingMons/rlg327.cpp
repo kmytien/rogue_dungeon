@@ -108,10 +108,9 @@ public:
 
     //printing monsters
     void print_monsters(){
-        cout << name << desc << symbol << color << ability << rrty << endl;
-        cout << speed.base << "+" << speed.number << "d" << speed.sides << endl;
-        cout << hp.base << "+" << hp.number << "d" << hp.sides << endl;
-        cout << damage.base << "+" << damage.number << "d" << damage.sides << endl << endl;
+        cout << name << desc << symbol << color << speed.base << "+" << speed.number << "d" << speed.sides << endl;
+        cout << ability << hp.base << "+" << hp.number << "d" << hp.sides << endl;
+        cout << damage.base << "+" << damage.number << "d" << damage.sides << endl << rrty << endl << endl << endl;
 
         //resetting monster description variables
         name.erase();
@@ -184,103 +183,101 @@ int parse_monsters() {
 
       		  //checking for name
       		  if (c == 'N') {
-        	  	getline(mfile, s, ' ');
-        			getline(mfile, s, '\n');
-        			md.name = s + "\n";
+		      	   getline(mfile, s, ' ');
+		      		 getline(mfile, s, '\n');
+		      		 md.name = s + "\n";
       	 	  }
 
       	 	  //checking for symbol and speed
       	 	  else if (c == 'S') {
-        	 		getline(mfile, s, ' ');
+        	 		 getline(mfile, s, ' ');
 
-                	//case for symbol
-        		 if (s == "SYMB") {
-          		        getline(mfile, s, '\n');
-          		        md.symbol = s + "\n";
-        		 }
+               //case for symbol
+		      		 if (s == "SYMB") {
+		        		       getline(mfile, s, '\n');
+		        		       md.symbol = s + "\n";
+		      		 }
 
-                	//case for speed
-        		else if (s == "SPEED") {
-
-                if(md.speed.base == 0 || md.speed.number == 0 || md.speed.sides == 0){
-                  getline(mfile, s, '+');
-                  md.speed.base = stoi(s);
-                  getline(mfile, s, 'd');
-                  md.speed.number = stoi(s);
-                  getline(mfile, s, '\n');
-                  md.speed.sides = stoi(s);
-                }
-        		}
+		           //case for speed
+		      		 else if (s == "SPEED") {
+		              if (md.speed.base == 0 || md.speed.number == 0 || md.speed.sides == 0){
+				              getline(mfile, s, '+');
+				              md.speed.base = stoi(s);
+				              getline(mfile, s, 'd');
+				              md.speed.number = stoi(s);
+				              getline(mfile, s, '\n');
+				              md.speed.sides = stoi(s);
+		              }
+		      		 }
       		  }
 
       		  //checking for color
       		  else if (c == 'C') {
-        		getline(mfile, s, ' ');
-        		getline(mfile, s, '\n');
-        		md.color = s + "\n";
+				    		getline(mfile, s, ' ');
+				    		getline(mfile, s, '\n');
+				    		md.color = s + "\n";
       		  }
 
       		  //checking for description or damage
       		  else if (c == 'D') {
-        		mfile.get(); //D is extracted
-        		mfile.get(c); //whatever next letter is extracted
+				    		mfile.get(); //D is extracted
+				    		mfile.get(c); //whatever next letter is extracted
 
-                	//case for description
+                //case for description
 				    		if (c == 'E') {
 				   		        getline(mfile, s, '\n');
 				              getline(mfile, s, '\n');
 
 				      		    while (s != ".") {
-				      					md.desc += s + "\n";
-				      					getline(mfile, s, '\n');
+						    					md.desc += s + "\n";
+						    					getline(mfile, s, '\n');
 				      		    }
-				    	  	}
+				    	  }
 
-				            	//case for damage
+				        //case for damage
 				    		else if (c == 'A') {
-				    			getline(mfile, s, ' ');
+				    				 getline(mfile, s, ' ');
 				    			
-				          if(md.damage.base == 0 || md.damage.number == 0 || md.damage.sides == 0){
-						          getline(mfile, s, '+'); 
-						          md.damage.base = stoi(s);
-						          getline(mfile, s, 'd');
-						          md.damage.number = stoi(s);
-						          getline(mfile, s, '\n');
-						          md.damage.sides = stoi(s);
-				          }
-				          
-				    		}
+				          	 if (md.damage.base == 0 || md.damage.number == 0 || md.damage.sides == 0){
+								         getline(mfile, s, '+'); 
+								         md.damage.base = stoi(s);
+								         getline(mfile, s, 'd');
+								         md.damage.number = stoi(s);
+								         getline(mfile, s, '\n');
+								         md.damage.sides = stoi(s);
+				         	  } 
+				    	  }
       		  }
 
       		  //checking for hp
       		  else if (c == 'H') {
-      		  	getline(mfile, s, ' ');
-      		  	
-              if(md.hp.base == 0 || md.hp.number == 0 || md.hp.sides == 0){
-                getline(mfile, s, '+');
-                md.hp.base = stoi(s);
-                getline(mfile, s, 'd');
-                md.hp.number = stoi(s);
-                getline(mfile, s, '\n');
-                md.hp.sides = stoi(s);
-              }
+		    		  	getline(mfile, s, ' ');
+		    		  	
+		            if(md.hp.base == 0 || md.hp.number == 0 || md.hp.sides == 0){
+				            getline(mfile, s, '+');
+				            md.hp.base = stoi(s);
+				            getline(mfile, s, 'd');
+				            md.hp.number = stoi(s);
+				            getline(mfile, s, '\n');
+				            md.hp.sides = stoi(s);
+		            }
       		  }
 
       		  //checking for rarity
       		  else if (c == 'R') {
-        		getline(mfile, s, ' ');
-       			getline(mfile, s, '\n');
-        		md.rrty = stoi(s);
+				    		getline(mfile, s, ' ');
+				   			getline(mfile, s, '\n');
+				    		md.rrty = stoi(s);
       		  }
 
       		  //checking for abilities - check if parses more than one word
       		  else if (c == 'A') {
-        		getline(mfile, s, ' ');
-        		getline(mfile, s, '\n');
-        		md.ability = s + "\n";
+				    		getline(mfile, s, ' ');
+				    		getline(mfile, s, '\n');
+				    		md.ability = s + "\n";
       		  }
 
-            	  //peeking at next letter in next line
+            //peeking at next letter in next line
       		  c = mfile.peek();
       	}
 
