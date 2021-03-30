@@ -15,6 +15,12 @@
 
 using namespace std;
 
+class dice{
+	int base;
+	int number;
+	int sides;
+};
+
 //monster descriptions class
 class monster_desc {
 public:
@@ -22,9 +28,9 @@ public:
     string desc;
     string color;
     string ability;
-    string speed;
-    string hp;
-    string damage;
+    dice speed;
+    dice hp;
+    dice damage;
     string symbol;
     string rrty;
 
