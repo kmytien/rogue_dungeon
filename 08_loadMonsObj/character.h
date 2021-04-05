@@ -28,7 +28,7 @@ class character {
   uint32_t kills[num_kill_types];
   
   // new code
-  std::vector<uint32_t> color;
+  uint32_t color;
   std::string name;
 };
 
