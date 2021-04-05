@@ -14,6 +14,7 @@
 #include "path.h"
 #include "event.h"
 #include "io.h"
+#include "assignment_108.h"
 
 void do_combat(dungeon *d, character *atk, character *def)
 {
@@ -58,6 +59,8 @@ void do_combat(dungeon *d, character *atk, character *def)
     
     if (def != d->PC) {
       d->num_monsters--;
+      // 1.08 new
+      if (def.abilities == 'UNIQ') unique_death(&d, &def);
     } else {
       if ((part = rand() % (sizeof (organs) / sizeof (organs[0]))) < 26) {
         io_queue_message("As the %c eats your %s, "
