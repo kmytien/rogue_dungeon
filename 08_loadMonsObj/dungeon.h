@@ -95,7 +95,7 @@ class dungeon {
   std::vector<object_description> object_descriptions;
   
   // new
-  item *item_map[DUNGEON_Y][DUNGEON_X];
+  object *object_map[DUNGEON_Y][DUNGEON_X];
 };
 
 void init_dungeon(dungeon *d);
