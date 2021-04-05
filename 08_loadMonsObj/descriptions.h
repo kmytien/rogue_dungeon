@@ -46,6 +46,7 @@ class monster_description {
   uint32_t abilities;
   dice speed, hitpoints, damage;
   uint32_t rarity;
+  bool isValid;
  public:
   monster_description() : name(),       description(), symbol(0),   color(0),
                           abilities(0), speed(),       hitpoints(), damage(),
