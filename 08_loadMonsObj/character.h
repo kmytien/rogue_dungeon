@@ -26,6 +26,9 @@ class character {
    * characters have been created by the game.                              */
   uint32_t sequence_number;
   uint32_t kills[num_kill_types];
+  
+  std::vector<uint32_t> color;
+  std::string name;
 };
 
 class dungeon;
