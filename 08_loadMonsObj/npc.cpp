@@ -66,6 +66,9 @@ void gen_monsters(dungeon *d)
     m->kills[kill_direct] = m->kills[kill_avenged] = 0;
 
     d->character_map[p[dim_y]][p[dim_x]] = m;
+    
+    // 1.08 new code
+    gen_dynamic_mon(&d, &m);
 
     heap_insert(&d->events, new_event(d, event_character_turn, m, 0));
   }
