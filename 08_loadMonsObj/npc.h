@@ -49,6 +49,12 @@ class npc : public character {
   npc_characteristics_t characteristics;
   uint32_t have_seen_pc;
   pair_t pc_last_known_position;
+  
+  // new code!!!!
+  bool is_valid;
+  std::string description;
+  uint32_t abilities, hitpoints, rarity;
+  dice damage;
 };
 
 void gen_monsters(dungeon *d);
