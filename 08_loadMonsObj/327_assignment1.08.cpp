@@ -119,9 +119,9 @@ public:
     bool done = false;
     //   - if the item or mon is ineligible for gen, go to 1; NOT NEEDED BC UNIQUE MONS ARE REMOVED FROM VECTOR LIST
     while (!done) {
-      if(!(d->monster_descriptions.unique_inUse)) {
+      if(!(d->monster_descriptions[idx].unique_inUse)) {
         done = true;
-        d->monster_descriptions.unique_inUse = true;
+        d->monster_descriptions[idx].unique_inUse = true;
       }
       //   - choose a rand int between 0 and 99 inclusive, if this num is greater than or equal to the selected mons or obj rarity, go to 1
       else if (r < d->monster_descriptions[idx].rarity) done = true;
