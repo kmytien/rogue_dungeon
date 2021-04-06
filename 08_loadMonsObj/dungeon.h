@@ -25,7 +25,7 @@
 #define MAX_MONSTERS           15
 #define SAVE_DIR               ".rlg327"
 #define DUNGEON_SAVE_FILE      "dungeon"
-#define DUNGEON_SAVE_SEMANTIC  "RLG327-" TERM
+#define DUNGEON_SAVE_SEMANTIC  "RLG327-S2021"
 #define DUNGEON_SAVE_VERSION   0U
 #define MONSTER_DESC_FILE      "monster_desc.txt"
 #define OBJECT_DESC_FILE       "object_desc.txt"
