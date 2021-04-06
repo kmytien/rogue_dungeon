@@ -110,7 +110,7 @@ public:
   // add a method(s) to gen dynamic instances of npc
   // npc and probably character will need to be extended to handle all new fields
   // damage is the ONLY THING that stays as a dice, all else becomes int 
-  void gen_dynamic_mon(dungeon *d, npc *m) { // IM GONNA EDIT GEN_MONSTERS SO THAT IT EDITS THE MONSTER THAT WAS CREATED BASED OFF OF DESCRIPTIONS
+  void gen_dynamic_mon(dungeon *d, npc *m) { // CALLED IN NPC GEN_MONSTERS
     // each unique mon may have no more than one instance in existence which becomes ineligible for generation on future dung levels only once killed m
 
     //   - uniformly selecting a rand description from your vectors of descriptions 0 - size 1-78 %79 +1
@@ -119,7 +119,7 @@ public:
     bool done = false;
     //   - if the item or mon is ineligible for gen, go to 1; NOT NEEDED BC UNIQUE MONS ARE REMOVED FROM VECTOR LIST
     while (!done) {
-      if(!(d->monster_descriptions[idx].unique_inUse)) {
+      if(!(d->monster_descriptions[idx].unique_inUse)) { //unique in use is in descriptions.h
         done = true;
         d->monster_descriptions[idx].unique_inUse = true;
       }
@@ -151,7 +151,7 @@ public:
 
   // make unique monsters die forever
   // find where monster deaths are and call this if the monster is unique
-  void unique_death(dungeon *d, character *m) {
+  void unique_death(dungeon *d, character *m) { //CALLED IN EAT MONSTERS IN MOVE.CPP
     // find vector with same name
     std::vector<monster_description>::iterator it;
     for (it = d->monster_descriptions.begin(); it < d->monster_descriptions.end(); it++) {
