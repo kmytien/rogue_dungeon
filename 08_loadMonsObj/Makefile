@@ -1,6 +1,6 @@
 #need -lncurses to make
 run: 
-	g++ heap.c heap.h rlg327.cpp 327_assignment1.08.cpp assignment_108.h dungeon.cpp dungeon.h path.cpp path.h utils.cpp utils.h dims.h character.cpp character.h event.cpp event.h move.cpp move.h npc.cpp npc.h pc.cpp pc.h io.cpp io.h descriptions.cpp descriptions.h dice.cpp dice.h io.cpp io.h-o run -lncurses
+	g++ heap.c heap.h rlg327.cpp 327_assignment1.08.cpp assignment_108.h dungeon.cpp dungeon.h path.cpp path.h utils.cpp utils.h dims.h character.cpp character.h event.cpp event.h move.cpp move.h npc.cpp npc.h pc.cpp pc.h io.cpp io.h descriptions.cpp descriptions.h dice.cpp dice.h io.cpp io.h -o run -lncurses
 	
 327_assignment1.08: 327_assignment1.08.cpppp
 	g++ 327_assignment1.08.cpppp -o 327_assignment1.08
