@@ -4,7 +4,7 @@
       - add a method(s) to gen dynamic instances of objects
       - add a method(s) to gen dynamic instances of npc
         - npc and probably character will need to be extended to handle all new fields
-      ** for everything, damage is the ONLY THING that stays as a dice, all else becomes int 
+      ** for everything, damage is the ONLY THING that stays as a dice, all else becomes int
       - after instantiation, place objects in the dungeon
         - for characters, extend or replace current monster generation routines
         - objects can go anywhere on the floor
@@ -16,7 +16,7 @@
               - ex. cyan pair -->  init_pair(COLOR_CYAN. COLOR_CYAN, COLOR_BLACK)
           - render color with attron(COLOR_PAIR(index)), render the symbol, and turn the color attribute off with attroff(COLOR_PAIR(index))
             - render blue with attron(COLOR_PAIR(COLOR_BLUE))
-          ** For mons with mult colors, can just use first color only 
+          ** For mons with mult colors, can just use first color only
     - when a character moves over an object, render character but keep object there
     - load at least 10 objects per dungeon level
       - clean up and properly deallocate objs and mons when leaving dung level or quitting (ie have a delete method??)
@@ -29,8 +29,8 @@
       - choose a rand int between 0 and 99 inclusive, if this num is greater than or equal to the selected mons or obj rarity, go to 1
       - gen the obj or mon and place in dungeon
       ** WE ARE NOT STACKING, TOO MUCH WORK AND ITS STUPID LOL -H
-      
 */
+
 
 /*
     CS 327: Assignment 1.08 - Loading Monsters & objects
@@ -41,13 +41,14 @@
 #include <string.h>
 #include "descriptions.h"
 #include "dungeon.h"
+#include "assignment_108.h"
 
 
 
 //ima just do it and if we change our mind we can delete
 class object {
-  
-public: 
+
+public:
   std::string name;
   std::string description;
   dice damage;
@@ -56,13 +57,66 @@ public:
   std::vector<uint32_t> color;
   object_description &od;
 
+  object(object_description &od);
+  ~object();
   //use damage.set(base, number, sides) to set the dice
+}
+
+void object_delete(object *o) {
+  delete o; // IN DUNGEON.H DEFINE OBJXY AND OBJPAIR TO BE USED IN DUNGEON.CPP EMPTY DUNGEON
+}
+
+// UNDER CONSTRUCTION -H
+void gen_objects(dungeon *d) {
+  uint32_t i;
+  object *o;
+  uint32_t room;
+  pair_t p;
+ // const static char symbol[] = "0123456789abcdef"; NOT SURE IF I SHOULD KEEP THIS
+
+  // d->num_monsters = min(d->max_monsters, max_monster_cells(d));
+
+ // UP TILL HERE HAS BEEN GONE THRU -H
+for (i = 0; i < d->num_monsters; i++) {
+  m = new object;
+  memset(m, 0, sizeof (*m));
+  // 1.08 new code, init the unique in use
+  d->monster_descriptions[i].unique_inUse = false;
+
+  do {
+    room = rand_range(1, d->num_rooms - 1);
+    p[dim_y] = rand_range(d->rooms[room].position[dim_y],
+                          (d->rooms[room].position[dim_y] +
+                           d->rooms[room].size[dim_y] - 1));
+    p[dim_x] = rand_range(d->rooms[room].position[dim_x],
+                          (d->rooms[room].position[dim_x] +
+                           d->rooms[room].size[dim_x] - 1));
+  } while (d->character_map[p[dim_y]][p[dim_x]]);
+  m->position[dim_y] = p[dim_y];
+  m->position[dim_x] = p[dim_x];
+  d->character_map[p[dim_y]][p[dim_x]] = m;
+  m->speed = rand_range(5, 20);
+  m->alive = 1;
+  m->sequence_number = ++d->character_sequence_number;
+  m->characteristics = rand() & 0x0000000f;
+  /*    m->npc->characteristics = 0xf;*/
+  m->symbol = symbol[m->characteristics];
+  m->have_seen_pc = 0;
+  m->kills[kill_direct] = m->kills[kill_avenged] = 0;
+
+  d->character_map[p[dim_y]][p[dim_x]] = m;
+
+  // 1.08 new code
+  gen_dynamic_mon(&d, &m);
+
+  heap_insert(&d->events, new_event(d, event_character_turn, m, 0));
+}
 }
 
 
 // make a class to instantiate the objects we read (object_description/factory??)
 class object_factory {
-  
+
 public:
   // add a method(s) to gen dynamic instances of objects
   // - select which mon or object to create by
@@ -76,7 +130,20 @@ public:
   void gen_dynamic_obj(dungeon *d, object_description &o){
     // std::vector<object_description> obj_desc;
 
-    int idx = rand() % d->object_descriptions.size();
+    object *obj = new object(o);
+
+    while (!done) {
+      int idx = rand() % d->object_descriptions.size();
+      uint32_t r = rand() % 100;
+
+      if((!d->object_descriptions.artifact) || (d->object_descriptions[idx].abilities == 'UNIQ' && r < d->object_descriptions[idx].rarity)) { //unique in use is in descriptions.h
+        d->objects_descriptions[idx].unique_inUse = true;
+        //   - choose a rand int between 0 and 99 inclusive, if this num is greater than or equal to the selected mons or obj rarity, go to 1
+        done = true;
+      }
+
+      else if (r < d->monster_descriptions[idx].rarity && d->monster_descriptions[idx].abilities != 'UNIQ') done = true;
+    }
 
     o.name = d->object_descriptions[idx].name;
     // set description
@@ -102,31 +169,52 @@ public:
     // set value
     o.value = roll(d->object_descriptions[idx].value);
     // set attru
-    o.attrubute = roll(d->object_descriptions[idx].attrubute);
+    o.attribute = roll(d->object_descriptions[idx].attribute);
     //set art
     o.art = d->object_description[idx].art;
+
+    place_obj(&obj);
   }
-  
+
+  // after instantiation, place objects in the dungeon
+  //  - objects can go anywhere on the floor
+  place_obj(object *o){
+    int x = 0, y = 0;
+
+    //makes sure coordinated at x and y are floor
+    while (mapxy(x, y) < ter_floor) {
+      x = (rand() % DUNGEON_X) + 1;
+      y = (rand() % DUNGEON_Y) + 1;
+    }
+
+    d->object_map[y][x] = obj;
+  }
+
   // add a method(s) to gen dynamic instances of npc
   // npc and probably character will need to be extended to handle all new fields
-  // damage is the ONLY THING that stays as a dice, all else becomes int 
+  // damage is the ONLY THING that stays as a dice, all else becomes int
   void gen_dynamic_mon(dungeon *d, npc *m) { // CALLED IN NPC GEN_MONSTERS
     // each unique mon may have no more than one instance in existence which becomes ineligible for generation on future dung levels only once killed m
 
     //   - uniformly selecting a rand description from your vectors of descriptions 0 - size 1-78 %79 +1
-    int idx = rand() % d->monster_descriptions.size();
-    uint32_t r = rand() % 100;
+    int inde;
+    uint32_t r;
     bool done = false;
+
     //   - if the item or mon is ineligible for gen, go to 1; NOT NEEDED BC UNIQUE MONS ARE REMOVED FROM VECTOR LIST
     while (!done) {
-      if(!(d->monster_descriptions[idx].unique_inUse)) { //unique in use is in descriptions.h
-        done = true;
+      int idx = rand() % d->monster_descriptions.size();
+      uint32_t r = rand() % 100;
+
+      if(!(d->monster_descriptions[idx].unique_inUse) && d->monster_descriptions[idx].abilities == 'UNIQ' && r < d->monster_descriptions[idx].rarity) { //unique in use is in descriptions.h
         d->monster_descriptions[idx].unique_inUse = true;
+        //   - choose a rand int between 0 and 99 inclusive, if this num is greater than or equal to the selected mons or obj rarity, go to 1
+        done = true;
       }
-      //   - choose a rand int between 0 and 99 inclusive, if this num is greater than or equal to the selected mons or obj rarity, go to 1
-      else if (r < d->monster_descriptions[idx].rarity) done = true;
+
+      else if (r < d->monster_descriptions[idx].rarity && d->monster_descriptions[idx].abilities != 'UNIQ') done = true;
     }
-    
+
     //   - gen the obj or mon and place in dungeon PLACED IN MAP IN GEN_MONSTERS
     // set name
     m.name = d->monster_descriptions[idx].name;
@@ -162,23 +250,7 @@ public:
       }
     }
   }
-  
-  // after instantiation, place objects in the dungeon
-  //  - objects can go anywhere on the floor
-  place_obj(object obj){
-    int x = 0, y = 0;
-    //spawn objects anywhere where there is floor (mapxy(x,y) >= ter_floor)
-    //can be walked over - should we make an object map for this then??
 
-    //makes sure coordinated at x and y are floor
-    while (mapxy(x, y) < ter_floor) {
-      x = (rand() % DUNGEON_X) + 1;
-      y = (rand() % DUNGEON_Y) + 1;
-    }
-
-    d->object_map[y][x] = obj;
-  }
-  
   // EDIT IO
   //  - i/o routines must be updated to render new mons and objects with colors
   //    - init curses color subsystem by calling start_color() when init-ing curses
