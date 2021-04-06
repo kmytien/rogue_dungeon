@@ -43,6 +43,8 @@ void gen_monsters(dungeon *d)
   for (i = 0; i < d->num_monsters; i++) {
     m = new npc;
     memset(m, 0, sizeof (*m));
+    // 1.08 new code, init the unique in use
+    d->monster_descriptions[i].unique_inUse = false;
     
     do {
       room = rand_range(1, d->num_rooms - 1);
