@@ -524,6 +524,7 @@ static int empty_dungeon(dungeon *d)
         hardnessxy(x, y) = 255;
       }
       charxy(x, y) = NULL;
+      objxy(x, y) = NULL;
     }
   }
   d->is_new = 1;
