@@ -674,6 +674,9 @@ void delete_dungeon(dungeon *d)
   free(d->rooms);
   heap_delete(&d->events);
   memset(d->character_map, 0, sizeof (d->character_map));
+	
+  // new 1.08 code
+  memset(d->object_map, 0, sizeof(d->object_map));
 }
 
 void init_dungeon(dungeon *d)
