@@ -36,10 +36,12 @@
     CS 327: Assignment 1.08 - Loading Monsters & objects
     Sanjana Amatya, Haylee Lawrence, MyTien Kien
 */
+#include <vector>
 #include <stdlib.h>
 #include <string.h>
-
+#include "descriptions.h"
 #include "dungeon.h"
+
 
 
 //ima just do it and if we change our mind we can delete
@@ -71,9 +73,38 @@ public:
   // - Each artifact object may have no more than one instance in existence
   //   -once the PC picks up an artifact, it become ineligible for future recreation even if the PC destroys the object or abandons it on the floor
   // - each unique mon may have no more than one instance in existence which becomes ineligible for generation on future dung levels only once killed m
-  void gen_dynamic_obj(dungeon *d){
-    std::vector<object_description> obj_desc;
+  void gen_dynamic_obj(dungeon *d, object_description &o){
+    // std::vector<object_description> obj_desc;
 
+    int idx = rand() % d->object_descriptions.size();
+
+    o.name = d->object_descriptions[idx].name;
+    // set description
+    o.description = d->object_descriptions[idx].description;
+    // set symbol
+    o.type = d->object_descriptions[idx].type;
+    // set color
+    o.color = d->object_descriptions[idx].color[1];
+    // rarity
+    o.rarity = d->object_descriptions[idx].rarity[1];
+    // damage
+    o.damage = roll(d->object_descriptions[idx].damage);
+    // set dice speed DONT KNOW IF ROLL IS RIGHT
+    o.speed = roll(d->object_descriptions[idx].speed);
+    // hp
+    o.hit = roll(d->object_descriptions[idx].hit);
+    //dodge
+    o.dodge = roll(d->object_descriptions[idx].dodge);
+    //defense
+    o.defence = roll(d->object_descriptions[idx].defence);
+    //dodge
+    o.weight = roll(d->object_descriptions[idx].weight);
+    // set value
+    o.value = roll(d->object_descriptions[idx].value);
+    // set attru
+    o.attrubute = roll(d->object_descriptions[idx].attrubute);
+    //set art
+    o.art = d->object_description[idx].art;
   }
   
   // add a method(s) to gen dynamic instances of npc
