@@ -116,11 +116,16 @@ public:
     //   - uniformly selecting a rand description from your vectors of descriptions 0 - size 1-78 %79 +1
     int idx = rand() % d->monster_descriptions.size();
     uint32_t r = rand() % 100;
-    
+    bool done = false;
     //   - if the item or mon is ineligible for gen, go to 1; NOT NEEDED BC UNIQUE MONS ARE REMOVED FROM VECTOR LIST
-    if(!(d->monster_descriptions.unique_inUse)) idx = 1;
-    //   - choose a rand int between 0 and 99 inclusive, if this num is greater than or equal to the selected mons or obj rarity, go to 1
-    else if (r >= d->monster_descriptions[idx].rarity) idx = 1;
+    while (!done) {
+      if(!(d->monster_descriptions.unique_inUse)) {
+        done = true;
+        d->monster_descriptions.unique_inUse = true;
+      }
+      //   - choose a rand int between 0 and 99 inclusive, if this num is greater than or equal to the selected mons or obj rarity, go to 1
+      else if (r < d->monster_descriptions[idx].rarity) done = true;
+    }
     
     //   - gen the obj or mon and place in dungeon PLACED IN MAP IN GEN_MONSTERS
     // set name
