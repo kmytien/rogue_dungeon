@@ -26,7 +26,7 @@ class dungeon; //INCLUDING THE .H CAUSES ERRORS BC CIRCULAR DEPENDENCY
 
 class object_factory{
 public:
-  void gen_dynamic_obj(dungeon *d, object_description *o);
+  void gen_dynamic_obj(dungeon *d, object *o);
   void gen_dynamic_mon(dungeon *d, npc *m);
   void unique_death(dungeon *d, character *m);
 };
