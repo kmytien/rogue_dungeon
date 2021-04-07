@@ -16,6 +16,8 @@ public:
   bool art_isused, artifact;
   uint32_t color;
   object_description &od;
+  
+  char obj_symbol();
 }
 
 class object_factory{
