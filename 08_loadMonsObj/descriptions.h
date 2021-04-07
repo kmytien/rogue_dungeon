@@ -39,7 +39,12 @@ typedef enum object_type {
 extern const char object_symbol[];
 
 class monster_description {
- private:
+ public:
+  monster_description() : name(),       description(), symbol(0),   color(0),
+                          abilities(0), speed(),       hitpoints(), damage(),
+                          rarity(0), unique_inUse(false)
+  {
+  }
   std::string name, description;
   char symbol;
   std::vector<uint32_t> color;
@@ -47,12 +52,6 @@ class monster_description {
   dice speed, hitpoints, damage;
   uint32_t rarity;
   bool unique_inUse;
- public:
-  monster_description() : name(),       description(), symbol(0),   color(0),
-                          abilities(0), speed(),       hitpoints(), damage(),
-                          rarity(0), unique_inUse(false)
-  {
-  }
   void set(const std::string &name,
            const std::string &description,
            const char symbol,
@@ -67,13 +66,6 @@ class monster_description {
 };
 
 class object_description {
- private:
-  std::string name, description;
-  object_type_t type;
-  uint32_t color;
-  dice hit, damage, dodge, defence, weight, speed, attribute, value;
-  bool art_isused, artifact;
-  uint32_t rarity;
  public:
   object_description() : name(),    description(), type(objtype_no_type),
                          color(0),  hit(),         damage(),
@@ -82,6 +74,12 @@ class object_description {
                          artifact(false), rarity(0), art_isused(false)
   {
   }
+  std::string name, description;
+  object_type_t type;
+  uint32_t color;
+  dice hit, damage, dodge, defence, weight, speed, attribute, value;
+  bool art_isused, artifact;
+  uint32_t rarity;
   void set(const std::string &name,
            const std::string &description,
            const object_type_t type,
