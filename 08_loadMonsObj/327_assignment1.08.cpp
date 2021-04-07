@@ -42,14 +42,9 @@
 
 //#include "npc.h"
 #include "descriptions.h"
-//#include "dungeon.h"
 #include "assignment_108.h"
-#include "utils.h"
-#include "character.h"
-#include "move.h"
-#include "path.h"
-#include "event.h"
-#include "pc.h"
+#include "dungeon.h"
+#include "dice.h"
 
 // obj class moved to header file -h
 
@@ -57,58 +52,55 @@
 //   delete o; // IN DUNGEON.H DEFINE OBJXY AND OBJPAIR TO BE USED IN DUNGEON.CPP EMPTY DUNGEON
 // }
 
-
-char object::obj_symbol() {
-    return object_symbol[type];
-}
-
 // make a class to instantiate the objects we read (object_description/factory??)
 void object_factory :: gen_dynamic_obj(dungeon *d, object *o){
   // std::vector<object_description> obj_desc;
 
-  object *obj = new object(o);
+  object *obj = new object(*o);
+  bool done = false;
+  int idx;
 
   while (!done) {
-    int idx = rand() % (d->object_descriptions.size());
+    idx = rand() % (d->object_descriptions.size());
     uint32_t r = rand() % 100;
 
     if((d->object_descriptions[idx].artifact) && !(d->object_descriptions[idx].art_isused) && r < d->object_descriptions[idx].rarity) { //unique in use is in descriptions.h
-      d->objects_descriptions[idx].art_isused = true;
+      d->object_descriptions[idx].art_isused = true;
       //   - choose a rand int between 0 and 99 inclusive, if this num is greater than or equal to the selected mons or obj rarity, go to 1
       done = true;
     }
     else if (r < d->object_descriptions[idx].rarity && !(d->object_descriptions[idx].artifact)) done = true;
   }
 
-  o.name = d->object_descriptions[idx].name;
+  obj->name = d->object_descriptions[idx].name;
   // set description
-  o.description = d->object_descriptions[idx].description;
+  obj->description = d->object_descriptions[idx].description;
   // set symbol
-  o.type = d->object_descriptions[idx].type;
+  obj->type = d->object_descriptions[idx].type;
   // set color
-  o.color = d->object_descriptions[idx].color[1];
+  obj->color = d->object_descriptions[idx].color[0];
   // rarity
-  o.rarity = d->object_descriptions[idx].rarity;
+  obj->rarity = d->object_descriptions[idx].rarity;
   // damage
-  o.damage = d->object_descriptions[idx].damage;
+  obj->damage = d->object_descriptions[idx].damage;
   // set dice speed DONT KNOW IF ROLL IS RIGHT
-  o.speed = roll(d->object_descriptions[idx].speed);
+  obj->speed = roll(d->object_descriptions[idx].speed);
   // hp
-  o.hp = roll(d->object_descriptions[idx].hit);
+  obj->hp = roll(d->object_descriptions[idx].hit);
   //dodge
-  o.dodge = roll(d->object_descriptions[idx].dodge);
+  obj->dodge = roll(d->object_descriptions[idx].dodge);
   //defense
-  o.defense = roll(d->object_descriptions[idx].defence); // his defense is spelt wrong (defence)
+  obj->defense = roll(d->object_descriptions[idx].defence); // his defense is spelt wrong (defence)
   //dodge
-  o.weight = roll(d->object_descriptions[idx].weight);
+  obj->weight = roll(d->object_descriptions[idx].weight);
   // set value
-  o.value = roll(d->object_descriptions[idx].value);
+  obj->value = roll(d->object_descriptions[idx].value);
   // set attru
-  o.attribute = roll(d->object_descriptions[idx].attribute);
+  obj->attribute = roll(d->object_descriptions[idx].attribute);
   //set art
-  o.artifact = d->object_description[idx].artifact;
+  obj->artifact = d->object_description[idx].artifact;
 
-  place_obj(&obj);
+  //place_obj(&obj);
 }
 
 // i deleted place obj bc gen_objects is doing that rn -h
@@ -146,7 +138,7 @@ void object_factory :: gen_dynamic_mon(dungeon *d, npc *m) { // CALLED IN NPC GE
     // set symbol
   m.symbol = d->monster_descriptions[idx].symbol;
   // set color
-  m.color = d->monster_descriptions[idx].color[1];
+  m.color = d->monster_descriptions[idx].color[0];
   // set abil
   m.abilities = d->monster_descriptions[idx].abilities;
   // set dice speed DONT KNOW IF ROLL IS RIGHT
