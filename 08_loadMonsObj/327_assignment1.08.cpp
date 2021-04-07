@@ -88,6 +88,9 @@ void gen_objects(dungeon *d) { // CALLED IN NEW_DUNGEON IN DUNGEON.CPP
     }
 }
 
+char object::obj_symbol() {
+    return object_symbol[type];
+}
 
 // make a class to instantiate the objects we read (object_description/factory??)
 void object_factory :: gen_dynamic_obj(dungeon *d, object *o){
