@@ -2,6 +2,7 @@
 # define CHARACTER_H
 
 # include <stdint.h>
+#include <string>
 
 # include "dims.h"
 
