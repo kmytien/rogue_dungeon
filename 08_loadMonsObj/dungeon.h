@@ -63,7 +63,8 @@ class dungeon {
               pc_distance{0}, pc_tunnel{0}, character_map{0}, PC(0),
               num_monsters(0), max_monsters(0), character_sequence_number(0),
               time(0), is_new(0), quit(0), monster_descriptions(),
-              object_descriptions() {}
+              object_descriptions(), max_objects(0), num_objects(0),
+              object_map{0} {}
   uint32_t num_rooms;
   room_t *rooms;
   terrain_type map[DUNGEON_Y][DUNGEON_X];
