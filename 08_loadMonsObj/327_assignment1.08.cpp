@@ -39,9 +39,17 @@
 #include <vector>
 #include <stdlib.h>
 #include <string.h>
+
+//#include "npc.h"
 #include "descriptions.h"
-#include "dungeon.h"
+//#include "dungeon.h"
 #include "assignment_108.h"
+#include "utils.h"
+#include "character.h"
+#include "move.h"
+#include "path.h"
+#include "event.h"
+#include "pc.h"
 
 // obj class moved to header file -h
 
@@ -49,44 +57,6 @@
 //   delete o; // IN DUNGEON.H DEFINE OBJXY AND OBJPAIR TO BE USED IN DUNGEON.CPP EMPTY DUNGEON
 // }
 
-// UNDER CONSTRUCTION -H
-void gen_objects(dungeon *d) { // CALLED IN NEW_DUNGEON IN DUNGEON.CPP
-  uint32_t i;
-  object *o;
-  uint32_t room;
-  pair_t p;
-  d->max_objects = rand() % 21 + 10;
- // const static char symbol[] = "0123456789abcdef"; NOT SURE IF I SHOULD KEEP THIS
-
-  d->num_objects = d->max_objects;
-
-  for (i = 0; i < d->num_objects; i++) {
-    o = new object;
-    memset(o, 0, sizeof (*o));
-    // 1.08 new code, init the unique in use
-    d->object_descriptions[i].art_isused = false;
-
-    do {
-      room = rand_range(1, d->num_rooms - 1);
-      p[dim_y] = rand_range(d->rooms[room].position[dim_y],
-                           (d->rooms[room].position[dim_y] +
-                            d->rooms[room].size[dim_y] - 1));
-      p[dim_x] = rand_range(d->rooms[room].position[dim_x],
-                           (d->rooms[room].position[dim_x] +
-                            d->rooms[room].size[dim_x] - 1));
-      } while (d->object_map[p[dim_y]][p[dim_x]] && mapxy(x, y) < ter_floor);
-      o->position[dim_y] = p[dim_y];
-      o->position[dim_x] = p[dim_x];
-      d->object_map[p[dim_y]][p[dim_x]] = o;
-      /*    m->npc->characteristics = 0xf;*/
-
-      // d->object_map[p[dim_y]][p[dim_x]] = o;
-
-      // 1.08 new code
-      gen_dynamic_obj(&d, &o);
-
-    }
-}
 
 char object::obj_symbol() {
     return object_symbol[type];
@@ -150,7 +120,7 @@ void object_factory :: gen_dynamic_mon(dungeon *d, npc *m) { // CALLED IN NPC GE
   // each unique mon may have no more than one instance in existence which becomes ineligible for generation on future dung levels only once killed m
 
   //   - uniformly selecting a rand description from your vectors of descriptions 0 - size 1-78 %79 +1
-  int inde;
+  int idx;
   uint32_t r;
   bool done = false;
 
@@ -204,6 +174,43 @@ void object_factory :: unique_death(dungeon *d, character *m) { //CALLED IN EAT 
   }
 }
 
+void gen_objects(dungeon *d) { // CALLED IN NEW_DUNGEON IN DUNGEON.CPP
+  uint32_t i;
+  object *o;
+  uint32_t room;
+  pair_t p;
+  d->max_objects = rand() % 21 + 10;
+ // const static char symbol[] = "0123456789abcdef"; NOT SURE IF I SHOULD KEEP THIS
+
+  d->num_objects = d->max_objects;
+
+  for (i = 0; i < d->num_objects; i++) {
+    o = new object;
+    memset(o, 0, sizeof (*o));
+    // 1.08 new code, init the unique in use
+    // d->object_descriptions[i].art_isused = false; INITIALIZED IN DESCRIPTIONS.H
+
+    do {
+      room = rand_range(1, d->num_rooms - 1);
+      p[dim_y] = rand_range(d->rooms[room].position[dim_y],
+                           (d->rooms[room].position[dim_y] +
+                            d->rooms[room].size[dim_y] - 1));
+      p[dim_x] = rand_range(d->rooms[room].position[dim_x],
+                           (d->rooms[room].position[dim_x] +
+                            d->rooms[room].size[dim_x] - 1));
+      } while (d->object_map[p[dim_y]][p[dim_x]] && mapxy(p[dim_x], p[dim_y]) < ter_floor);
+      o->position[dim_y] = p[dim_y];
+      o->position[dim_x] = p[dim_x];
+      d->object_map[p[dim_y]][p[dim_x]] = o;
+      /*    m->npc->characteristics = 0xf;*/
+
+      // d->object_map[p[dim_y]][p[dim_x]] = o;
+
+      // 1.08 new code
+      gen_dynamic_obj(&d, &o);
+
+    }
+}
 
   // EDIT IO
   //  - i/o routines must be updated to render new mons and objects with colors
