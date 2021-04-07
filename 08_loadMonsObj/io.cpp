@@ -9,6 +9,7 @@
 #include "pc.h"
 #include "utils.h"
 #include "dungeon.h"
+#include "assignment_108.h"
 
 /* Same ugly hack we did in path.c */
 static dungeon *thedungeon;
@@ -217,9 +218,17 @@ void io_display(dungeon *d)
                   character_get_pos(d->PC),
                   character_get_pos(d->character_map[y][x]),
                   1, 0)) {
-       mvaddch(y + 1, x,
+         attron(COLOR_PAIR(d->character_map[y][x].color));
+         mvaddch(y + 1, x,
                 character_get_symbol(d->character_map[y][x]));
-        visible_monsters++;
+         visible_monsters++;
+      }
+      
+      else if (d->object_map[y][x] && can_see(d, character_get_pos(d->PC), pos, 1, 0)) {
+         attron(COLOR_PAIR(d->object_map[y][x].color));
+         mvaddch(y + 1, x,
+                 d->object_map[y][x]->obj_symbol());
+      }
       } else {
         switch (pc_learned_terrain(d->PC, y, x)) {
         case ter_wall:
@@ -276,7 +285,7 @@ void io_display(dungeon *d)
     mvprintw(22, 55, "NONE.");
     attroff(COLOR_PAIR(COLOR_BLUE));
   }
-  
+
   io_print_message_queue(0, 0);
 
   refresh();
@@ -291,7 +300,11 @@ void io_display_no_fog(dungeon *d)
   for (y = 0; y < 21; y++) {
     for (x = 0; x < 80; x++) {
       if (d->character_map[y][x]) {
+        attron(COLOR_PAIR(d->character_map[y][x].color));
         mvaddch(y + 1, x, d->character_map[y][x]->symbol);
+      } else if (d->object_map[y][x]) {
+        attron(COLOR_PAIR(d->object_map[y][x].color));
+        mvaddch(y + 1, x, d->object_map[y][x]->obj_symbol());
       } else {
         switch (mapxy(x, y)) {
         case ter_wall:
@@ -344,7 +357,7 @@ void io_display_no_fog(dungeon *d)
     mvprintw(22, 55, "NONE.");
     attroff(COLOR_PAIR(COLOR_BLUE));
   }
-  
+
   io_print_message_queue(0, 0);
 }
 
@@ -402,7 +415,7 @@ uint32_t io_teleport_pc(dungeon *d)
         break;
       default:
         break;
-      }      
+      }
     }
 
     mvaddch(dest[dim_y] + 1, dest[dim_x], actual);
@@ -491,7 +504,7 @@ uint32_t io_teleport_pc(dungeon *d)
 
   if (charpair(dest) && charpair(dest) != d->PC) {
     io_queue_message("Teleport failed.  Destination occupied.");
-  } else {  
+  } else {
     d->character_map[d->PC->position[dim_y]][d->PC->position[dim_x]] = NULL;
     d->character_map[dest[dim_y]][dest[dim_x]] = d->PC;
 
