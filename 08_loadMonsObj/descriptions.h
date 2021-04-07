@@ -50,7 +50,7 @@ class monster_description {
  public:
   monster_description() : name(),       description(), symbol(0),   color(0),
                           abilities(0), speed(),       hitpoints(), damage(),
-                          rarity(0)
+                          rarity(0), unique_inUse(false)
   {
   }
   void set(const std::string &name,
@@ -72,14 +72,14 @@ class object_description {
   object_type_t type;
   uint32_t color;
   dice hit, damage, dodge, defence, weight, speed, attribute, value;
-  bool artifact;
+  bool art_isused, artifact;
   uint32_t rarity;
  public:
   object_description() : name(),    description(), type(objtype_no_type),
                          color(0),  hit(),         damage(),
                          dodge(),   defence(),     weight(),
                          speed(),   attribute(),   value(),
-                         artifact(false), rarity(0)
+                         artifact(false), rarity(0), art_isused(false)
   {
   }
   void set(const std::string &name,
