@@ -39,16 +39,21 @@ typedef enum object_type {
 extern const char object_symbol[];
 
 class monster_description {
- public:
-  std::string name;
-  std::string description;
+ private:
+  std::string name, description;
   char symbol;
   std::vector<uint32_t> color;
   uint32_t abilities;
   dice speed, hitpoints, damage;
   uint32_t rarity;
-  bool unique_inUse;
 
+  // 1.08 new code
+  bool unique_inUse;
+  inline bool is_valid() {
+    return (!(abilities & NPC_UNIQ) || ((abilities & NPC_UNIQ) && !unique_inUse))
+  }
+  inline bool valid_rarity() { return rarity > (unsigned) (rand() % 100); }
+ public:
   monster_description() : name(),       description(), symbol(0),   color(0),
                           abilities(0), speed(),       hitpoints(), damage(),
                           rarity(0), unique_inUse(false)
@@ -68,19 +73,20 @@ class monster_description {
 };
 
 class object_description {
- public:
+ private:
   std::string name, description;
   object_type_t type;
   uint32_t color;
   dice hit, damage, dodge, defence, weight, speed, attribute, value;
-  bool art_isused, artifact;
+  bool artifact;
   uint32_t rarity;
 
+ public:
   object_description() : name(),    description(), type(objtype_no_type),
                          color(0),  hit(),         damage(),
                          dodge(),   defence(),     weight(),
                          speed(),   attribute(),   value(),
-                         artifact(false), rarity(0), art_isused(false)
+                         artifact(false), rarity(0)
   {
   }
   void set(const std::string &name,
@@ -112,9 +118,8 @@ class object_description {
   inline const dice &get_speed() const { return speed; }
   inline const dice &get_attribute() const { return attribute; }
   inline const dice &get_value() const { return value; }
-  inline const bool &get_artifact() const { return artifact; }
-  inline const bool &get_isused() const { return art_isused; }
-  inline const uint32_t &get_rarity() const { return rarity; }
+  inline bool &get_artifact() { return artifact; }
+  inline uint32_t &get_rarity() { return rarity; }
 };
 
 std::ostream &operator<<(std::ostream &o, monster_description &m);
