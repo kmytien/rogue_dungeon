@@ -9,6 +9,8 @@
 #include "pc.h"
 #include "utils.h"
 #include "dungeon.h"
+#include "npc.h"
+#include "character.h"
 #include "assignment_108.h"
 
 /* Same ugly hack we did in path.c */
@@ -202,31 +204,30 @@ static character *io_nearest_visible_monster(dungeon *d)
 
 void io_display(dungeon *d)
 {
+  pair_t p;
   uint32_t y, x;
   uint32_t illuminated;
   character *c;
   int32_t visible_monsters;
 
   clear();
-  for (visible_monsters = -1, y = 0; y < 21; y++) {
-    for (x = 0; x < 80; x++) {
+  for (visible_monsters = -1, p[dim_y] = 0, y = 0; y < 21; p[dim_y]++, y++) {
+    for (p[dim_x] = 0, x = 0; x < 80; p[dim_x]++, x++) {
       if ((illuminated = is_illuminated(d->PC, y, x))) {
         attron(A_BOLD);
       }
       if (d->character_map[y][x] &&
-           can_see(d,
-                  character_get_pos(d->PC),
-                  character_get_pos(d->character_map[y][x]),
-                  1, 0)) {
-         attron(COLOR_PAIR(d->character_map[y][x]->color));
-         mvaddch(y + 1, x,
-                character_get_symbol(d->character_map[y][x]));
-         visible_monsters++;
+           can_see(d, character_get_pos(d->PC), character_get_pos(d->character_map[y][x]), 1, 0)) {
+
+        attron(COLOR_PAIR(d->character_map[y][x]->color));
+        mvaddch(y + 1, x, character_get_symbol(d->character_map[y][x]));
+        attroff(COLOR_PAIR(d->character_map[y][x]->color));
+        visible_monsters++;
       }
-      else if (d->object_map[y][x] && can_see(d, character_get_pos(d->PC), character_get_pos(d->character_map[y][x]), 1, 0)) {
-         attron(COLOR_PAIR(d->object_map[y][x]->color));
-         mvaddch(y + 1, x,
-                 d->object_map[y][x]->obj_symbol());
+      else if (d->object_map[y][x] && can_see(d, character_get_pos(d->PC), p, 1, 0)) {
+        attron(COLOR_PAIR(d->object_map[y][x]->color));
+        mvaddch(y + 1, x, d->object_map[y][x]->obj_symbol());
+        attroff(COLOR_PAIR(d->object_map[y][x]->color));
       } else {
         switch (pc_learned_terrain(d->PC, y, x)) {
         case ter_wall:
@@ -297,12 +298,15 @@ void io_display_no_fog(dungeon *d)
   clear();
   for (y = 0; y < 21; y++) {
     for (x = 0; x < 80; x++) {
-      if (d->character_map[y][x]) {
+      if (d->character_map[y][x] {
         attron(COLOR_PAIR(d->character_map[y][x]->color));
-        mvaddch(y + 1, x, d->character_map[y][x]->symbol);
-      } else if (d->object_map[y][x]) {
+        mvaddch(y + 1, x, character_get_symbol(d->character_map[y][x]));
+        attroff(COLOR_PAIR(d->character_map[y][x]->color));
+      }
+      else if (d->object_map[y][x]) {
         attron(COLOR_PAIR(d->object_map[y][x]->color));
         mvaddch(y + 1, x, d->object_map[y][x]->obj_symbol());
+        attroff(COLOR_PAIR(d->object_map[y][x]->color));
       } else {
         switch (mapxy(x, y)) {
         case ter_wall:
