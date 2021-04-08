@@ -40,26 +40,33 @@
 # define NPC_BIT31         0x80000000
 
 # define has_characteristic(character, bit)              \
-  (((npc *)character)->npc->characteristics & NPC_##bit)
+  (((npc *) character)->characteristics & NPC_##bit)
 # define is_unique(character) has_characteristic(character, UNIQ)
 
-class monster_descripion;
+class monster_description;
 
 typedef uint32_t npc_characteristics_t;
 
-class npc : public character {
- public:
-  npc(dungeon *d, monster_description &m);
-  ~npc();
-  npc_characteristics_t characteristics;
-  uint32_t have_seen_pc;
-  pair_t pc_last_known_position;
-  monster_description &md;
+class npc : public character
+{
+public:
+    npc(dungeon *d, monster_description &m);
+
+    ~npc();
+
+    npc_characteristics_t characteristics;
+    uint32_t have_seen_pc;
+    pair_t pc_last_known_position;
+    const char *description;
+    monster_description &md;
 };
 
 void gen_monsters(dungeon *d);
+
 void npc_delete(npc *n);
+
 void npc_next_pos(dungeon *d, npc *c, pair_t next);
+
 uint32_t dungeon_has_npcs(dungeon *d);
 
 #endif

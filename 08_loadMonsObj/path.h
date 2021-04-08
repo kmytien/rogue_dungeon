@@ -6,6 +6,7 @@
 class dungeon;
 
 void dijkstra(dungeon *d);
+
 void dijkstra_tunnel(dungeon *d);
 
 #endif
