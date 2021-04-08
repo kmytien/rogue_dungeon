@@ -5,7 +5,6 @@
 
 # include "dims.h"
 # include "character.h"
-# include "dice.h"
 
 # define NPC_SMART         0x00000001
 # define NPC_TELEPATH      0x00000002
@@ -41,21 +40,21 @@
 # define NPC_BIT31         0x80000000
 
 # define has_characteristic(character, bit)              \
-  ((character)->npc->characteristics & NPC_##bit)
+  (((npc *)character)->npc->characteristics & NPC_##bit)
+# define is_unique(character) has_characteristic(character, UNIQ)
+
+class monster_descripion;
 
 typedef uint32_t npc_characteristics_t;
 
 class npc : public character {
  public:
+  npc(dungeon *d, monster_description &m);
+  ~npc();
   npc_characteristics_t characteristics;
   uint32_t have_seen_pc;
   pair_t pc_last_known_position;
-  
-  // new code!!!!
-  bool is_valid;
-  std::string description;
-  uint32_t abilities, hitpoints, rarity;
-  dice damage;
+  monster_description &md;
 };
 
 void gen_monsters(dungeon *d);
