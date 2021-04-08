@@ -16,7 +16,7 @@ private:
   object next;
   object_description od;
   bool seen;
-  
+
   inline bool is_valid() {
     return (!(artifact) || ((artifact) && !art_isused))
   }
@@ -25,7 +25,7 @@ public:
   object(object_description &o, pair_t p, object *next);
 
   ~object();
-  
+
   char obj_symbol();
 }
 
