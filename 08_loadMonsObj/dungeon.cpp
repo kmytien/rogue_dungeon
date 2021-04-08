@@ -16,7 +16,7 @@
 #include "event.h"
 #include "pc.h"
 #include "npc.h"
-#include "object.h"
+#include "assignment_108.h"
 
 #define DUMP_HARDNESS_IMAGES 0
 
