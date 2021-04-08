@@ -32,47 +32,21 @@ static uint32_t max_monster_cells(dungeon *d)
 
 void gen_monsters(dungeon *d)
 {
-  uint32_t i;
-  npc *m;
-  uint32_t room;
-  pair_t p;
-  const static char symbol[] = "0123456789abcdef";
+    uint32_t i, idx;
+    npc *m;
+    std::vector <monster_description> &md = d->monster_descriptions;
 
-  d->num_monsters = min(d->max_monsters, max_monster_cells(d));
-
-  for (i = 0; i < d->num_monsters; i++) {
-    m = new npc;
-    memset(m, 0, sizeof (*m));
-    // 1.08 new code, init the unique in use
-    d->monster_descriptions[i].unique_inUse = false;
+    d->num_monsters = min(d->max_monsters, max_monster_cells(d));
     
-    do {
-      room = rand_range(1, d->num_rooms - 1);
-      p[dim_y] = rand_range(d->rooms[room].position[dim_y],
-                            (d->rooms[room].position[dim_y] +
-                             d->rooms[room].size[dim_y] - 1));
-      p[dim_x] = rand_range(d->rooms[room].position[dim_x],
-                            (d->rooms[room].position[dim_x] +
-                             d->rooms[room].size[dim_x] - 1));
-    } while (d->character_map[p[dim_y]][p[dim_x]]);
-    m->position[dim_y] = p[dim_y];
-    m->position[dim_x] = p[dim_x];
-    d->character_map[p[dim_y]][p[dim_x]] = m;
-    m->speed = rand_range(5, 20);
-    m->alive = 1;
-    m->sequence_number = ++d->character_sequence_number;
-    m->characteristics = rand() & 0x0000000f;
-    /*    m->npc->characteristics = 0xf;*/
-    m->symbol = symbol[m->characteristics];
-    m->have_seen_pc = 0;
-    m->kills[kill_direct] = m->kills[kill_avenged] = 0;
+    for (i = 0; i < d->num_monsters; i++) {
+      while (!md[(idx = (rand() % md.size()))].is_valid() || !md[idx].valid_rarity());
 
-    d->character_map[p[dim_y]][p[dim_x]] = m;
-    
-    // 1.08 new code
-    gen_dynamic_mon(d, m);
+      monster_description &desc = md[idx];
+      m = new npc(d, desc);
 
-    heap_insert(&d->events, new_event(d, event_character_turn, m, 0));
+      heap_insert(&d->events, new_event(d, event_character_turn, m, 0));
+    }
+
   }
 }
 
