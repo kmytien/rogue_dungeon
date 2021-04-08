@@ -17,6 +17,7 @@
 #include "pc.h"
 #include "npc.h"
 #include "io.h"
+#include "assignment_108.h"
 
 #define DUMP_HARDNESS_IMAGES 0
 
@@ -78,7 +79,7 @@ static void dijkstra_corridor(dungeon *d, pair_t from, pair_t to)
     }
     initialized = 1;
   }
-  
+
   for (y = 0; y < DUNGEON_Y; y++) {
     for (x = 0; x < DUNGEON_X; x++) {
       path[y][x].cost = INT_MAX;
@@ -177,7 +178,7 @@ static void dijkstra_corridor_inv(dungeon *d, pair_t from, pair_t to)
     }
     initialized = 1;
   }
-  
+
   for (y = 0; y < DUNGEON_Y; y++) {
     for (x = 0; x < DUNGEON_X; x++) {
       path[y][x].cost = INT_MAX;
@@ -387,7 +388,7 @@ static int smooth_hardness(dungeon *d)
   fwrite(&hardness, sizeof (hardness), 1, out);
   fclose(out);
 #endif
-  
+
   /* Diffuse the vaules to fill the space */
   while (head) {
     x = head->x;
@@ -584,7 +585,7 @@ static void place_stairs(dungeon *d)
            (p[dim_x] = rand_range(1, DUNGEON_X - 2)) &&
            ((mappair(p) < ter_floor)                 ||
             (mappair(p) > ter_stairs)))
-      
+
       ;
     mappair(p) = ter_stairs_up;
   } while (rand_under(2, 4));
@@ -598,7 +599,7 @@ static int make_rooms(dungeon *d)
     ;
   d->num_rooms = i;
   d->rooms = (room_t *) malloc(sizeof (*d->rooms) * d->num_rooms);
-  
+
   for (i = 0; i < d->num_rooms; i++) {
     d->rooms[i].size[dim_x] = ROOM_MIN_X;
     d->rooms[i].size[dim_y] = ROOM_MIN_Y;
@@ -674,9 +675,7 @@ void delete_dungeon(dungeon *d)
   free(d->rooms);
   heap_delete(&d->events);
   memset(d->character_map, 0, sizeof (d->character_map));
-	
-  // new 1.08 code
-  memset(d->object_map, 0, sizeof(d->object_map));
+  destroy_objects(d);
 }
 
 void init_dungeon(dungeon *d)
@@ -684,6 +683,10 @@ void init_dungeon(dungeon *d)
   empty_dungeon(d);
   memset(&d->events, 0, sizeof (d->events));
   heap_init(&d->events, compare_events, event_delete);
+
+  // 1.08 new code
+  memset(d->character_map, 0, sizeof(d->character_map));
+  memset(d->object_map, 0, sizeof(d->obj_map));
 }
 
 int write_dungeon_map(dungeon *d, FILE *f)
@@ -949,7 +952,7 @@ int read_rooms(dungeon *d, FILE *f)
 
       exit(-1);
     }
-        
+
 
     /* After reading each room, we need to reconstruct them in the dungeon. */
     for (y = d->rooms[i].position[dim_y];
@@ -1034,7 +1037,7 @@ int read_dungeon(dungeon *d, char *file)
 
   fread(&d->PC->position[dim_x], 1, 1, f);
   fread(&d->PC->position[dim_y], 1, 1, f);
-  
+
   read_dungeon_map(d, f);
 
   read_rooms(d, f);
@@ -1136,10 +1139,10 @@ void render_hardness_map(dungeon *d)
 {
   /* The hardness map includes coordinates, since it's larger *
    * size makes it more difficult to index a position by eye. */
-  
+
   pair_t p;
   int i;
-  
+
   putchar('\n');
   printf("   ");
   for (i = 0; i < DUNGEON_X; i++) {
