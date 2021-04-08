@@ -56,5 +56,5 @@ uint32_t character_get_dkills(const character *c);
 uint32_t character_get_ikills(const character *c);
 uint32_t character_increment_dkills(character *c);
 uint32_t character_increment_ikills(character *c, uint32_t k);
-
+std::string *character_name(character *ch);
 #endif
