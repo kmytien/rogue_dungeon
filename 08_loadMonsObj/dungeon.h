@@ -7,7 +7,6 @@
 # include "dims.h"
 # include "character.h"
 # include "descriptions.h"
-# include "assignment_108.h"
 
 #define DUNGEON_X              80
 #define DUNGEON_Y              21
@@ -25,7 +24,7 @@
 #define MAX_MONSTERS           15
 #define SAVE_DIR               ".rlg327"
 #define DUNGEON_SAVE_FILE      "dungeon"
-#define DUNGEON_SAVE_SEMANTIC  "RLG327-S2021"
+#define DUNGEON_SAVE_SEMANTIC  "RLG327-" TERM
 #define DUNGEON_SAVE_VERSION   0U
 #define MONSTER_DESC_FILE      "monster_desc.txt"
 #define OBJECT_DESC_FILE       "object_desc.txt"
@@ -57,14 +56,15 @@ typedef struct room {
 
 class pc;
 
+class object;
+
 class dungeon {
  public:
   dungeon() : num_rooms(0), rooms(0), map{ter_wall}, hardness{0},
               pc_distance{0}, pc_tunnel{0}, character_map{0}, PC(0),
               num_monsters(0), max_monsters(0), character_sequence_number(0),
               time(0), is_new(0), quit(0), monster_descriptions(),
-              object_descriptions(), max_objects(0), num_objects(0),
-              object_map{0} {}
+              object_descriptions(), num_objects(0), max_objects(0) {}
   uint32_t num_rooms;
   room_t *rooms;
   terrain_type map[DUNGEON_Y][DUNGEON_X];
@@ -80,12 +80,13 @@ class dungeon {
   uint8_t pc_distance[DUNGEON_Y][DUNGEON_X];
   uint8_t pc_tunnel[DUNGEON_Y][DUNGEON_X];
   character *character_map[DUNGEON_Y][DUNGEON_X];
+  object *object_map[DUNGEON_Y][DUNGEON_X];
   pc *PC;
   heap_t events;
   uint16_t num_monsters;
   uint16_t max_monsters;
-  uint16_t num_objects;
-  uint16_t max_objects;
+  uint16_t max_objects
+  uint32_t num_objects;
   uint32_t character_sequence_number;
   /* Game time isn't strictly necessary.  It's implicit in the turn number *
    * of the most recent thing removed from the event queue; however,       *
@@ -97,9 +98,6 @@ class dungeon {
   uint32_t quit;
   std::vector<monster_description> monster_descriptions;
   std::vector<object_description> object_descriptions;
-  
-  // new
-  object *object_map[DUNGEON_Y][DUNGEON_X];
 };
 
 void init_dungeon(dungeon *d);
