@@ -9,7 +9,7 @@
 #include "pc.h"
 #include "utils.h"
 #include "dungeon.h"
-#include "object.h"
+#include "assignment_108.h"
 #include "npc.h"
 #include "character.h"
 
