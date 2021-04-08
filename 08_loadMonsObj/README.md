@@ -2,6 +2,7 @@
 - This assignment is for CS 327 Spring 2021
 - We used Prof. Schaeffer's solution code for 1.07
 - We did NOT implement stacking of items
+- We did implement color changing 
 - Bug? Sometimes it randomly freezes, but we think it might be our computers
 - Object class in assignment_108.h
 - We put everything that had to deal with monster in npc/monster_desc
