@@ -234,6 +234,7 @@ int main(int argc, char *argv[])
     /* Ignoring PC position in saved dungeons.  Not a bug. */
     config_pc(&d);
     gen_monsters(&d);
+    gen_dyn_object(&d);
 
     io_display(&d);
     if (!do_load && !do_image)
