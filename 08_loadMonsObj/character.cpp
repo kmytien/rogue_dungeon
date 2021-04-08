@@ -173,3 +173,7 @@ uint32_t can_see(dungeon *d, pair_t voyeur, pair_t exhibitionist,
 
   return 1;
 }
+
+std::string *character_name(character *ch) {
+  return ch->name;
+}
