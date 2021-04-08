@@ -1,5 +1,5 @@
 #include <stdlib.h>
-
+#include <ncurses.h>
 #include "string.h"
 
 #include "dungeon.h"
@@ -8,6 +8,7 @@
 #include "move.h"
 #include "path.h"
 #include "io.h"
+#include "assignment_108.h"
 
 uint32_t pc_is_alive(dungeon *d)
 {
