@@ -1,7 +1,7 @@
 /*
   NOTES:
   - edit pc
-    - give pc a default num hitpoints
+    - give pc a default num hp, speed, etc
    H - give pc slots WEAPON, OFFHAND, RANGED, ARMOR, HELMET, CLOAK, GLOVES, BOOTS, AMULET, LIGHT, and two for RING
    H - ‘numbered’ a–l (that’s lowercase ’A’ through ’L’).
    H - give pc 10 carry slots, numbered 0–9. (not effected by weapon/equip slots
