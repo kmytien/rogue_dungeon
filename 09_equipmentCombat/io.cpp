@@ -1097,8 +1097,8 @@ void io_wear_item(dungeon *d){
     boolean isTrue = true;
     char c;
 
-    for(i = 0; i < 10; i++) {
-      io_convertObject(d->pc->putIn[i], c, );
+    for(i = 0; i < *inventory; i++) {
+      io_convertObject(d->pc->putItem[i], c, /* not sure what size is*/ );
       mvprintw(i + 5, 15, " %-60s ", "");
     }
 
@@ -1120,7 +1120,8 @@ void io_wear_item(dungeon *d){
         refresh();
       }
 
-      mvprintw(17, 15, " %-60s ", "");
+      d->pc->putItem[pressKey - '0']->get_name()
+      mvprintw(17, 15, "Cannot use item %s, please try again!", get_name());
       mvprintw(18, 15, " %-60s ", "");
       refresh();
 
@@ -1128,15 +1129,20 @@ void io_wear_item(dungeon *d){
 
     isTrue = true;
 
-
 }
 
 // take item off -- case 't':
 void io_remove_item(dungeon*d){
 
     // remove item
-    int i;
-    for(i = 0; i < 10, i++) {
+    uint32_t i, pressKey;
+    boolean isTrue = true;
+    char ch, d;
+
+    for(i = 0; i < *equiptment, i++) {
+      sprintf(ch, "[%s]", allEquipment[i]);
+      io_convertObject(d->pc->takeoutItem[i], d, /* not sure what size is*/);
+      mvprintw(i, 0, " %c %-60s) %-60s ", 'a' + i, ch, d);
 
     }
     //brings up inventory for equiptment
@@ -1146,6 +1152,27 @@ void io_remove_item(dungeon*d){
     mvprintw(18, 15, " %-60s ", "Which item do you want taken out?");
     mvprintw(19, 15, " %-60s ", "");
     refresh();
+
+    while(isTrue){
+      // have to use getch()
+      if((pressKey = getch()) == 27){
+        io_display(d);
+        isTrue = true;
+      }
+
+      if (pressKey < 'a' || pressKey > 'l') {
+        mvprintw(20, 15, " %-60s ", "Letters have to be between a and l");
+        refresh();
+      }
+
+      d->pc->putItem[pressKey - 'a']->get_name()
+      mvprintw(17, 15, "Cannot use item %s, please try again!", get_name());
+      mvprintw(18, 15, " %-60s ", "");
+      refresh();
+
+    }
+
+    isTrue = true;
 
 }
 
