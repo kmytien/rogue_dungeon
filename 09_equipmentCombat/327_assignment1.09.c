@@ -2,8 +2,8 @@
   NOTES:
   - edit pc
     - give pc a default num hitpoints
-    - give pc slots WEAPON, OFFHAND, RANGED, ARMOR, HELMET, CLOAK, GLOVES, BOOTS, AMULET, LIGHT, and two for RING
-      - ‘numbered’ a–l (that’s lowercase ’A’ through ’L’).
+   H - give pc slots WEAPON, OFFHAND, RANGED, ARMOR, HELMET, CLOAK, GLOVES, BOOTS, AMULET, LIGHT, and two for RING
+   H - ‘numbered’ a–l (that’s lowercase ’A’ through ’L’).
     - give pc 10 carry slots, numbered 0–9. (not effected by weapon/equip slots
     - When the PC walks over an item, if it has an open carry slot, it automatically picks the item up; else the item is ignored.
   - add commands
