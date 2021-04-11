@@ -4,8 +4,8 @@
     - give pc a default num hitpoints
    H - give pc slots WEAPON, OFFHAND, RANGED, ARMOR, HELMET, CLOAK, GLOVES, BOOTS, AMULET, LIGHT, and two for RING
    H - ‘numbered’ a–l (that’s lowercase ’A’ through ’L’).
-    - give pc 10 carry slots, numbered 0–9. (not effected by weapon/equip slots
-    - When the PC walks over an item, if it has an open carry slot, it automatically picks the item up; else the item is ignored.
+   H - give pc 10 carry slots, numbered 0–9. (not effected by weapon/equip slots
+   H - When the PC walks over an item, if it has an open carry slot, it automatically picks the item up; else the item is ignored.
   S- add commands
     - w:  Wear an item. Prompts the user for a carry slot. If an item of that type is already equipped, items are swapped.
     - t Take off an item. Prompts for equipment slot. Item goes to an open carry slot.
