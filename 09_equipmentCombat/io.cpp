@@ -683,7 +683,7 @@ uint32_t io_teleport_pc(dungeon *d)
 
   if (charpair(dest) && charpair(dest) != d->PC) {
     io_queue_message("Teleport failed.  Destination occupied.");
-  } else {  
+  } else {
     d->character_map[d->PC->position[dim_y]][d->PC->position[dim_x]] = NULL;
     d->character_map[dest[dim_y]][dest[dim_x]] = d->PC;
 
@@ -1005,6 +1005,43 @@ void io_handle_input(dungeon *d)
       io_queue_message("Have fun!  And happy printing!");
       fail_code = 0;
       break;
+
+    //pick up item
+    case ',':
+      break;
+
+    //wear item and swap items
+    case 'w':
+      break;
+
+    //take off item
+    case 't':
+      break;
+
+    //drop item t floor
+    case 'd':
+      break;
+
+    //remove item from game
+    case 'x':
+      break;
+
+    //list pc inventory
+    case 'i':
+      break;
+
+    //list pc equipment
+    case 'e':
+      break;
+
+    //inspect an item
+    case 'I':
+      break;
+
+    //look at a monster
+    case 'L':
+      break;
+
     default:
       /* Also not in the spec.  It's not always easy to figure out what *
        * key code corresponds with a given keystroke.  Print out any    *
@@ -1019,4 +1056,178 @@ void io_handle_input(dungeon *d)
       fail_code = 1;
     }
   } while (fail_code);
+}
+
+//for equipment
+const char item_slot[12] = {
+  "weapon",
+  "offhand",
+  "ranged",
+  "light",
+  "armor",
+  "helmet",
+  "cloak",
+  "gloves",
+  "boots",
+  "amulet",
+  "lh ring",
+  "rh ring"
+}
+
+//picks up the item
+void io_pickup(dungeon *d) {
+
+}
+
+//changes an object to a string
+void io_convertObject(object *o, char *c, uint32_t size) {
+
+  if(o){
+    //takes in all values as a string
+    snprintf(c, size, "%s (speed: %d, damage: %d+%dd%d)", o->get_name(), o->get_speed(), o->get_dmgBase(), o->get_dmgNumber(), o->get_dmgSides())
+  } else {
+    *c = '\0';
+  }
+
+}
+
+//wear item
+void io_wear_item(dungeon *d){
+    uint32_t i, pressKey;
+    boolean isTrue = true;
+    char c;
+
+    for(i = 0; i < 10; i++) {
+      io_convertObject(d->pc->putIn[i], c, );
+      mvprintw(i + 5, 15, " %-60s ", "");
+    }
+
+    mvprintw(17, 15, " %-60s ", "");
+    mvprintw(18, 15, " %-60s ", "Select an item");
+    mvprintw(19, 15, " %-60s ", "");
+
+    refresh();
+
+    while(isTrue){
+      // have to use getch()
+      if((pressKey = getch()) == 27){
+        io_display(d);
+        isTrue = true;
+      }
+
+      if (pressKey < '0' || pressKey > '9') {
+        mvprintw(20, 15, " %-60s ", "Numbers have to be between 0 and 9");
+        refresh();
+      }
+
+      mvprintw(17, 15, " %-60s ", "");
+      mvprintw(18, 15, " %-60s ", "");
+      refresh();
+
+    }
+
+    isTrue = true;
+
+
+}
+
+// take item off -- case 't':
+void io_remove_item(dungeon*d){
+
+    // remove item
+    int i;
+    for(i = 0; i < 10, i++) {
+
+    }
+    //brings up inventory for equiptment
+    //item goes to empty slot
+
+    mvprintw(17, 15, " %-60s ", "");
+    mvprintw(18, 15, " %-60s ", "Which item do you want taken out?");
+    mvprintw(19, 15, " %-60s ", "");
+    refresh();
+
+}
+
+// drops an item on the floor -- case 'd':
+void io_drop_item(dungeon *d) {
+
+    mvprintw(18, 15, " %-60s ", "");
+    mvprintw(19, 15, " %-60s ", "Which item do you want dropped?");
+    mvprintw(19, 15, " %-60s ", "");
+    mvprintw(20, 15, " %-60s ", "");
+    refresh();
+
+}
+
+// permanently removes item from game
+void io_permanent_itemRemoval(){
+
+    int i;
+    for(i = 0; i < 10, i++){
+      mvprintw(i + 5, 15, " %d) %s", i);
+    }
+
+    mvprintw(18, 15, " %-60s ", "");
+    mvprintw(19, 15, " %-60s ", "Which item do you want destroyed?");
+    mvprintw(19, 15, " %-60s ", "");
+    mvprintw(20, 15, " %-60s ", "");
+    refresh();
+
+}
+
+
+//display inventory - key 'i'
+void io_display_inventory(dungeon *d, object *o) {
+
+  int i;
+  char* foo; //prob can't use a char pointer? need to look into this
+
+  for (i = 0; i < 10; i++) {
+    //need to display item name, speed, and damage
+    io_convertObject(d->pc->equipment[i], foo, /*idk what the size would be?*/);
+    mvprintw(i + 5, 15, "%d) %s", i, foo);
+  }
+
+  mvprintw(17, 15, " %s ", "");
+  mvprintw(18, 15, "Hit any key to continue.        ");
+  mvprintw(19, 15, " %s ", "");
+  mvprintw(20, 15, " %s ", "");
+
+  refresh();
+  getch();
+  io_display(d);
+}
+
+//displays what pc is wearing rn
+void io_display_equip(dungeon *d) {
+
+  int i;
+  char* foo; //prob can't use a char pointer? need to look into this
+  char[13] alpha = "abcdefghijkl";
+
+  for (i = 0; i < 12; i++) {
+    //need to display item name, speed, and damage
+    io_convertObject(d->pc->equipment[i], foo, /*idk what the size would be?*/);
+    mvprintw(i + 5, 15, "%c [%s]  ) ", alpha[i], item_slot[i], foo);
+  }
+
+  mvprintw(17, 5, " %s ", "");
+  mvprintw(18, 5, "Hit any key to continue.        ");
+  mvprintw(19, 5, " %s ", "");
+  mvprintw(20, 5, " %s ", "");
+
+  refresh();
+  getch();
+  io_display(d);
+}
+
+//inspects item
+void io_inspect_item(dungeon *d) {
+
+}
+
+//looks at monsters
+void io_look_monster(dungeon *d) {
+
 }
