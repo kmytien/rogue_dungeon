@@ -6,7 +6,7 @@
    H - ‘numbered’ a–l (that’s lowercase ’A’ through ’L’).
     - give pc 10 carry slots, numbered 0–9. (not effected by weapon/equip slots
     - When the PC walks over an item, if it has an open carry slot, it automatically picks the item up; else the item is ignored.
-  - add commands
+  S- add commands
     - w:  Wear an item. Prompts the user for a carry slot. If an item of that type is already equipped, items are swapped.
     - t Take off an item. Prompts for equipment slot. Item goes to an open carry slot.
     - d Drop an item. Prompts user for carry slot. Item goes to floor.
