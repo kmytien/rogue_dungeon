@@ -31,3 +31,9 @@
      - The game ends with a win if the PC kills an NPC with the BOSS flag (in our case, SpongeBob SquarePants). It no longer ends when the dungeon level is free of NPCs.
 
 */
+
+// I GOT THESE 2 :) -H
+void pc_equipables() {
+}
+void pc_inventory() {
+}
