@@ -31,7 +31,7 @@ void place_pc(dungeon *d)
 void config_pc(dungeon *d)
 {
   static dice pc_dice(0, 1, 4);
-  
+
   d->PC = new pc;
 
   d->PC->symbol = '@';
@@ -45,6 +45,9 @@ void config_pc(dungeon *d)
   d->PC->color.push_back(COLOR_WHITE);
   d->PC->damage = &pc_dice;
   d->PC->name = "Isabella Garcia-Shapiro";
+
+  //new to 1.09
+  d->PC->hp = 100;
 
   d->character_map[d->PC->position[dim_y]][d->PC->position[dim_x]] = d->PC;
 
@@ -237,7 +240,7 @@ void pc_observe_terrain(pc *p, dungeon *d)
     can_see(d, p->position, where, 1, 1);
     where[dim_y] = y_max;
     can_see(d, p->position, where, 1, 1);
-  }       
+  }
 }
 
 int32_t is_illuminated(pc *p, int16_t y, int16_t x)
@@ -250,6 +253,56 @@ void pc_see_object(character *the_pc, object *o)
   if (o) {
     o->has_been_seen();
   }
+}
+
+uint32_t pc::wear(uint32_t emty_slot){
+  if(!inventory[emty_slot] || !inventory[emty_slot]->wearable()){
+        isTrue = true;
+  }
+
+  x = inventory[emty_slot]->equiptmentIndex()
+  if(equipment[x] && ((equipment[x]->get_type() == objtype_RING) && !equipment[x + 1])){
+        x++;
+  }
+  tempArray = inventory[emty_slot];
+  inventory[emty_slot] = equipment[x];
+  equipment[x] = tempArray;
+
+  io_queue_message("You're wearing %s.", equipment[x]->get_name());
+
+  newSpeed();
+  isTrue = false;
+}
+
+void pc::newSpeed(){
+  int i;
+
+  for (speed = PC_SPEED, i = 0; i < num_equip_inv; i++) {
+    if (equipment[i]) {
+      speed += equipment[i]->get_speed();
+    }
+  }
+
+  if (speed <= 0) {
+    speed = 1;
+  }
+}
+
+void pc::remove(dungeon *d, int32_t emty_slot){
+  // at given index make equipment = NULL
+  //d->PC->equipment[i] = NULL;
+  if(!inventory[emty_slot] || !inventory[emty_slot]->/*method for removing item*/ || emty_slot = NULL){
+      io_queue_message("Cannot be removed, nowhere to place it  %s", equipment[emty_slot]->get_name());
+      isTrue = true;
+  }
+  
+  io_queue_message("You removed  %s.", equipment[emty_slot]->get_name());
+
+  equipment[emty_slot] = NULL;
+  newSpeed();
+
+  isTrue = false;
+
 }
 
 // int all slots to no_type objects
@@ -273,60 +326,70 @@ int32_t pc_equip(dungeon *d, object *o) {
         d->PC->equipment[0] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_OFFHAND:
       if(d->PC->equipment[1] == NULL) {
         d->PC->equipment[1] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_RANGED:
       if(d->PC->equipment[2] == NULL) {
         d->PC->equipment[2] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_ARMOR:
       if(d->PC->equipment[3] == NULL) {
         d->PC->equipment[3] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_HELMET:
       if(d->PC->equipment[4] == NULL) {
         d->PC->equipment[4] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_CLOAK:
       if(d->PC->equipment[5] == NULL) {
         d->PC->equipment[5] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_GLOVES:
       if(d->PC->equipment[6] == NULL) {
         d->PC->equipment[6] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_BOOTS:
       if(d->PC->equipment[7] == NULL) {
         d->PC->equipment[7] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_AMULET:
       if(d->PC->equipment[8] == NULL) {
         d->PC->equipment[8] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_LIGHT:
       if(d->PC->equipment[9] == NULL) {
         d->PC->equipment[9] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_RING:
       if(d->PC->equipment[10] == NULL) { 
@@ -336,17 +399,24 @@ int32_t pc_equip(dungeon *d, object *o) {
         d->PC->equipment[11] = o;
         return 0;
       }
+      else if (pc_take(d, o) == 0) return 0;
+      
       break;
     default:
-      // if inventory is not full, add object to inventory
-      int i;
-      for (i = 0; i < 10; i++) {
-        if(d->PC->inventory[i] == NULL) {
-          d->PC->inventory[i] = o;
-          return 0;
-        }
-      }
+      if (pc_take(d, o) == 0) return 0;
       break;
+  }
+  return 1;
+}
+
+int32_t pc_take(dungeon *d, object *o) {
+  // if inventory is not full, add object to inventory
+  int i;
+  for (i = 0; i < 10; i++) {
+    if(d->PC->inventory[i] == NULL) {
+      d->PC->inventory[i] = o;
+      return 0;
+    }
   }
   return 1;
 }
