@@ -1009,10 +1009,12 @@ void io_handle_input(dungeon *d)
 
     //wear item and swap items
     case 'w':
+    io_wear_item(d);
       break;
 
     //take off item
     case 't':
+    io_remove_item(d);
       break;
 
     //drop item t floor
@@ -1025,10 +1027,12 @@ void io_handle_input(dungeon *d)
 
     //list pc inventory
     case 'i':
+    io_display_inventory(d);
       break;
 
     //list pc equipment
     case 'e':
+    io_display_equip(d);
       break;
 
     //inspect an item
@@ -1093,12 +1097,12 @@ void io_convertObject(object *o, char *c, uint32_t size) {
 void io_wear_item(dungeon *d){
     uint32_t i, pressKey;
     bool isTrue = true;
-    char c;
+    char c[80];
 
     //assuming it goes up to 10? was *inventory before
     //putItem is not a member in class pc**
     for(i = 0; i < 10; i++) {
-      io_convertObject(d->PC->putItem[i], c, /* not sure what size is*/ ); //need to add size**
+      io_convertObject(d->PC->equipment[i], c, 80); //need to add size**
       mvprintw(i + 5, 15, " %-60s ", "");
     }
 
@@ -1120,9 +1124,7 @@ void io_wear_item(dungeon *d){
         refresh();
       }
 
-      //putItem is not a member in class pc
-      d->PC->putItem[pressKey - '0']->get_name()
-      mvprintw(17, 15, "Cannot use item %s, please try again!", get_name());
+      mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
       mvprintw(18, 15, " %-60s ", "");
       refresh();
 
@@ -1138,13 +1140,12 @@ void io_remove_item(dungeon*d){
     // remove item
     uint32_t i, pressKey;
     bool isTrue = true;
-    char ch, f;
+    char ch[80];
 
     //assuming that it goes to 12? was *equipment before
     for(i = 0; i < 12; i++) {
-      sprintf(ch, "[%s]", allEquipment[i]);
-      io_convertObject(d->PC->takeoutItem[i], f, /* not sure what size is*/);
-      mvprintw(i, 0, " %c %-60s) %-60s ", 'a' + i, ch, f);
+      io_convertObject(d->PC->equipment[i], ch, 80);
+      mvprintw(i, 0, " %c %-60s) %-60s ", 'a' + i, ch);
 
     }
     //brings up inventory for equiptment
@@ -1167,8 +1168,7 @@ void io_remove_item(dungeon*d){
         refresh();
       }
 
-      d->PC->putItem[pressKey - 'a']->get_name()
-      mvprintw(17, 15, "Cannot use item %s, please try again!", get_name());
+      mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->equipment[pressKey - 'a']->get_name());
       mvprintw(18, 15, " %-60s ", "");
       refresh();
 
@@ -1207,14 +1207,14 @@ void io_permanent_itemRemoval(){
 
 
 //display inventory - key 'i'
-void io_display_inventory(dungeon *d, object *o) {
+void io_display_inventory(dungeon *d) {
 
   int i;
-  char* foo; //prob can't use a char pointer? need to look into this
+  char foo[80]; //prob can't use a char pointer? need to look into this
 
   for (i = 0; i < 10; i++) {
     //need to display item name, speed, and damage
-    io_convertObject(d->PC->equipment[i], foo, /*idk what the size would be?*/);
+    io_convertObject(d->PC->equipment[i], foo, 80);
     mvprintw(i + 5, 15, "%d) %s", i, foo);
   }
 
@@ -1232,12 +1232,12 @@ void io_display_inventory(dungeon *d, object *o) {
 void io_display_equip(dungeon *d) {
 
   int i;
-  char* foo; //prob can't use a char pointer? need to look into this
+  char foo[80]; //prob can't use a char pointer? need to look into this
   char alpha[] = "abcdefghijkl";
 
   for (i = 0; i < 12; i++) {
     //need to display item name, speed, and damage
-    io_convertObject(d->PC->equipment[i], foo, /*idk what the size would be?*/);
+    io_convertObject(d->PC->equipment[i], foo, 80);
     mvprintw(i + 5, 15, "%c [%s]  ) ", alpha[i], item_slot[i], foo);
   }
 
