@@ -1130,6 +1130,7 @@ void io_wear_item(dungeon *d, uint32_t empty_slot){
     }
 
     isTrue = true;
+  pc_stat_refresh(d);
 }
 
 
