@@ -42,6 +42,8 @@ class object {
   bool have_seen() { return seen; }
   void has_been_seen() { seen = true; }
   int16_t *get_position() { return position; }
+  uint32_t wearable();
+  int32_t equipmentIndex();
 };
 
 void gen_objects(dungeon *d);
