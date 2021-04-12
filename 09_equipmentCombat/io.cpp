@@ -1003,18 +1003,14 @@ void io_handle_input(dungeon *d)
       fail_code = 0;
       break;
 
-    //pick up item
-    case ',':
-      break;
-
     //wear item and swap items
     case 'w':
-    io_wear_item(d);
+      io_wear_item(d);
       break;
 
     //take off item
     case 't':
-    io_remove_item(d);
+      io_remove_item(d);
       break;
 
     //drop item t floor
@@ -1027,20 +1023,22 @@ void io_handle_input(dungeon *d)
 
     //list pc inventory
     case 'i':
-    io_display_inventory(d);
+      io_display_inventory(d);
       break;
 
     //list pc equipment
     case 'e':
-    io_display_equip(d);
+      io_display_equip(d);
       break;
 
     //inspect an item
     case 'I':
+      io_inspect_item(d);
       break;
 
     //look at a monster
     case 'L':
+      io_look_monster(d);
       break;
 
     default:
@@ -1059,8 +1057,9 @@ void io_handle_input(dungeon *d)
   } while (fail_code);
 }
 
+
 //for equipment
-const char* item_slot[12] = {
+const char* item_slot[] = {
   "weapon",
   "offhand",
   "ranged",
@@ -1075,17 +1074,13 @@ const char* item_slot[12] = {
   "rh ring"
 };
 
-//picks up the item
-void io_pickup(dungeon *d) {
-
-}
 
 //changes an object to a string
 void io_convertObject(object *o, char *c, uint32_t size) {
 
   if(o){
     //takes in all values as a string
-    snprintf(c, size, "%s (speed: %d, damage: %d+%dd%d)", 
+    snprintf(c, size, "%s (speed: %d, damage: %d+%dd%d)",
     	o->get_name(), o->get_speed(), o->get_damage_base(), o->get_damage_number(), o->get_damage_sides());
   } else {
     *c = '\0';
@@ -1093,15 +1088,17 @@ void io_convertObject(object *o, char *c, uint32_t size) {
 
 }
 
+
 //wear item
-void io_wear_item(dungeon *d){
-    uint32_t i, pressKey;
+void io_wear_item(dungeon *d, uint32_t empty_slot){
+    uint32_t i, pressKey, x;
     bool isTrue = true;
     char c[80];
+    object tempArray;
 
     //assuming it goes up to 10? was *inventory before
     //putItem is not a member in class pc**
-    for(i = 0; i < 10; i++) {
+    for (i = 0; i < 10; i++) {
       io_convertObject(d->PC->equipment[i], c, 80); //need to add size**
       mvprintw(i + 5, 15, " %-60s ", "");
     }
@@ -1112,11 +1109,10 @@ void io_wear_item(dungeon *d){
 
     refresh();
 
-    while(isTrue){
+    while (isTrue){
       // have to use getch()
-      if((pressKey = getch()) == 27){
+      if ((pressKey = getch()) == 27){
         io_display(d);
-        isTrue = true;
       }
 
       if (pressKey < '0' || pressKey > '9') {
@@ -1124,18 +1120,21 @@ void io_wear_item(dungeon *d){
         refresh();
       }
 
+      if (!d->PC->wear(pressKey - '0')){
+        isTrue = false
+      }
+
       mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
       mvprintw(18, 15, " %-60s ", "");
       refresh();
-
     }
 
     isTrue = true;
-
 }
 
-// take item off -- case 't':
-void io_remove_item(dungeon*d){
+
+// take item off -- case 't': use pc_remove_equipment
+void io_remove_item(dungeon* d){
 
     // remove item
     uint32_t i, pressKey;
@@ -1146,8 +1145,8 @@ void io_remove_item(dungeon*d){
     for(i = 0; i < 12; i++) {
       io_convertObject(d->PC->equipment[i], ch, 80);
       mvprintw(i, 0, " %c %-60s) %-60s ", 'a' + i, ch);
-
     }
+
     //brings up inventory for equiptment
     //item goes to empty slot
 
@@ -1156,11 +1155,10 @@ void io_remove_item(dungeon*d){
     mvprintw(19, 15, " %-60s ", "");
     refresh();
 
-    while(isTrue){
+    while (isTrue) {
       // have to use getch()
-      if((pressKey = getch()) == 27){
+      if ((pressKey = getch()) == 27) {
         io_display(d);
-        isTrue = true;
       }
 
       if (pressKey < 'a' || pressKey > 'l') {
@@ -1168,32 +1166,71 @@ void io_remove_item(dungeon*d){
         refresh();
       }
 
+      if (!d->PC->remove(pressKey - 'a'){
+        isTrue = false;
+      }
+
       mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->equipment[pressKey - 'a']->get_name());
       mvprintw(18, 15, " %-60s ", "");
       refresh();
-
     }
 
     isTrue = true;
 
+    pc_stat_refresh(d);
 }
 
-// drops an item on the floor -- case 'd':
-void io_drop_item(dungeon *d) {
 
-    mvprintw(18, 15, " %-60s ", "");
-    mvprintw(19, 15, " %-60s ", "Which item do you want dropped?");
+//drops an item on the floor -- case 'd': use pc_remove_inventory
+void io_drop_item(dungeon *d) {
+    int c, i;
+    char* foo;
+    bool in = true;
+
+    for (i = 0; i < 10; i++) {
+      io_convertObject(d->PC->equipment[i], foo, 80);
+      mvprintw(i + 5, 15, "%d) %s", i, foo);
+    }
+
+    mvprintw(17, 15, " %-60s ", "");
+    mvprintw(18, 15, " %-60s ", "Which item do you want dropped?");
     mvprintw(19, 15, " %-60s ", "");
-    mvprintw(20, 15, " %-60s ", "");
     refresh();
 
+    while (in) {
+      // have to use getch()
+      if ((key = getch()) == 27) {
+        io_display(d);
+      }
+
+      if (key < '0' || key > '9') {
+        mvprintw(20, 15, " %-60s ", "Invalid entry. Must be keys 0-9.");
+        refresh();
+      }
+
+      //NEED TO CHANGE THIS TO DROP
+      if (!d->PC->remove(pressKey - '0') {
+        in = false;
+      }
+
+      mvprintw(17, 15, "Cannot drop item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
+      mvprintw(18, 15, " %-60s ", "");
+      refresh();
+    }
+
+    in = true;
+    refresh();
+    pc_stat_refresh(d);
 }
 
-// permanently removes item from game
+
+//permanently removes item from game
 void io_permanent_itemRemoval(){
 
-    int i;
-    for(i = 0; i < 10; i++){
+    uint32_t i, pressKey;
+    bool isTrue = true;
+
+    for(i = 0; i < 10; i++) {
       mvprintw(i + 5, 15, " %d) %s", i);
     }
 
@@ -1203,8 +1240,25 @@ void io_permanent_itemRemoval(){
     mvprintw(20, 15, " %-60s ", "");
     refresh();
 
-}
+    while(isTrue){
+      if((pressKey = getch()) == 27){
+        io_display(d);
+        isTrue = true;
+      }
 
+      if (pressKey < '0' || pressKey > '9') {
+        mvprintw(20, 15, " %-60s ", "Numbers have to be between 0 and 9");
+        refresh();
+      }
+
+      mvprintw(17, 15, "Cannot destroy the item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
+      mvprintw(18, 15, " %-60s ", "");
+      refresh();
+
+    }
+
+    isTrue = true;
+}
 
 //display inventory - key 'i'
 void io_display_inventory(dungeon *d) {
@@ -1238,25 +1292,205 @@ void io_display_equip(dungeon *d) {
   for (i = 0; i < 12; i++) {
     //need to display item name, speed, and damage
     io_convertObject(d->PC->equipment[i], foo, 80);
-    mvprintw(i + 5, 15, "%c [%s]  ) ", alpha[i], item_slot[i], foo);
+    mvprintw(i + 5, 15, "%c [%s]\t) ", alpha[i], item_slot[i], foo);
   }
 
-  mvprintw(17, 5, " %s ", "");
+  mvprintw(17, 5, " %s", "");
   mvprintw(18, 5, "Hit any key to continue.        ");
-  mvprintw(19, 5, " %s ", "");
-  mvprintw(20, 5, " %s ", "");
+  mvprintw(19, 5, " %s", "");
+  mvprintw(20, 5, " %s", "");
 
   refresh();
   getch();
   io_display(d);
 }
 
-//inspects item
-void io_inspect_item(dungeon *d) {
 
+//inspects item - opens up list of items on hand, user press 0-9 depending on what item they want to inspect
+//then that prints our the item name, speed, dmg, and the item description under it
+void io_inspect_item(dungeon *d) {
+  int i, key, out = 0;
+  char foo[80]; //prob can't use a char pointer? need to look into this
+  char alpha[] = "abcdefghijkl";
+  char* output;
+
+  for (i = 0; i < 12; i++) {
+    //need to display item name, speed, and damage
+    io_convertObject(d->PC->equipment[i], foo, 80);
+    mvprintw(i + 5, 15, "%c [%s]  ) ", alpha[i], item_slot[i], foo);
+  }
+
+  mvprintw(17, 5, "%s", "What item would you like to inspect (0-9)? Press ESC to go back.");
+  mvprintw(18, 5, "                                                 ");
+  mvprintw(19, 5, "                                                 ");
+  refresh();
+
+  while (!out) {
+    switch (key = getch()) {
+
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        //if empty - would it be null?
+        if (d->PC->equipment[key] == NULL)
+          mvprintw(17, 5, "%s", "Slot picked is empty. Choose another slot with keys 0-9.");
+
+        //else print name, speed, dmg and description
+        else {
+          //might need to make get_description for object
+          io_convertObject(d->PC->equipment[key], output, 80);
+          mvprintw(7, 5, "%s", output);
+          mvprintw(8, 5, "%s", "");
+          mvprintw(9, 5, "%s", d->PC->equipment[key]->get_description());
+          mvprintw(10, 5, "%s", "");
+          mvprintw(11, 5, "%s", "Hit any key to continue.");
+          refresh();
+          getch();
+        }
+        break;
+
+      case 27:
+        out = 1;
+        break;
+
+      default:
+        mvprintw(17, 5, "%s", "Invalid key. Please choose your item with the keys 0-9.")
+        break;
+    }
+  }
+
+  io_display(d);
+  refresh();
 }
 
-//looks at monsters
+
+//looks at monsters - opens up the whole map similar to teleport mode, uses an asterisk to locate a monster,
+//users oress t to select that monster and lists monster name, speed, hp, dmg, and description
+//referenced off of teleport pc
 void io_look_monster(dungeon *d) {
 
+  int c, out = 0;
+  char* output1, output2;
+  pair_t current;
+  current[dim_x] = d->PC->position[dim_x];
+  current[dim_y] = d->PC->position[dim_y];
+
+  //can only look at what is visible, can't open up no fog
+  mvaddch(current[dim_y] + 1, current[dim_x], '*');
+  refresh();
+
+  while (!out) {
+    switch (mappair(current)) {
+      case ter_wall:
+      case ter_wall_immutable:
+      case ter_unknown:
+        mvaddch(current[dim_y] + 1, current[dim_x], ' ');
+        break;
+      case ter_floor:
+      case ter_floor_room:
+        mvaddch(current[dim_y] + 1, current[dim_x], '.');
+        break;
+      case ter_floor_hall:
+        mvaddch(current[dim_y] + 1, current[dim_x], '#');
+        break;
+      case ter_debug:
+        mvaddch(current[dim_y] + 1, current[dim_x], '*');
+        break;
+      case ter_stairs_up:
+        mvaddch(current[dim_y] + 1, current[dim_x], '<');
+        break;
+      case ter_stairs_down:
+        mvaddch(current[dim_y] + 1, current[dim_x], '>');
+        break;
+      default:
+        mvaddch(current[dim_y] + 1, current[dim_x], '0');
+    }
+
+    switch(c = getch()) {
+      case '7':
+      case 'y':
+      case KEY_HOME:
+        if (current[dim_y] != 1) current[dim_y]--;
+        if (current[dim_x] != 1) current[dim_x]--;
+        break;
+      case '8':
+      case 'k':
+      case KEY_UP:
+        if (current[dim_y] != 1) current[dim_y]--;
+        break;
+      case '9':
+      case 'u':
+      case KEY_PPAGE:
+        if (current[dim_y] != 1) current[dim_y]--;
+        if (current[dim_x] != DUNGEON_X - 2) current[dim_x]++;
+        break;
+      case '6':
+      case 'l':
+      case KEY_RIGHT:
+        if (current[dim_x] != DUNGEON_X - 2) current[dim_x]++;
+        break;
+      case '3':
+      case 'n':
+      case KEY_NPAGE:
+        if (current[dim_y] != DUNGEON_Y - 2) current[dim_y]++;
+        if (current[dim_x] != DUNGEON_X - 2) current[dim_x]++;
+        break;
+      case '2':
+      case 'j':
+      case KEY_DOWN:
+        if (current[dim_y] != DUNGEON_Y - 2) current[dim_y]++;
+        break;
+      case '1':
+      case 'b':
+      case KEY_END:
+        if (current[dim_y] != DUNGEON_Y - 2) current[dim_y]++;
+        if (current[dim_x] != 1) current[dim_x]--;
+        break;
+      case '4':
+      case 'h':
+      case KEY_LEFT:
+        if (current[dim_x] != 1) current[dim_x]--;
+        break;
+
+      //print out description
+      case 't':
+        //would it be null if there is no character in certain spot?
+        if (charpair(current) == NULL) mvprintw(0, 5, "%s", "No monster here, pick another spot.");
+
+        else {
+          snprintf(output1, 80, "%s: (speed: %d, damage: %d+%dd%d, hp: %d)",
+                   charpair(current)->name, charpair(current)->speed,
+                   charpair(current)->damage->get_base(), charpair(current)->damage->get_number(), charpair(current)->damage->get_sides());
+
+          mvprintw(7, 5, "%s", output1);
+          mvprintw(8, 5, "%s", charpair(current)->description);
+          mvprintw(9, 5, "%s", "");
+          mvprintw(10, 5, "%s", "Hit any key to continue.");
+        }
+
+        refresh();
+        getch();
+        break;
+
+      //ESC button to exit out
+      case 27:
+        out = 1;
+        break;
+
+      default:
+        mvprintw(0, 5, "%s", "Invalid key.");
+        break;
+    }
+  }
+
+  refresh();
+  getch();
+  io_display(d);
 }
