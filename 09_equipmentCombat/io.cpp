@@ -968,9 +968,6 @@ void io_handle_input(dungeon *d)
       io_display(d);
       fail_code = 1;
       break;
-    case 'L':
-      fail_code = 1;
-      break;
     case 'g':
       /* Teleport the PC to a random place in the dungeon.              */
       io_teleport_pc(d);
@@ -1059,7 +1056,7 @@ void io_handle_input(dungeon *d)
 }
 
 //for equipment
-const char item_slot[12] = {
+const char* item_slot[12] = {
   "weapon",
   "offhand",
   "ranged",
@@ -1072,7 +1069,7 @@ const char item_slot[12] = {
   "amulet",
   "lh ring",
   "rh ring"
-}
+};
 
 //picks up the item
 void io_pickup(dungeon *d) {
@@ -1084,7 +1081,8 @@ void io_convertObject(object *o, char *c, uint32_t size) {
 
   if(o){
     //takes in all values as a string
-    snprintf(c, size, "%s (speed: %d, damage: %d+%dd%d)", o->get_name(), o->get_speed(), o->get_dmgBase(), o->get_dmgNumber(), o->get_dmgSides())
+    snprintf(c, size, "%s (speed: %d, damage: %d+%dd%d)", 
+    	o->get_name(), o->get_speed(), o->get_damage_base(), o->get_damage_number(), o->get_damage_sides());
   } else {
     *c = '\0';
   }
@@ -1094,11 +1092,13 @@ void io_convertObject(object *o, char *c, uint32_t size) {
 //wear item
 void io_wear_item(dungeon *d){
     uint32_t i, pressKey;
-    boolean isTrue = true;
+    bool isTrue = true;
     char c;
 
-    for(i = 0; i < *inventory; i++) {
-      io_convertObject(d->pc->putItem[i], c, /* not sure what size is*/ );
+    //assuming it goes up to 10? was *inventory before
+    //putItem is not a member in class pc**
+    for(i = 0; i < 10; i++) {
+      io_convertObject(d->PC->putItem[i], c, /* not sure what size is*/ ); //need to add size**
       mvprintw(i + 5, 15, " %-60s ", "");
     }
 
@@ -1120,7 +1120,8 @@ void io_wear_item(dungeon *d){
         refresh();
       }
 
-      d->pc->putItem[pressKey - '0']->get_name()
+      //putItem is not a member in class pc
+      d->PC->putItem[pressKey - '0']->get_name()
       mvprintw(17, 15, "Cannot use item %s, please try again!", get_name());
       mvprintw(18, 15, " %-60s ", "");
       refresh();
@@ -1136,13 +1137,14 @@ void io_remove_item(dungeon*d){
 
     // remove item
     uint32_t i, pressKey;
-    boolean isTrue = true;
-    char ch, d;
+    bool isTrue = true;
+    char ch, f;
 
-    for(i = 0; i < *equiptment, i++) {
+    //assuming that it goes to 12? was *equipment before
+    for(i = 0; i < 12; i++) {
       sprintf(ch, "[%s]", allEquipment[i]);
-      io_convertObject(d->pc->takeoutItem[i], d, /* not sure what size is*/);
-      mvprintw(i, 0, " %c %-60s) %-60s ", 'a' + i, ch, d);
+      io_convertObject(d->PC->takeoutItem[i], f, /* not sure what size is*/);
+      mvprintw(i, 0, " %c %-60s) %-60s ", 'a' + i, ch, f);
 
     }
     //brings up inventory for equiptment
@@ -1165,7 +1167,7 @@ void io_remove_item(dungeon*d){
         refresh();
       }
 
-      d->pc->putItem[pressKey - 'a']->get_name()
+      d->PC->putItem[pressKey - 'a']->get_name()
       mvprintw(17, 15, "Cannot use item %s, please try again!", get_name());
       mvprintw(18, 15, " %-60s ", "");
       refresh();
@@ -1191,7 +1193,7 @@ void io_drop_item(dungeon *d) {
 void io_permanent_itemRemoval(){
 
     int i;
-    for(i = 0; i < 10, i++){
+    for(i = 0; i < 10; i++){
       mvprintw(i + 5, 15, " %d) %s", i);
     }
 
@@ -1212,7 +1214,7 @@ void io_display_inventory(dungeon *d, object *o) {
 
   for (i = 0; i < 10; i++) {
     //need to display item name, speed, and damage
-    io_convertObject(d->pc->equipment[i], foo, /*idk what the size would be?*/);
+    io_convertObject(d->PC->equipment[i], foo, /*idk what the size would be?*/);
     mvprintw(i + 5, 15, "%d) %s", i, foo);
   }
 
@@ -1231,11 +1233,11 @@ void io_display_equip(dungeon *d) {
 
   int i;
   char* foo; //prob can't use a char pointer? need to look into this
-  char[13] alpha = "abcdefghijkl";
+  char alpha[] = "abcdefghijkl";
 
   for (i = 0; i < 12; i++) {
     //need to display item name, speed, and damage
-    io_convertObject(d->pc->equipment[i], foo, /*idk what the size would be?*/);
+    io_convertObject(d->PC->equipment[i], foo, /*idk what the size would be?*/);
     mvprintw(i + 5, 15, "%c [%s]  ) ", alpha[i], item_slot[i], foo);
   }
 
