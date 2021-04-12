@@ -47,7 +47,7 @@ void gen_object(dungeon *d)
   do {
     i = rand_range(0, v.size() - 1);
   } while (!v[i].can_be_generated() || !v[i].pass_rarity_roll());
-  
+
   room = rand_range(0, d->num_rooms - 1);
   do {
     p[dim_y] = rand_range(d->rooms[room].position[dim_y],
@@ -61,7 +61,7 @@ void gen_object(dungeon *d)
   o = new object(v[i], p, d->objmap[p[dim_y]][p[dim_x]]);
 
   d->objmap[p[dim_y]][p[dim_x]] = o;
-  
+
 }
 
 void gen_objects(dungeon *d)
@@ -102,6 +102,19 @@ int32_t object::roll_dice()
   return damage.roll();
 }
 
+int32_t object::get_type()
+{
+  return type;
+}
+
+uint32_t object::wearable()
+{
+  return type >= objtype_WEAPON && type <= objtype_RING;
+}
+
+
+
+
 void destroy_objects(dungeon *d)
 {
   uint32_t y, x;
@@ -114,6 +127,17 @@ void destroy_objects(dungeon *d)
       }
     }
   }
+}
+
+int32_t object::equipmentIndex()
+{
+  if (type < objtype_WEAPON ||
+      type > objtype_RING)
+  {
+    return -1;
+  }
+
+  return type - 1;
 }
 
 int32_t object::get_type()
