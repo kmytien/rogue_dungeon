@@ -251,3 +251,102 @@ void pc_see_object(character *the_pc, object *o)
     o->has_been_seen();
   }
 }
+
+// int all slots to no_type objects
+void init_slots(dungeon *d) {
+  int i;
+  
+  for (i = 0; i < 12; i++) {
+    d->PC->equipment[i] = NULL;
+  }
+  for (i = 0; i < 10; i++) {
+    d->PC->inventory[i] = NULL;
+  }
+}
+
+// add equipment to the pc's equipment slots
+int32_t pc_equip(dungeon *d, object *o) {
+  // if the item is equipment and the slot is open 
+  switch(o->get_type()) {
+    case objtype_WEAPON:
+      if(d->PC->equipment[0] == NULL) {
+        d->PC->equipment[0] = o;
+        return 0;
+      }
+      break;
+    case objtype_OFFHAND:
+      if(d->PC->equipment[1] == NULL) {
+        d->PC->equipment[1] = o;
+        return 0;
+      }
+      break;
+    case objtype_RANGED:
+      if(d->PC->equipment[2] == NULL) {
+        d->PC->equipment[2] = o;
+        return 0;
+      }
+      break;
+    case objtype_ARMOR:
+      if(d->PC->equipment[3] == NULL) {
+        d->PC->equipment[3] = o;
+        return 0;
+      }
+      break;
+    case objtype_HELMET:
+      if(d->PC->equipment[4] == NULL) {
+        d->PC->equipment[4] = o;
+        return 0;
+      }
+      break;
+    case objtype_CLOAK:
+      if(d->PC->equipment[5] == NULL) {
+        d->PC->equipment[5] = o;
+        return 0;
+      }
+      break;
+    case objtype_GLOVES:
+      if(d->PC->equipment[6] == NULL) {
+        d->PC->equipment[6] = o;
+        return 0;
+      }
+      break;
+    case objtype_BOOTS:
+      if(d->PC->equipment[7] == NULL) {
+        d->PC->equipment[7] = o;
+        return 0;
+      }
+      break;
+    case objtype_AMULET:
+      if(d->PC->equipment[8] == NULL) {
+        d->PC->equipment[8] = o;
+        return 0;
+      }
+      break;
+    case objtype_LIGHT:
+      if(d->PC->equipment[9] == NULL) {
+        d->PC->equipment[9] = o;
+        return 0;
+      }
+      break;
+    case objtype_RING:
+      if(d->PC->equipment[10] == NULL) { 
+        d->PC->equipment[10] = o;
+       }
+      else if(d->PC->equipment[11] == NULL) {
+        d->PC->equipment[11] = o;
+        return 0;
+      }
+      break;
+    default:
+      // if inventory is not full, add object to inventory
+      int i;
+      for (i = 0; i < 10; i++) {
+        if(d->PC->inventory[i] == NULL) {
+          d->PC->inventory[i] = o;
+          return 0;
+        }
+      }
+      break;
+  }
+  return 1;
+}
