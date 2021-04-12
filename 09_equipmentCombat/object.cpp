@@ -139,8 +139,3 @@ int32_t object::equipmentIndex()
 
   return type - 1;
 }
-
-int32_t object::get_type()
-{
-  return type;
-}
