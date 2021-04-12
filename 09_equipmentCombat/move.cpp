@@ -56,7 +56,7 @@ void do_combat(dungeon *d, character *atk, character *def)
   if (def->alive) {
     def->alive = 0;
     charpair(def->position) = NULL;
-    
+
     if (def != d->PC) {
       d->num_monsters--;
     } else {
@@ -114,15 +114,17 @@ void do_combat(dungeon *d, character *atk, character *def)
 
 void move_character(dungeon *d, character *c, pair_t next)
 {
-  // if there is an object in the new position
-  if (d->objmap[next[dim_y]][next[dim_x]] != NULL) {
+  // if there is an object in the new position & c is the pc
+  if (d->objmap[next[dim_y]][next[dim_x]] != NULL && c == d->PC) {
     // equip the item
     int32_t success = pc_equip(d, d->objmap[next[dim_y]][next[dim_x]]);
-    if (success == 0) {
+    if (success == 0) { // if it successfully gets picked up
       // remove item from the object map
       d->objmap[next[dim_y]][next[dim_x]] = NULL;
+      // refresh speed and damage
+      pc_stat_refresh(d);
       // if it is an artifact, set as not again spawnable
-      //d->objmap[next[dim_y]][next[dim_x]].has_been_seen();
+      //d->objmap[next[dim_y]][next[dim_x]].has_been_seen(); ERROR??
     }
   }
   //if there is a character in the new position
