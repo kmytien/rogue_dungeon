@@ -270,22 +270,7 @@ uint32_t pc::wear(uint32_t emty_slot){
 
   io_queue_message("You're wearing %s.", equipment[x]->get_name());
 
-  newSpeed();
   isTrue = false;
-}
-
-void pc::newSpeed(){
-  int i;
-
-  for (speed = PC_SPEED, i = 0; i < num_equip_inv; i++) {
-    if (equipment[i]) {
-      speed += equipment[i]->get_speed();
-    }
-  }
-
-  if (speed <= 0) {
-    speed = 1;
-  }
 }
 
 void pc_remove_equipment(dungeon *d, int32_t emty_slot){
@@ -299,7 +284,6 @@ void pc_remove_equipment(dungeon *d, int32_t emty_slot){
   io_queue_message("You removed  %s.", equipment[emty_slot]->get_name());
 
   equipment[emty_slot] = NULL;
-  newSpeed();
 
   isTrue = false;
 
