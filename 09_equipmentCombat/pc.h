@@ -31,7 +31,10 @@ void pc_observe_terrain(pc *p, dungeon *d);
 int32_t is_illuminated(pc *p, int16_t y, int16_t x);
 void pc_reset_visibility(pc *p);
 
+uint32_t pc_wear(uint32_t emty_slot);
+ void pc_remove(dungeon *d, int32_t emty_slot);
 void init_slots(dungeon *d);
 int32_t pc_equip(dungeon *d, object *o);
+void pc_stat_refresh(dungeon *d);
 
 #endif
