@@ -114,6 +114,18 @@ void do_combat(dungeon *d, character *atk, character *def)
 
 void move_character(dungeon *d, character *c, pair_t next)
 {
+  // if there is an object in the new position
+  if (d->objmap[next[dim_y]][next[dim_x]] != NULL) {
+    // equip the item
+    int32_t success = pc_equip(d, d->objmap[next[dim_y]][next[dim_x]]);
+    if (success == 0) {
+      // remove item from the object map
+      d->objmap[next[dim_y]][next[dim_x]] = NULL;
+      // if it is an artifact, set as not again spawnable
+      //d->objmap[next[dim_y]][next[dim_x]].has_been_seen();
+    }
+  }
+  //if there is a character in the new position
   if (charpair(next) &&
       ((next[dim_y] != c->position[dim_y]) ||
        (next[dim_x] != c->position[dim_x]))) {
