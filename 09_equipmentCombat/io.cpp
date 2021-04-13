@@ -1119,7 +1119,7 @@ uint32_t io_wear_item(dungeon *d){
         refresh();
       }
 
-      if (!d->PC->pc_wear_item(pressKey - '0')){
+      if (!d->PC->pc_wear_item(d, pressKey - '0')){
         return 0;
       }
 
@@ -1166,7 +1166,7 @@ uint32_t io_remove_item(dungeon* d){
         refresh();
       }
 
-      if (!d->PC->pc_remove_equipment(pressKey - 'a')){
+      if (!d->PC->pc_remove_equipment(d, pressKey - 'a')){
         return 0;
       }
 
@@ -1208,7 +1208,7 @@ uint32_t io_drop_item(dungeon *d) {
       }
 
       //NEED TO CHANGE THIS TO DROP
-      if (!d->PC->pc_drop_equipment(pressKey - 'a')) {
+      if (!d->PC->pc_drop_equipment(d, pressKey - 'a')) {
         return 1;
       }
 
@@ -1249,7 +1249,7 @@ uint32_t io_permanent_itemRemoval(dungeon *d){
         refresh();
       }
 
-      if (!d->PC->pc_permanent_itemRemoval(pressKey - '0')) {
+      if (!d->PC->pc_permanent_itemRemoval(d, pressKey - '0')) {
       	io_display(d);
         return 1;
       }
