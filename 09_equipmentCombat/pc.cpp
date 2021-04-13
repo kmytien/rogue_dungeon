@@ -255,7 +255,7 @@ void pc_see_object(character *the_pc, object *o)
   }
 }
 
-uint32_t pc::wear(uint32_t emty_slot){
+void pc_wear_item(dungeon *d, uint32_t emty_slot){
   if(!inventory[emty_slot] || !inventory[emty_slot]->wearable()){
         isTrue = true;
   }
@@ -273,15 +273,25 @@ uint32_t pc::wear(uint32_t emty_slot){
   isTrue = false;
 }
 
-void pc_remove_equipment(dungeon *d, int32_t emty_slot){
+void isEmpty(){
+  int i;
+  for(i = 0, i < 10, i++)
+    if(!inventory[i]){
+      isTrue = true;
+    }
+
+  isTrue = false;
+}
+
+void pc_remove_equipment(dungeon *d, uint32_t emty_slot){
   // at given index make equipment = NULL
-  d->PC->equipment[i] = NULL;
-  if(!inventory[emty_slot] || !inventory[emty_slot]->/*method for removing item*/ || emty_slot = NULL){
+  //d->PC->equipment[i] = NULL;
+  if(!inventory[emty_slot] || !isEmpty()){
       io_queue_message("Cannot be removed, nowhere to place it  %s", equipment[emty_slot]->get_name());
       isTrue = true;
   }
 
-  io_queue_message("You removed  %s.", equipment[emty_slot]->get_name());
+  io_queue_message("You have removed  %s.", equipment[emty_slot]->get_name());
 
   equipment[emty_slot] = NULL;
 
@@ -289,10 +299,35 @@ void pc_remove_equipment(dungeon *d, int32_t emty_slot){
 
 }
 
-void pc_remove_inventory(dungeon *d, int32_t i){
+void pc_drop_equipment(dungeon *d, uint32_t emty_slot){
+  if(!inventory[emty_slot]){
+    isTrue = true;
+  }
+
+  io_queue_message("You droped %s.", inventory[emty_slot]->get_name());
+
+  inventory[emty_slot] = /*current pos of th epc*/;
+  inventory[emty_slot] = NULL;
+
+}
+
+void pc_permanent_itemRemoval(dungeon *d, uint32_t emty_slot){
+    if(!inventory[emty_slot]){
+      isTrue = true;
+    }
+
+    io_queue_message("You have destroyed %s.", inventory[emty_slot]->get_name());
+
+    delete inventory[emty_slot];
+    inventory[emty_slot] = NULL;
+
+    isTrue = false;
+}
+
+/*void pc_remove_inventory(dungeon *d, int32_t i){
   // at given index make equipment = NULL
   d->PC->inventory[i] = NULL;
-}
+}*/
 
 // int all slots to no_type objects
 void init_slots(dungeon *d) {
@@ -308,7 +343,6 @@ void init_slots(dungeon *d) {
 
 // add equipment to the pc's equipment slots
 int32_t pc_equip(dungeon *d, object *o) {
-  int32_t i = 0;
   // if the item is equipment and the slot is open
   switch(o->get_type()) {
     case objtype_WEAPON:
@@ -316,100 +350,70 @@ int32_t pc_equip(dungeon *d, object *o) {
         d->PC->equipment[0] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, &o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_OFFHAND:
       if(d->PC->equipment[1] == NULL) {
         d->PC->equipment[1] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_RANGED:
       if(d->PC->equipment[2] == NULL) {
         d->PC->equipment[2] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_ARMOR:
       if(d->PC->equipment[3] == NULL) {
         d->PC->equipment[3] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_HELMET:
       if(d->PC->equipment[4] == NULL) {
         d->PC->equipment[4] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_CLOAK:
       if(d->PC->equipment[5] == NULL) {
         d->PC->equipment[5] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_GLOVES:
       if(d->PC->equipment[6] == NULL) {
         d->PC->equipment[6] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_BOOTS:
       if(d->PC->equipment[7] == NULL) {
         d->PC->equipment[7] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_AMULET:
       if(d->PC->equipment[8] == NULL) {
         d->PC->equipment[8] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_LIGHT:
       if(d->PC->equipment[9] == NULL) {
         d->PC->equipment[9] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
       break;
     case objtype_RING:
       if(d->PC->equipment[10] == NULL) {
@@ -419,14 +423,11 @@ int32_t pc_equip(dungeon *d, object *o) {
         d->PC->equipment[11] = o;
         return 0;
       }
-      else {
-        i = pc_take(d, o);
-        if (i == 0) return 0;
-      }
+      else if (pc_take(d, o) == 0) return 0;
+
       break;
     default:
-      i = pc_take(d, o);
-      if (i == 0) return 0;
+      if (pc_take(d, o) == 0) return 0;
       break;
   }
   return 1;
@@ -463,7 +464,7 @@ void pc_stat_refresh(dungeon *d) { // called when picking up DONE an item and eq
     }
   }
   // update speed number
-  d->PC->speed = sp;
+  d->PC.speed = sp;
   // update damage dice
   static dice pc_dice(ba, nu, si);
   d->PC->damage = &pc_dice;
