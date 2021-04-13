@@ -1090,7 +1090,7 @@ void io_convertObject(object *o, char *c, uint32_t size) {
 
 
 //wear item
-void io_wear_item(dungeon *d, uint32_t empty_slot){
+void io_wear_item(dungeon *d){
     uint32_t i, pressKey, x;
     bool isTrue = true;
     char c[80];
@@ -1120,7 +1120,7 @@ void io_wear_item(dungeon *d, uint32_t empty_slot){
         refresh();
       }
 
-      if (!d->PC->wear(pressKey - '0')){
+      if (!d->PC->pc_wear_item(pressKey - '0')){
         isTrue = false
       }
 
@@ -1167,7 +1167,7 @@ void io_remove_item(dungeon* d){
         refresh();
       }
 
-      if (!d->PC->remove(pressKey - 'a'){
+      if (!d->PC->pc_remove_equipment(pressKey - 'a'){
         isTrue = false;
       }
 
@@ -1184,9 +1184,9 @@ void io_remove_item(dungeon* d){
 
 //drops an item on the floor -- case 'd': use pc_remove_inventory
 void io_drop_item(dungeon *d) {
-    int c, i;
+    int i, pressKey;
     char* foo;
-    bool in = true;
+    bool isTrue = true;
 
     for (i = 0; i < 10; i++) {
       io_convertObject(d->PC->equipment[i], foo, 80);
@@ -1198,23 +1198,23 @@ void io_drop_item(dungeon *d) {
     mvprintw(19, 15, " %-60s ", "");
     refresh();
 
-    while (in) {
+    while (isTrue) {
       // have to use getch()
-      if ((key = getch()) == 27) {
+      if ((pressKey = getch()) == 27) {
         io_display(d);
       }
 
-      if (key < '0' || key > '9') {
+      if (pressKey < 'a' || pressKey > 'l') {
         mvprintw(20, 15, " %-60s ", "Invalid entry. Must be keys 0-9.");
         refresh();
       }
 
       //NEED TO CHANGE THIS TO DROP
-      if (!d->PC->remove(pressKey - '0') {
+      if (!d->PC->pc_drop_equipment(pressKey - 'a') {
         in = false;
       }
 
-      mvprintw(17, 15, "Cannot drop item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
+      mvprintw(17, 15, "Cannot drop item %s, please try again!", d->PC->equipment[pressKey - 'a']->get_name());
       mvprintw(18, 15, " %-60s ", "");
       refresh();
     }
@@ -1226,7 +1226,7 @@ void io_drop_item(dungeon *d) {
 
 
 //permanently removes item from game
-void io_permanent_itemRemoval(){
+void io_permanent_itemRemoval(dungeon *d){
 
     uint32_t i, pressKey;
     bool isTrue = true;
@@ -1250,6 +1250,10 @@ void io_permanent_itemRemoval(){
       if (pressKey < '0' || pressKey > '9') {
         mvprintw(20, 15, " %-60s ", "Numbers have to be between 0 and 9");
         refresh();
+      }
+
+      if (!d->PC->pc_permanent_itemRemoval(pressKey - '0') {
+        in = false;
       }
 
       mvprintw(17, 15, "Cannot destroy the item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
