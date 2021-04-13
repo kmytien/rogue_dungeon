@@ -7,6 +7,8 @@
 # include "character.h"
 # include "dungeon.h"
 
+class dungeon;
+
 class pc : public character {
  public:
   ~pc() {}
@@ -16,10 +18,10 @@ class pc : public character {
 
   terrain_type known_terrain[DUNGEON_Y][DUNGEON_X];
   uint8_t visible[DUNGEON_Y][DUNGEON_X];
-  uint32_t pc_wear_item(uint32_t empty_slot);
-  uint32_t pc_remove_equipment(uint32_t empty_slot);
-  uint32_t pc_drop_equipment(uint32_t empty_slot);
-  uint32_t pc_permanent_itemRemoval(uint32_t empty_slot);
+  uint32_t pc_wear_item(dungeon *d, uint32_t empty_slot);
+  uint32_t pc_remove_equipment(dungeon *d, uint32_t empty_slot);
+  uint32_t pc_drop_equipment(dungeon *d, uint32_t empty_slot);
+  uint32_t pc_permanent_itemRemoval(dungeon *d, uint32_t empty_slot);
 };
 
 void pc_delete(pc *pc);
