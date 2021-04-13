@@ -112,9 +112,6 @@ uint32_t object::wearable()
   return type >= objtype_WEAPON && type <= objtype_RING;
 }
 
-
-
-
 void destroy_objects(dungeon *d)
 {
   uint32_t y, x;
@@ -138,4 +135,9 @@ int32_t object::equipmentIndex()
   }
 
   return type - 1;
+}
+
+int32_t object::get_type()
+{
+  return type;
 }
