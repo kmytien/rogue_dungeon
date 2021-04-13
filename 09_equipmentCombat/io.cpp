@@ -1183,7 +1183,7 @@ uint32_t io_remove_item(dungeon* d){
 //drops an item on the floor -- case 'd': use pc_remove_inventory
 uint32_t io_drop_item(dungeon *d) {
     int i, pressKey;
-    char* foo;
+    char foo[80];
 
     for (i = 0; i < 10; i++) {
       io_convertObject(d->PC->equipment[i], foo, 80);
@@ -1315,7 +1315,7 @@ void io_inspect_item(dungeon *d) {
   int i, key, out = 0;
   char foo[80]; //prob can't use a char pointer? need to look into this
   char alpha[] = "abcdefghijkl";
-  char* output;
+  char output[80];
 
   for (i = 0; i < 12; i++) {
     //need to display item name, speed, and damage
@@ -1380,7 +1380,7 @@ void io_inspect_item(dungeon *d) {
 void io_look_monster(dungeon *d) {
 
   int c, out = 0;
-  char* output1;
+  char output1[80];
   pair_t current;
   current[dim_x] = d->PC->position[dim_x];
   current[dim_y] = d->PC->position[dim_y];
@@ -1470,7 +1470,7 @@ void io_look_monster(dungeon *d) {
         else {
           snprintf(output1, 80, "%s: (speed: %d, damage: %d+%dd%d, hp: %d)",
                    charpair(current)->name, charpair(current)->speed,
-                   charpair(current)->damage->get_base(), charpair(current)->damage->get_number(), charpair(current)->damage->get_sides());
+                   charpair(current)->damage->get_base(), charpair(current)->damage->get_number(), charpair(current)->damage->get_sides(), charpair(current)->get_hp());
 
           mvprintw(7, 5, "%s", output1);
           mvprintw(8, 5, "%s", ((npc *)charpair(current))->description);
