@@ -1015,6 +1015,7 @@ void io_handle_input(dungeon *d)
 
     //drop item t floor
     case 'd':
+      io_drop_item(d);
       break;
 
     //remove item from game
@@ -1097,13 +1098,13 @@ uint32_t io_wear_item(dungeon *d){
     //assuming it goes up to 10? was *inventory before
     //putItem is not a member in class pc**
     for (i = 0; i < 10; i++) {
-      io_convertObject(d->PC->equipment[i], c, 80); //need to add size**
-      mvprintw(i + 5, 15, " %-60s ", "");
+      io_convertObject(d->PC->inventory[i], c, 80); //need to add size**
+      mvprintw(i, 0, " %c) %-55s ", '0' + i, c);
     }
 
-    mvprintw(17, 15, " %-60s ", "");
+    mvprintw(17, 15, " %-60s ", "\n");
     mvprintw(18, 15, " %-60s ", "Select an item");
-    mvprintw(19, 15, " %-60s ", "");
+    mvprintw(19, 15, " %-60s ", "\n");
 
     refresh();
 
@@ -1115,16 +1116,21 @@ uint32_t io_wear_item(dungeon *d){
       }
 
       if (pressKey < '0' || pressKey > '9') {
-        mvprintw(20, 15, " %-60s ", "Numbers have to be between 0 and 9");
+        mvprintw(20, 15, " %-60s ", "Numbers have to be between 0 and 9 (ESC to leave)");
         refresh();
       }
+      
+      if (!d->PC->inventory[pressKey - '0']){
+      	mvprintw(20, 0, "Inventory is empty. Go pick something up first.");
+      	continue;
+    }
 
       if (!d->PC->pc_wear_item(d, pressKey - '0')){
         return 0;
       }
 
       mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
-      mvprintw(18, 15, " %-60s ", "");
+      mvprintw(18, 15, " %-60s ", c);
       refresh();
     }
 
@@ -1138,20 +1144,21 @@ uint32_t io_remove_item(dungeon* d){
 
     // remove item
     uint32_t i, pressKey;
-    char ch[80];
+    char ch[80], p[80];
 
     //assuming that it goes to 12? was *equipment before
     for(i = 0; i < 12; i++) {
-      io_convertObject(d->PC->equipment[i], ch, 80);
-      mvprintw(i, 0, " %c %-60s) %-60s ", 'a' + i, ch);
+      //sprintf(ch, "[%s]", d->PC->equipment[i]->get_description());
+      io_convertObject(d->PC->equipment[i], p, 80);
+      mvprintw(i,  0, " %c) %-60s ", 'a' + i, ch, p);
     }
 
     //brings up inventory for equiptment
     //item goes to empty slot
 
-    mvprintw(17, 15, " %-60s ", "");
+    mvprintw(17, 15, " %-60s ", "\n");
     mvprintw(18, 15, " %-60s ", "Which item do you want taken out?");
-    mvprintw(19, 15, " %-60s ", "");
+    mvprintw(19, 15, " %-60s ", "\n");
     refresh();
 
     while (1) {
@@ -1186,8 +1193,7 @@ uint32_t io_drop_item(dungeon *d) {
     char foo[80];
 
     for (i = 0; i < 10; i++) {
-      io_convertObject(d->PC->equipment[i], foo, 80);
-      mvprintw(i + 5, 15, "%d) %s", i, foo);
+      mvprintw(i + 6, 18, " %c) %-60s ", '0' + i, d->PC->inventory[i] ? d->PC->inventory[i]->get_name() : "");
     }
 
     mvprintw(17, 15, " %-60s ", "");
@@ -1202,7 +1208,8 @@ uint32_t io_drop_item(dungeon *d) {
         return 1;
       }
 
-      if (pressKey < 'a' || pressKey > 'l') {
+      if (pressKey < '0' || pressKey > '9') {
+      	snprintf(foo, 80, "Invalid input: '%c'.  Enter 0-9 or ESC to cancel.", pressKey);
         mvprintw(20, 15, " %-60s ", "Invalid entry. Must be keys 0-9.");
         refresh();
       }
@@ -1218,7 +1225,6 @@ uint32_t io_drop_item(dungeon *d) {
     }
 
     return 1;
-    refresh();
     pc_stat_refresh(d);
 }
 
