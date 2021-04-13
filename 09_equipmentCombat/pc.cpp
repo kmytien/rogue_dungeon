@@ -255,7 +255,7 @@ void pc_see_object(character *the_pc, object *o)
   }
 }
 
-uint32_t pc_wear_item(dungeon *d, uint32_t empty_slot){
+uint32_t pc::pc_wear_item(dungeon *d, uint32_t empty_slot){
 	int x;
 	object* tempArray;
 
@@ -290,7 +290,7 @@ bool isEmpty(dungeon *d){
   return false;
 }
 
-uint32_t pc_remove_equipment(dungeon *d, uint32_t empty_slot){
+uint32_t pc::pc_remove_equipment(dungeon *d, uint32_t empty_slot){
   // at given index make equipment = NULL
   //d->PC->equipment[i] = NULL;
 
@@ -307,7 +307,7 @@ uint32_t pc_remove_equipment(dungeon *d, uint32_t empty_slot){
 
 }
 
-uint32_t pc_drop_equipment(dungeon *d, uint32_t empty_slot){
+uint32_t pc::pc_drop_equipment(dungeon *d, uint32_t empty_slot){
 
   if(!d->PC->inventory[empty_slot]){
     return 1; //this doesn't do anything, do you mean to make this function return bool or int?
@@ -321,7 +321,7 @@ uint32_t pc_drop_equipment(dungeon *d, uint32_t empty_slot){
 	return 0;
 }
 
-uint32_t pc_permanent_itemRemoval(dungeon *d, uint32_t empty_slot){
+uint32_t pc::pc_permanent_itemRemoval(dungeon *d, uint32_t empty_slot){
 
     if(!d->PC->inventory[empty_slot]){
       return 1;
