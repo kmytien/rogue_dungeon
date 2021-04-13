@@ -10,10 +10,10 @@
 class pc : public character {
  public:
   ~pc() {}
- 
+
   object *equipment[12]; // [WEAPON][OFFHAND][RANGED][ARMOR][HELMET][CLOAK][GLOVES][BOOTS][AMULET][LIGHT][RING][RING]
   object *inventory[10];
- 
+
   terrain_type known_terrain[DUNGEON_Y][DUNGEON_X];
   uint8_t visible[DUNGEON_Y][DUNGEON_X];
 };
@@ -31,8 +31,10 @@ void pc_observe_terrain(pc *p, dungeon *d);
 int32_t is_illuminated(pc *p, int16_t y, int16_t x);
 void pc_reset_visibility(pc *p);
 
-uint32_t pc_wear(uint32_t emty_slot);
- void pc_remove(dungeon *d, int32_t emty_slot);
+void pc_wear_item(dungeon *d, uint32_t emty_slot);
+void pc_remove_equipment(dungeon *d, int32_t emty_slot);
+void pc_drop_equipment(dungeon *d, int32_t emty_slot);
+void pc_permanent_itemRemoval(dungeon *d, uint32_t emty_slot);
 void init_slots(dungeon *d);
 int32_t pc_equip(dungeon *d, object *o);
 void pc_stat_refresh(dungeon *d);
