@@ -16,6 +16,10 @@ class pc : public character {
 
   terrain_type known_terrain[DUNGEON_Y][DUNGEON_X];
   uint8_t visible[DUNGEON_Y][DUNGEON_X];
+  uint32_t pc_wear_item(uint32_t empty_slot);
+  uint32_t pc_remove_equipment(uint32_t empty_slot);
+  uint32_t pc_drop_equipment(uint32_t empty_slot);
+  uint32_t pc_permanent_itemRemoval(uint32_t empty_slot);
 };
 
 void pc_delete(pc *pc);
@@ -32,10 +36,7 @@ int32_t is_illuminated(pc *p, int16_t y, int16_t x);
 void pc_reset_visibility(pc *p);
 
 int32_t pc_take(dungeon *d, object *o);
-uint32_t pc_wear_item(dungeon *d, uint32_t empty_slot);
-uint32_t pc_remove_equipment(dungeon *d, int32_t empty_slot);
-uint32_t pc_drop_equipment(dungeon *d, int32_t empty_slot);
-uint32_t pc_permanent_itemRemoval(dungeon *d, uint32_t empty_slot);
+
 void init_slots(dungeon *d);
 int32_t pc_equip(dungeon *d, object *o);
 void pc_stat_refresh(dungeon *d);
