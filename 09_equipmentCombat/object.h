@@ -37,7 +37,6 @@ class object {
   uint32_t get_color();
   const char *get_name();
   int32_t get_speed();
-  int32_t get_speed();
   int32_t roll_dice();
   int32_t get_type();
   int32_t equipmentIndex();
