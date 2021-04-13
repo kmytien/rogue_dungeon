@@ -47,7 +47,7 @@ void config_pc(dungeon *d)
   d->PC->name = "Isabella Garcia-Shapiro";
 
   //new to 1.09
-  d->PC->hp = 100;
+  d->PC->hp = 3000;
 
   d->character_map[d->PC->position[dim_y]][d->PC->position[dim_x]] = d->PC;
 
