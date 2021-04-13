@@ -256,6 +256,7 @@ void pc_see_object(character *the_pc, object *o)
 }
 
 void pc_wear_item(dungeon *d, uint32_t emty_slot){
+  object *temp
   if(!inventory[emty_slot] || !inventory[emty_slot]->wearable()){
         isTrue = true;
   }
@@ -264,7 +265,7 @@ void pc_wear_item(dungeon *d, uint32_t emty_slot){
   if(equipment[x] && ((equipment[x]->get_type() == objtype_RING) && !equipment[x + 1])){
         x++;
   }
-  tempArray = inventory[emty_slot];
+  temp = inventory[emty_slot];
   inventory[emty_slot] = equipment[x];
   equipment[x] = tempArray;
 
