@@ -38,6 +38,7 @@ class character {
   uint32_t kills[num_kill_types];
   inline uint32_t get_color() { return color[rand_range(0, color.size() - 1)]; }
   inline char get_symbol() { return symbol; }
+  inline uint32_t get_hp() { return hp; }
 };
 
 class dungeon;
