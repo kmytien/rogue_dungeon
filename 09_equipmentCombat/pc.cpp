@@ -255,74 +255,84 @@ void pc_see_object(character *the_pc, object *o)
   }
 }
 
-void pc_wear_item(dungeon *d, uint32_t emty_slot){
-  object *temp
-  if(!inventory[emty_slot] || !inventory[emty_slot]->wearable()){
-        isTrue = true;
+uint32_t pc_wear_item(dungeon *d, uint32_t empty_slot){
+	int x;
+	object* tempArray;
+
+  if(!d->PC->inventory[empty_slot] || !d->PC->inventory[empty_slot]->wearable()){
+        return 1;
   }
 
-  x = inventory[emty_slot]->equiptmentIndex()
-  if(equipment[x] && ((equipment[x]->get_type() == objtype_RING) && !equipment[x + 1])){
+  x = d->PC->inventory[empty_slot]->equipmentIndex();
+  if(d->PC->equipment[x] && ((d->PC->equipment[x]->get_type() == objtype_RING) && !d->PC->equipment[x + 1])){
         x++;
   }
-  temp = inventory[emty_slot];
-  inventory[emty_slot] = equipment[x];
-  equipment[x] = tempArray;
+	
+	//what is array is temparray
+  tempArray = d->PC->inventory[empty_slot];
+  d->PC->inventory[empty_slot] = d->PC->equipment[x];
+  d->PC->equipment[x] = tempArray;
 
-  io_queue_message("You're wearing %s.", equipment[x]->get_name());
+  io_queue_message("You're wearing %s.", d->PC->equipment[x]->get_name());
 
-  isTrue = false;
+  return 0;
 }
 
-void isEmpty(){
+//changed void function to bool
+bool isEmpty(dungeon *d){
   int i;
-  for(i = 0, i < 10, i++)
-    if(!inventory[i]){
-      isTrue = true;
+
+  for(i = 0; i < 10; i++)
+    if(!d->PC->inventory[i]) {
+      return true;
     }
 
-  isTrue = false;
+  return false;
 }
 
-void pc_remove_equipment(dungeon *d, uint32_t emty_slot){
+uint32_t pc_remove_equipment(dungeon *d, uint32_t empty_slot){
   // at given index make equipment = NULL
   //d->PC->equipment[i] = NULL;
-  if(!inventory[emty_slot] || !isEmpty()){
-      io_queue_message("Cannot be removed, nowhere to place it  %s", equipment[emty_slot]->get_name());
-      isTrue = true;
+
+  if (!d->PC->inventory[empty_slot] || !isEmpty(d)){
+      io_queue_message("Cannot be removed, nowhere to place it  %s", d->PC->equipment[empty_slot]->get_name());
+      return 1;
   }
 
-  io_queue_message("You have removed  %s.", equipment[emty_slot]->get_name());
+  io_queue_message("You have removed  %s.", d->PC->equipment[empty_slot]->get_name());
 
-  equipment[emty_slot] = NULL;
+  d->PC->equipment[empty_slot] = NULL;
 
-  isTrue = false;
+  return 0;
 
 }
 
-void pc_drop_equipment(dungeon *d, uint32_t emty_slot){
-  if(!inventory[emty_slot]){
-    isTrue = true;
+uint32_t pc_drop_equipment(dungeon *d, uint32_t empty_slot){
+
+  if(!d->PC->inventory[empty_slot]){
+    return 1; //this doesn't do anything, do you mean to make this function return bool or int?
   }
 
-  io_queue_message("You droped %s.", inventory[emty_slot]->get_name());
+  io_queue_message("You dropped %s.", d->PC->inventory[empty_slot]->get_name());
 
-  inventory[emty_slot] = /*current pos of th epc*/;
-  inventory[emty_slot] = NULL;
+  //d->PC->inventory[empty_slot] = /*current pos of the pc*/;
+  d->PC->inventory[empty_slot] = NULL;
 
+	return 0;
 }
 
-void pc_permanent_itemRemoval(dungeon *d, uint32_t emty_slot){
-    if(!inventory[emty_slot]){
-      isTrue = true;
+uint32_t pc_permanent_itemRemoval(dungeon *d, uint32_t empty_slot){
+
+    if(!d->PC->inventory[empty_slot]){
+      return 1;
     }
 
-    io_queue_message("You have destroyed %s.", inventory[emty_slot]->get_name());
+    io_queue_message("You have destroyed %s.", d->PC->inventory[empty_slot]->get_name());
 
-    delete inventory[emty_slot];
-    inventory[emty_slot] = NULL;
+    delete d->PC->inventory[empty_slot];
+    d->PC->inventory[empty_slot] = NULL;
 
-    isTrue = false;
+    return 0;
 }
 
 /*void pc_remove_inventory(dungeon *d, int32_t i){
@@ -457,15 +467,15 @@ void pc_stat_refresh(dungeon *d) { // called when picking up DONE an item and eq
   for(i = 0; i < 12; i++) {
     if(d->PC->equipment[i] != NULL) {
       // update sp
-      sp += d->PC->equipment[i].get_speed();
+      sp += d->PC->equipment[i]->get_speed();
       //update ba nu si
-      ba += d->PC->equipment[i].get_damage_base();
-      nu += d->PC->equipment[i].get_damage_number();
-      si += d->PC->equipment[i].get_damage_sides();
+      ba += d->PC->equipment[i]->get_damage_base();
+      nu += d->PC->equipment[i]->get_damage_number();
+      si += d->PC->equipment[i]->get_damage_sides();
     }
   }
   // update speed number
-  d->PC.speed = sp;
+  d->PC->speed = sp;
   // update damage dice
   static dice pc_dice(ba, nu, si);
   d->PC->damage = &pc_dice;
