@@ -15,124 +15,136 @@
 #include "event.h"
 #include "io.h"
 #include "npc.h"
+#include "dice.h"
 
 void do_combat(dungeon *d, character *atk, character *def)
 {
-  int can_see_atk, can_see_def;
-  const char *organs[] = {
-    "liver",                   /*  0 */
-    "pancreas",                /*  1 */
-    "heart",                   /*  2 */
-    "eye",                     /*  3 */
-    "arm",                     /*  4 */
-    "leg",                     /*  5 */
-    "intestines",              /*  6 */
-    "gall bladder",            /*  7 */
-    "lungs",                   /*  8 */
-    "hand",                    /*  9 */
-    "foot",                    /* 10 */
-    "spinal cord",             /* 11 */
-    "pituitary gland",         /* 12 */
-    "thyroid",                 /* 13 */
-    "tongue",                  /* 14 */
-    "bladder",                 /* 15 */
-    "diaphram",                /* 16 */
-    "stomach",                 /* 17 */
-    "pharynx",                 /* 18 */
-    "esophagus",               /* 19 */
-    "trachea",                 /* 20 */
-    "urethra",                 /* 21 */
-    "spleen",                  /* 22 */
-    "ganglia",                 /* 23 */
-    "ear",                     /* 24 */
-    "subcutaneous tissue"      /* 25 */
-    "cerebellum",              /* 26 */ /* Brain parts begin here */
-    "hippocampus",             /* 27 */
-    "frontal lobe",            /* 28 */
-    "brain",                   /* 29 */
-  };
-  int part;
-
-  if (def->alive) {
-    def->alive = 0;
-    charpair(def->position) = NULL;
-
-    if (def != d->PC) {
-      d->num_monsters--;
-    } else {
-      if ((part = rand() % (sizeof (organs) / sizeof (organs[0]))) < 26) {
-        io_queue_message("As %s%s eats your %s,", is_unique(atk) ? "" : "the ",
-                         atk->name, organs[rand() % (sizeof (organs) /
-                                                     sizeof (organs[0]))]);
-        io_queue_message("   ...you wonder if there is an afterlife.");
-        /* Queue an empty message, otherwise the game will not pause for *
-         * player to see above.                                          */
-        io_queue_message("");
-      } else {
-        io_queue_message("Your last thoughts fade away as "
-                         "%s%s eats your %s...",
-                         is_unique(atk) ? "" : "the ",
-                         atk->name, organs[part]);
-        io_queue_message("");
-      }
-      /* Queue an empty message, otherwise the game will not pause for *
-       * player to see above.                                          */
-      io_queue_message("");
+    uint32_t dam;
+    const char *organs[] = {
+      "liver",                   /*  0 */
+      "pancreas",                /*  1 */
+      "heart",                   /*  2 */
+      "eye",                     /*  3 */
+      "arm",                     /*  4 */
+      "leg",                     /*  5 */
+      "intestines",              /*  6 */
+      "gall bladder",            /*  7 */
+      "lungs",                   /*  8 */
+      "hand",                    /*  9 */
+      "foot",                    /* 10 */
+      "spinal cord",             /* 11 */
+      "pituitary gland",         /* 12 */
+      "thyroid",                 /* 13 */
+      "tongue",                  /* 14 */
+      "bladder",                 /* 15 */
+      "diaphram",                /* 16 */
+      "stomach",                 /* 17 */
+      "pharynx",                 /* 18 */
+      "esophagus",               /* 19 */
+      "trachea",                 /* 20 */
+      "urethra",                 /* 21 */
+      "spleen",                  /* 22 */
+      "ganglia",                 /* 23 */
+      "ear",                     /* 24 */
+      "subcutaneous tissue"      /* 25 */
+      "cerebellum",              /* 26 */ /* Brain parts begin here */
+      "hippocampus",             /* 27 */
+      "frontal lobe",            /* 28 */
+      "brain",                   /* 29 */
+    };
+    if (def->alive)
+    {
+      pc_stat_refresh(d);
+      dam = atk->damage->roll();
+      //if attacker not pc then give diff message
+      if (atk != d->PC) io_queue_message("The %s %s your %s for %d damage.",atk->name, "stabs", 
+                             organs[rand() % (sizeof(organs) / sizeof(organs[0]))], dam);
+      // since attacker is the pc, give pc dam message
+      else io_queue_message("You hit the %s for %d damage.", def->name, dam);
+	
+      // if the hit kills def (old combat code)
+      if (dam >= def->hp) {
+        // if pc isnt killed (old combat code)
+        if (atk != d->PC) {
+           io_queue_message("You die.");
+            io_queue_message("As %s%s eats your %s,", is_unique(atk) ? "" : "the ",
+                             atk->name, organs[rand() % (sizeof(organs) / sizeof(organs[0]))]);
+            io_queue_message("   ...you wonder if there is an afterlife.");
+            /* Queue an empty message, otherwise the game will not pause for *
+             * player to see above.                                          */
+             io_queue_message("");
+        } else {
+          io_queue_message("%s%s dies.", is_unique(def) ? "" : "The ", def->name);
+        }
+        def->hp = 0;
+        def->alive = 0;
+        character_increment_dkills(atk);
+        character_increment_ikills(atk, (character_get_dkills(def) +
+                                         character_get_ikills(def)));
+        if (def != d->PC) {
+          d->num_monsters--;
+        }
+          charpair(def->position) = NULL;
+      } 
+      // if the hit doesnt kill then just subtract it from defs hp
+      else def->hp -= dam;
     }
-    atk->kills[kill_direct]++;
-    atk->kills[kill_avenged] += (def->kills[kill_direct] +
-                                  def->kills[kill_avenged]);
-  }
-
-  if (atk == d->PC) {
-    io_queue_message("You smite %s%s!", is_unique(def) ? "" : "the ", def->name);
-  }
-
-  can_see_atk = can_see(d, character_get_pos(d->PC),
-                        character_get_pos(atk), 1, 0);
-  can_see_def = can_see(d, character_get_pos(d->PC),
-                        character_get_pos(def), 1, 0);
-
-  if (atk != d->PC && def != d->PC) {
-    if (can_see_atk && !can_see_def) {
-      io_queue_message("%s%s callously murders some poor, "
-                       "defenseless creature.",
-                       is_unique(atk) ? "" : "The ", atk->name);
-    }
-    if (can_see_def && !can_see_atk) {
-      io_queue_message("Something kills %s%s.",
-                       is_unique(def) ? "" : "the helpless ", def->name);
-    }
-    if (can_see_atk && can_see_def) {
-      io_queue_message("You watch in abject horror as %s%s "
-                       "gruesomely murders %s%s!",
-                       is_unique(atk) ? "" : "the ", atk->name,
-                       is_unique(def) ? "" : "the ", def->name);
-    }
-  }
 }
 
 void move_character(dungeon *d, character *c, pair_t next)
 {
+  //int can_see_atk, can_see_def;   
+  pair_t cell;
+  uint32_t valid_cell;
+  // WHATS USED TO MAKE EASY SHIFTING, RECOMMENDED BY SCHAEFFER AND PIAZZA(?)
+  pair_t p[9] = { {-1, -1},{-1, 0},{-1, 1},{0, -1},{0, 0},{0, 1},{1, -1},{1, 0},{1, 1}, };
+  uint32_t s, i;  
+  
+  // EQUIP CALL CODE
   // if there is an object in the new position & c is the pc
   if (d->objmap[next[dim_y]][next[dim_x]] != NULL && c == d->PC) {
     // equip the item
     int32_t success = pc_equip(d, d->objmap[next[dim_y]][next[dim_x]]);
-    if (success == 0) { // if it successfully gets picked up
+    if (success == 0) {
       // remove item from the object map
       d->objmap[next[dim_y]][next[dim_x]] = NULL;
-      // refresh speed and damage
       pc_stat_refresh(d);
       // if it is an artifact, set as not again spawnable
-      //d->objmap[next[dim_y]][next[dim_x]].has_been_seen(); ERROR??
+      //d->objmap[next[dim_y]][next[dim_x]].has_been_seen();
     }
   }
+  
   //if there is a character in the new position
   if (charpair(next) &&
       ((next[dim_y] != c->position[dim_y]) ||
        (next[dim_x] != c->position[dim_x]))) {
-    do_combat(d, c, charpair(next));
-  } else {
+    // if pc is def or atk do combat
+    if ((charpair(next) == d->PC) || c == d->PC) do_combat(d, c, charpair(next));
+    // else move mons out of the way
+    else {
+      // for random num till cell is valid or for all the p pairs
+      for (s = rand() % 9, valid_cell = i = 0; i < 9 && !valid_cell; i++) {
+        // cell is next + adjusted val (p[s%9] was on Piazza)
+        cell[dim_y] = next[dim_y] + p[s%9][dim_y];
+        cell[dim_x] = next[dim_x] + p[s%9][dim_x];
+        // if can pass wall or if cell has atk or is empty then its valid
+        if ((((npc *) charpair(next))->characteristics & NPC_PASS_WALL) && (!charpair(cell) || (charpair(cell) == c))) {
+          valid_cell = 1;
+        }
+        // else if theres no char and its not wall or if atk is there then its valid
+        else if ((!charpair(cell) && (mappair(cell) >= ter_floor)) || (charpair(cell) == c)) valid_cell = 1;
+      }
+      // set positions
+      charpair(c->position) = NULL;
+      charpair(cell) = charpair(next);
+      charpair(next) = c;
+      charpair(cell)->position[dim_y] = cell[dim_y];
+      charpair(cell)->position[dim_x] = cell[dim_x];
+      c->position[dim_y] = next[dim_y];
+      c->position[dim_x] = next[dim_x];
+    }
+  } 
+  else {
     /* No character in new position. */
 
     d->character_map[c->position[dim_y]][c->position[dim_x]] = NULL;
