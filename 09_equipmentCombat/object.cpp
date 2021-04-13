@@ -87,6 +87,10 @@ uint32_t object::get_color()
   return color;
 }
 
+const char *object::get_description() {
+  return description.c_str();
+}
+
 const char *object::get_name()
 {
   return name.c_str();
