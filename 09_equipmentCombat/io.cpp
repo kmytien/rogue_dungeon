@@ -1090,10 +1090,9 @@ void io_convertObject(object *o, char *c, uint32_t size) {
 
 
 //wear item
-int io_wear_item(dungeon *d){
-    uint32_t i, pressKey, x;
+uint32_t io_wear_item(dungeon *d){
+    uint32_t i, pressKey;
     char c[80];
-    object* tempArray;
 
     //assuming it goes up to 10? was *inventory before
     //putItem is not a member in class pc**
@@ -1112,6 +1111,7 @@ int io_wear_item(dungeon *d){
       // have to use getch()
       if ((pressKey = getch()) == 27){
         io_display(d);
+        return 1;
       }
 
       if (pressKey < '0' || pressKey > '9') {
@@ -1119,7 +1119,7 @@ int io_wear_item(dungeon *d){
         refresh();
       }
 
-      if (!pc_wear_item(pressKey - '0')){
+      if (!d->PC->pc_wear_item(pressKey - '0')){
         return 0;
       }
 
@@ -1134,11 +1134,10 @@ int io_wear_item(dungeon *d){
 
 
 // take item off -- case 't': use pc_remove_equipment
-void io_remove_item(dungeon* d){
+uint32_t io_remove_item(dungeon* d){
 
     // remove item
     uint32_t i, pressKey;
-    bool isTrue = true;
     char ch[80];
 
     //assuming that it goes to 12? was *equipment before
@@ -1155,10 +1154,11 @@ void io_remove_item(dungeon* d){
     mvprintw(19, 15, " %-60s ", "");
     refresh();
 
-    while (isTrue) {
+    while (1) {
       // have to use getch()
       if ((pressKey = getch()) == 27) {
         io_display(d);
+        return 1;
       }
 
       if (pressKey < 'a' || pressKey > 'l') {
@@ -1166,26 +1166,24 @@ void io_remove_item(dungeon* d){
         refresh();
       }
 
-      if (!d->PC->pc_remove_equipment(pressKey - 'a'){
-        isTrue = false;
+      if (!d->PC->pc_remove_equipment(pressKey - 'a')){
+        return 0;
       }
 
       mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->equipment[pressKey - 'a']->get_name());
-      mvprintw(18, 15, " %-60s ", "");
       refresh();
     }
 
-    isTrue = true;
+    return 1;
 
     pc_stat_refresh(d);
 }
 
 
 //drops an item on the floor -- case 'd': use pc_remove_inventory
-void io_drop_item(dungeon *d) {
+uint32_t io_drop_item(dungeon *d) {
     int i, pressKey;
     char* foo;
-    bool isTrue = true;
 
     for (i = 0; i < 10; i++) {
       io_convertObject(d->PC->equipment[i], foo, 80);
@@ -1197,10 +1195,11 @@ void io_drop_item(dungeon *d) {
     mvprintw(19, 15, " %-60s ", "");
     refresh();
 
-    while (isTrue) {
+    while (1) {
       // have to use getch()
       if ((pressKey = getch()) == 27) {
         io_display(d);
+        return 1;
       }
 
       if (pressKey < 'a' || pressKey > 'l') {
@@ -1209,8 +1208,8 @@ void io_drop_item(dungeon *d) {
       }
 
       //NEED TO CHANGE THIS TO DROP
-      if (!d->PC->pc_drop_equipment(pressKey - 'a') {
-        in = false;
+      if (!d->PC->pc_drop_equipment(pressKey - 'a')) {
+        return 1;
       }
 
       mvprintw(17, 15, "Cannot drop item %s, please try again!", d->PC->equipment[pressKey - 'a']->get_name());
@@ -1218,17 +1217,16 @@ void io_drop_item(dungeon *d) {
       refresh();
     }
 
-    in = true;
+    return 1;
     refresh();
     pc_stat_refresh(d);
 }
 
 
 //permanently removes item from game
-void io_permanent_itemRemoval(dungeon *d){
+uint32_t io_permanent_itemRemoval(dungeon *d){
 
     uint32_t i, pressKey;
-    bool isTrue = true;
 
     for(i = 0; i < 10; i++) {
       mvprintw(i + 5, 15, " %d) %s", i);
@@ -1240,10 +1238,10 @@ void io_permanent_itemRemoval(dungeon *d){
     mvprintw(20, 15, " %-60s ", "");
     refresh();
 
-    while(isTrue){
+    while(1){
       if((pressKey = getch()) == 27){
         io_display(d);
-        isTrue = true;
+        return 1;
       }
 
       if (pressKey < '0' || pressKey > '9') {
@@ -1251,8 +1249,9 @@ void io_permanent_itemRemoval(dungeon *d){
         refresh();
       }
 
-      if (!d->PC->pc_permanent_itemRemoval(pressKey - '0') {
-        in = false;
+      if (!d->PC->pc_permanent_itemRemoval(pressKey - '0')) {
+      	io_display(d);
+        return 1;
       }
 
       mvprintw(17, 15, "Cannot destroy the item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
@@ -1261,7 +1260,7 @@ void io_permanent_itemRemoval(dungeon *d){
 
     }
 
-    isTrue = true;
+    return 1;
 }
 
 //display inventory - key 'i'
@@ -1365,7 +1364,7 @@ void io_inspect_item(dungeon *d) {
         break;
 
       default:
-        mvprintw(17, 5, "%s", "Invalid key. Please choose your item with the keys 0-9.")
+        mvprintw(17, 5, "%s", "Invalid key. Please choose your item with the keys 0-9.");
         break;
     }
   }
@@ -1381,7 +1380,7 @@ void io_inspect_item(dungeon *d) {
 void io_look_monster(dungeon *d) {
 
   int c, out = 0;
-  char* output1, output2;
+  char* output1;
   pair_t current;
   current[dim_x] = d->PC->position[dim_x];
   current[dim_y] = d->PC->position[dim_y];
@@ -1474,7 +1473,7 @@ void io_look_monster(dungeon *d) {
                    charpair(current)->damage->get_base(), charpair(current)->damage->get_number(), charpair(current)->damage->get_sides());
 
           mvprintw(7, 5, "%s", output1);
-          mvprintw(8, 5, "%s", charpair(current)->description);
+          mvprintw(8, 5, "%s", ((npc *)charpair(current))->description);
           mvprintw(9, 5, "%s", "");
           mvprintw(10, 5, "%s", "Hit any key to continue.");
         }
