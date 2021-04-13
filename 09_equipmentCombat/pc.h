@@ -31,10 +31,11 @@ void pc_observe_terrain(pc *p, dungeon *d);
 int32_t is_illuminated(pc *p, int16_t y, int16_t x);
 void pc_reset_visibility(pc *p);
 
-void pc_wear_item(dungeon *d, uint32_t emty_slot);
-void pc_remove_equipment(dungeon *d, int32_t emty_slot);
-void pc_drop_equipment(dungeon *d, int32_t emty_slot);
-void pc_permanent_itemRemoval(dungeon *d, uint32_t emty_slot);
+int32_t pc_take(dungeon *d, object *o);
+uint32_t pc_wear_item(dungeon *d, uint32_t empty_slot);
+uint32_t pc_remove_equipment(dungeon *d, int32_t empty_slot);
+uint32_t pc_drop_equipment(dungeon *d, int32_t empty_slot);
+uint32_t pc_permanent_itemRemoval(dungeon *d, uint32_t empty_slot);
 void init_slots(dungeon *d);
 int32_t pc_equip(dungeon *d, object *o);
 void pc_stat_refresh(dungeon *d);
