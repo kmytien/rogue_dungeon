@@ -37,13 +37,14 @@ class object {
   uint32_t get_color();
   const char *get_name();
   int32_t get_speed();
+  int32_t get_speed();
   int32_t roll_dice();
   int32_t get_type();
+  int32_t equipmentIndex();
+  uint32_t wearable();
   bool have_seen() { return seen; }
   void has_been_seen() { seen = true; }
   int16_t *get_position() { return position; }
-  uint32_t wearable();
-  int32_t equipmentIndex();
 };
 
 void gen_objects(dungeon *d);
