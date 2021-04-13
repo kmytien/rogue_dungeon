@@ -1090,11 +1090,10 @@ void io_convertObject(object *o, char *c, uint32_t size) {
 
 
 //wear item
-void io_wear_item(dungeon *d){
+int io_wear_item(dungeon *d){
     uint32_t i, pressKey, x;
-    bool isTrue = true;
     char c[80];
-    object tempArray;
+    object* tempArray;
 
     //assuming it goes up to 10? was *inventory before
     //putItem is not a member in class pc**
@@ -1109,7 +1108,7 @@ void io_wear_item(dungeon *d){
 
     refresh();
 
-    while (isTrue){
+    while (1){
       // have to use getch()
       if ((pressKey = getch()) == 27){
         io_display(d);
@@ -1120,8 +1119,8 @@ void io_wear_item(dungeon *d){
         refresh();
       }
 
-      if (!d->PC->pc_wear_item(pressKey - '0')){
-        isTrue = false
+      if (!pc_wear_item(pressKey - '0')){
+        return 0;
       }
 
       mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
@@ -1129,8 +1128,8 @@ void io_wear_item(dungeon *d){
       refresh();
     }
 
-    isTrue = true;
-  pc_stat_refresh(d);
+    pc_stat_refresh(d);
+    return 1;
 }
 
 
