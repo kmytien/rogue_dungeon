@@ -1237,13 +1237,13 @@ uint32_t io_permanent_itemRemoval(dungeon *d){
     uint32_t i, pressKey;
 
     for(i = 0; i < 10; i++) {
-      mvprintw(i + 5, 15, " %d) %s", i);
+      mvprintw(i, 0, " %c) %-60s ", '0' + i, d->PC->inventory[i] ? d->PC->inventory[i]->get_name() : "");
     }
 
-    mvprintw(18, 15, " %-60s ", "");
+    mvprintw(18, 15, " %-60s ", "\n");
     mvprintw(19, 15, " %-60s ", "Which item do you want destroyed?");
-    mvprintw(19, 15, " %-60s ", "");
-    mvprintw(20, 15, " %-60s ", "");
+    mvprintw(19, 15, " %-60s ", "\n");
+    mvprintw(20, 15, " %-60s ", "\n");
     refresh();
 
     while(1){
@@ -1255,6 +1255,13 @@ uint32_t io_permanent_itemRemoval(dungeon *d){
       if (pressKey < '0' || pressKey > '9') {
         mvprintw(20, 15, " %-60s ", "Numbers have to be between 0 and 9");
         refresh();
+        continue;
+      }
+      
+      if (!d->PC->inventory[pressKey - '0']) {
+        mvprintw(20, 15, "Numbers have to be between 0-9, ESC to cancel.");
+        refresh();
+        continue;
       }
 
       if (!d->PC->pc_permanent_itemRemoval(d, pressKey - '0')) {
@@ -1263,7 +1270,7 @@ uint32_t io_permanent_itemRemoval(dungeon *d){
       }
 
       mvprintw(17, 15, "Cannot destroy the item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
-      mvprintw(18, 15, " %-60s ", "");
+      //mvprintw(18, 15, " %-60s ", "");
       refresh();
 
     }
