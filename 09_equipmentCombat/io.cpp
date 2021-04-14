@@ -1020,6 +1020,7 @@ void io_handle_input(dungeon *d)
 
     //remove item from game
     case 'x':
+      io_permanent_itemRemoval(d);
       break;
 
     //list pc inventory
@@ -1079,7 +1080,7 @@ const char* item_slot[] = {
 //changes an object to a string
 void io_convertObject(object *o, char *c, uint32_t size) {
 
-  if(o){
+  if (o) {
     //takes in all values as a string
     snprintf(c, size, "%s (speed: %d, damage: %d+%dd%d)",
     	o->get_name(), o->get_speed(), o->get_damage_base(), o->get_damage_number(), o->get_damage_sides());
@@ -1129,11 +1130,12 @@ uint32_t io_wear_item(dungeon *d){
         return 0;
       }
 
-      mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
+      mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->inventory[pressKey - '0']->get_name());
       mvprintw(18, 15, " %-60s ", c);
       refresh();
     }
 
+    
     pc_stat_refresh(d);
     return 1;
 }
@@ -1215,11 +1217,11 @@ uint32_t io_drop_item(dungeon *d) {
       }
 
       //NEED TO CHANGE THIS TO DROP
-      if (!d->PC->pc_drop_equipment(d, pressKey - 'a')) {
+      if (!d->PC->pc_drop_equipment(d, pressKey - '0')) {
         return 1;
       }
 
-      mvprintw(17, 15, "Cannot drop item %s, please try again!", d->PC->equipment[pressKey - 'a']->get_name());
+      mvprintw(17, 15, "Cannot drop item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
       mvprintw(18, 15, " %-60s ", "");
       refresh();
     }
@@ -1277,7 +1279,7 @@ void io_display_inventory(dungeon *d) {
 
   for (i = 0; i < 10; i++) {
     //need to display item name, speed, and damage
-    io_convertObject(d->PC->equipment[i], foo, 80);
+    io_convertObject(d->PC->inventory[i], foo, 80);
     mvprintw(i + 5, 15, "%d) %s", i, foo);
   }
 
@@ -1295,13 +1297,13 @@ void io_display_inventory(dungeon *d) {
 void io_display_equip(dungeon *d) {
 
   int i;
-  char foo[80]; //prob can't use a char pointer? need to look into this
+  char foo[100]; //prob can't use a char pointer? need to look into this
   char alpha[] = "abcdefghijkl";
 
   for (i = 0; i < 12; i++) {
     //need to display item name, speed, and damage
-    io_convertObject(d->PC->equipment[i], foo, 80);
-    mvprintw(i + 5, 15, "%c [%s]\t) ", alpha[i], item_slot[i], foo);
+    io_convertObject(d->PC->equipment[i], foo, 100);
+    mvprintw(i + 5, 15, "%c [%s]\t) %s", alpha[i], item_slot[i], foo);
   }
 
   mvprintw(17, 5, " %s", "");
@@ -1323,9 +1325,9 @@ void io_inspect_item(dungeon *d) {
   char alpha[] = "abcdefghijkl";
   char output[80];
 
-  for (i = 0; i < 12; i++) {
+  for (i = 0; i < 10; i++) {
     //need to display item name, speed, and damage
-    io_convertObject(d->PC->equipment[i], foo, 80);
+    io_convertObject(d->PC->inventory[i], foo, 80);
     mvprintw(i + 5, 15, "%c [%s]  ) ", alpha[i], item_slot[i], foo);
   }
 
