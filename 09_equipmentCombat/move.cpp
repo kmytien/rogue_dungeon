@@ -104,8 +104,8 @@ void move_character(dungeon *d, character *c, pair_t next)
   // if there is an object in the new position & c is the pc
   if (d->objmap[next[dim_y]][next[dim_x]] != NULL && c == d->PC) {
     // equip the item
-    int32_t success = pc_equip(d, d->objmap[next[dim_y]][next[dim_x]]);
-    if (success == 0) {
+    //changed equip to take method
+    if (!pc_take(d, d->objmap[next[dim_y]][next[dim_x]])) {
       // remove item from the object map
       d->objmap[next[dim_y]][next[dim_x]] = NULL;
       pc_stat_refresh(d);
