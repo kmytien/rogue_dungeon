@@ -1100,7 +1100,7 @@ uint32_t io_wear_item(dungeon *d){
     //putItem is not a member in class pc**
     for (i = 0; i < 10; i++) {
       io_convertObject(d->PC->inventory[i], c, 80); //need to add size**
-      mvprintw(i, 0, " %c) %-55s ", '0' + i, c);
+      mvprintw(i + 5, 8, " %c) %s ", '0' + i, c);
     }
 
     mvprintw(17, 15, " %-60s ", "\n");
@@ -1146,20 +1146,21 @@ uint32_t io_remove_item(dungeon* d){
 
     // remove item
     uint32_t i, pressKey;
-    char ch[80], p[80];
+    char p[80];
 
-    //assuming that it goes to 12? was *equipment before
+		clear();
+		
     for(i = 0; i < 12; i++) {
       //sprintf(ch, "[%s]", d->PC->equipment[i]->get_description());
       io_convertObject(d->PC->equipment[i], p, 80);
-      mvprintw(i,  0, " %c) %-60s ", 'a' + i, ch, p);
+      mvprintw(i + 5, 8, "%c [%s]\t) %s ", 'a' + i, item_slot[i], p);
     }
 
     //brings up inventory for equiptment
     //item goes to empty slot
 
     mvprintw(17, 15, " %-60s ", "\n");
-    mvprintw(18, 15, " %-60s ", "Which item do you want taken out?");
+    mvprintw(19, 5, " %-60s ", "Which item do you want taken out?");
     mvprintw(19, 15, " %-60s ", "\n");
     refresh();
 
@@ -1179,7 +1180,7 @@ uint32_t io_remove_item(dungeon* d){
         return 0;
       }
 
-      mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->equipment[pressKey - 'a']->get_name());
+      mvprintw(17, 15, "Cannot remove item %s, please try again!", d->PC->equipment[pressKey - 'a']->get_name());
       refresh();
     }
 
