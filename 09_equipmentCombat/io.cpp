@@ -1322,48 +1322,50 @@ void io_display_equip(dungeon *d) {
 void io_inspect_item(dungeon *d) {
   int i, key, out = 0;
   char foo[80]; //prob can't use a char pointer? need to look into this
-  char alpha[] = "abcdefghijkl";
   char output[80];
-
-  for (i = 0; i < 10; i++) {
-    //need to display item name, speed, and damage
-    io_convertObject(d->PC->inventory[i], foo, 80);
-    mvprintw(i + 5, 15, "%c [%s]  ) ", alpha[i], item_slot[i], foo);
-  }
-
-  mvprintw(17, 5, "%s", "What item would you like to inspect (0-9)? Press ESC to go back.");
-  mvprintw(18, 5, "                                                 ");
-  mvprintw(19, 5, "                                                 ");
-  refresh();
-
+	
+	clear();
   while (!out) {
+  	for (i = 0; i < 10; i++) {
+		  //need to display item name, speed, and damage
+		  io_convertObject(d->PC->inventory[i], foo, 80);
+		  mvprintw(i + 5, 8, "%d) %s", i, foo);
+  	}
+
+		mvprintw(17, 8, "%s", "What item would you like to inspect (0-9)? Press ESC to go back.");
+		refresh();
+  	
     switch (key = getch()) {
-
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
-      case '8':
-      case '9':
-        //if empty - would it be null?
-        if (d->PC->equipment[key] == NULL)
-          mvprintw(17, 5, "%s", "Slot picked is empty. Choose another slot with keys 0-9.");
-
+      case 48:
+      case 49:
+      case 50:
+      case 51:
+      case 52:
+      case 53:
+      case 54:
+      case 55:
+      case 56:
+      case 57:
+        //if empty
+        if (!d->PC->inventory[key - '0']) {
+          mvprintw(17, 8, "%s", "Slot picked is empty.																				");
+          mvprintw(18, 8, "%s", "Hit any key to continue.");
+					refresh();
+					getch();
+				}
         //else print name, speed, dmg and description
         else {
+        	clear();
           //might need to make get_description for object
-          io_convertObject(d->PC->equipment[key], output, 80);
-          mvprintw(7, 5, "%s", output);
-          mvprintw(8, 5, "%s", "");
-          mvprintw(9, 5, "%s", d->PC->equipment[key]->get_description());
-          mvprintw(10, 5, "%s", "");
-          mvprintw(11, 5, "%s", "Hit any key to continue.");
+          io_convertObject(d->PC->inventory[key - '0'], output, 80);
+          mvprintw(3, 2, "%s", output);
+          mvprintw(4, 2, "%s", "");
+          mvprintw(5, 2, "%s", d->PC->inventory[key - '0']->get_description());
+          mvprintw(6, 2, "%s", "");
+          mvprintw(12, 2, "%s", "Hit any key to continue.");
           refresh();
           getch();
+          clear();
         }
         break;
 
@@ -1372,11 +1374,16 @@ void io_inspect_item(dungeon *d) {
         break;
 
       default:
-        mvprintw(17, 5, "%s", "Invalid key. Please choose your item with the keys 0-9.");
+        mvprintw(17, 8, "%s", "Invalid key. Next time, use the keys 0-9.														");
+        mvprintw(18, 8, "%s", "Hit any key to continue.");
+			  refresh();
+			  getch();
         break;
     }
+    clear();
   }
 
+	clear();
   io_display(d);
   refresh();
 }
