@@ -65,7 +65,7 @@ class dungeon {
   dungeon() : num_rooms(0), rooms(0), map{ter_wall}, hardness{0},
               pc_distance{0}, pc_tunnel{0}, character_map{0}, PC(0),
               num_monsters(0), max_monsters(0), character_sequence_number(0),
-              time(0), is_new(0), quit(0), monster_descriptions(),
+              time(0), is_new(0), quit(0), boss_dead(false), monster_descriptions(),
               object_descriptions() {}
   uint32_t num_rooms;
   room_t *rooms;
@@ -98,6 +98,7 @@ class dungeon {
   uint32_t time;
   uint32_t is_new;
   uint32_t quit;
+  bool boss_dead;
   std::vector<monster_description> monster_descriptions;
   std::vector<object_description> object_descriptions;
 };
