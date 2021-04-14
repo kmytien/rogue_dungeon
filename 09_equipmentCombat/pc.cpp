@@ -264,15 +264,15 @@ uint32_t pc::pc_wear_item(dungeon *d, uint32_t empty_slot){
   }
 
   x = d->PC->inventory[empty_slot]->equipmentIndex();
-  if(d->PC->equipment[x] && ((d->PC->equipment[x]->get_type() == objtype_RING) && !d->PC->equipment[x + 1])){
+  if (d->PC->equipment[x] && ((d->PC->equipment[x]->get_type() == objtype_RING) && !d->PC->equipment[x + 1])) {
         x++;
   }
 	
-	//what is array is temparray
   tempArray = d->PC->inventory[empty_slot];
   d->PC->inventory[empty_slot] = d->PC->equipment[x];
   d->PC->equipment[x] = tempArray;
-
+  printf("%d", x);
+  
   io_queue_message("You're wearing %s.", d->PC->equipment[x]->get_name());
 
   return 0;
