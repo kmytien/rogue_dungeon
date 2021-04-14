@@ -79,7 +79,7 @@ void do_combat(dungeon *d, character *atk, character *def)
 	
       // if the hit kills def (old combat code)
       if (dam >= def->hp) {
-        // if pc isnt killed (old combat code)
+        // if pc is killed (old combat code)
         if (atk != d->PC) {
            io_queue_message("You die.");
             io_queue_message("As %s%s eats your %s,", is_unique(atk) ? "" : "the ",
@@ -88,8 +88,10 @@ void do_combat(dungeon *d, character *atk, character *def)
             /* Queue an empty message, otherwise the game will not pause for *
              * player to see above.                                          */
              io_queue_message("");
-        } else {
+        } else { // else monster is killed
           io_queue_message("%s%s dies.", is_unique(def) ? "" : "The ", def->name);
+	  // if you killed the boss
+          if (has_characteristic(def, BOSS)) d->boss_dead = true;
         }
         def->hp = 0;
         def->alive = 0;
