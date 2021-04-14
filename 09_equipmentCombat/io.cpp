@@ -1401,17 +1401,106 @@ void io_inspect_item(dungeon *d) {
 //referenced off of teleport pc
 void io_look_monster(dungeon *d) {
 
-  int c, out = 0;
+  int c, x, y, out = 0;
   char output1[80];
   pair_t current;
   current[dim_x] = d->PC->position[dim_x];
   current[dim_y] = d->PC->position[dim_y];
 
   //can only look at what is visible, can't open up no fog
+  //mvprintw(1, 3, "%s", "Use the keys to find a monster. Press 't' to inspect the monster.");
   mvaddch(current[dim_y] + 1, current[dim_x], '*');
   refresh();
 
   while (!out) {
+    mvprintw(1, 3, "%s", "Use the keys to find a monster. Press 't' to inspect the monster.");
+		x = 0;
+		y = 0;
+		
+    switch(c = getch()) {
+      case '7':
+      case 'y':
+      case KEY_HOME:
+        if (current[dim_y] != 1) y = -1;;
+        if (current[dim_x] != 1) x = -1;;
+        break;
+      case '8':
+      case 'k':
+      case KEY_UP:
+        if (current[dim_y] != 1) y = -1;
+        x = 0;
+        break;
+      case '9':
+      case 'u':
+      case KEY_PPAGE:
+        if (current[dim_y] != 1) y = -1;
+        if (current[dim_x] != DUNGEON_X - 2) x = 1;
+        break;
+      case '6':
+      case 'l':
+      case KEY_RIGHT:
+        if (current[dim_x] != DUNGEON_X - 2) x = 1;
+        y = 0;
+        break;
+      case '3':
+      case 'n':
+      case KEY_NPAGE:
+        if (current[dim_y] != DUNGEON_Y - 2) y = 1;
+        if (current[dim_x] != DUNGEON_X - 2) x = 1;
+        break;
+      case '2':
+      case 'j':
+      case KEY_DOWN:
+        if (current[dim_y] != DUNGEON_Y - 2) y = 1;
+        x = 0;
+        break;
+      case '1':
+      case 'b':
+      case KEY_END:
+        if (current[dim_y] != DUNGEON_Y - 2) y = 1;
+        if (current[dim_x] != 1) x = -1;
+        break;
+      case '4':
+      case 'h':
+      case KEY_LEFT:
+        if (current[dim_x] != 1) x = -1;
+        y = 0;
+        break;
+
+      //print out description
+      case 't':
+        //would it be null if there is no character in certain spot?
+        if (charpair(current) == NULL) {
+        	mvprintw(1, 3, "%s", "No monster here, pick another spot.                                           "); 
+        }
+
+        else {
+        	clear();
+          snprintf(output1, 80, "%s: (speed: %d, damage: %d+%dd%d, hp: %d)",
+                   charpair(current)->name, charpair(current)->speed,
+                   charpair(current)->damage->get_base(), charpair(current)->damage->get_number(), 
+                   charpair(current)->damage->get_sides(), charpair(current)->get_hp());
+
+          mvprintw(3, 0, "%s", output1);
+          mvprintw(4, 0, "%s", "");
+          mvprintw(5, 0, "%s", ((npc *)charpair(current))->description);
+          mvprintw(15, 0, "%s", "Hit any key to continue.");
+        }
+
+        refresh();
+        getch();
+        break;
+
+      //ESC button to exit out
+      case 27:
+        out = 1;
+        break;
+
+      default:
+        mvprintw(0, 5, "%s", "Invalid key.");
+        break;
+    }
+    
     switch (mappair(current)) {
       case ter_wall:
       case ter_wall_immutable:
@@ -1437,85 +1526,15 @@ void io_look_monster(dungeon *d) {
       default:
         mvaddch(current[dim_y] + 1, current[dim_x], '0');
     }
-
-    switch(c = getch()) {
-      case '7':
-      case 'y':
-      case KEY_HOME:
-        if (current[dim_y] != 1) current[dim_y]--;
-        if (current[dim_x] != 1) current[dim_x]--;
-        break;
-      case '8':
-      case 'k':
-      case KEY_UP:
-        if (current[dim_y] != 1) current[dim_y]--;
-        break;
-      case '9':
-      case 'u':
-      case KEY_PPAGE:
-        if (current[dim_y] != 1) current[dim_y]--;
-        if (current[dim_x] != DUNGEON_X - 2) current[dim_x]++;
-        break;
-      case '6':
-      case 'l':
-      case KEY_RIGHT:
-        if (current[dim_x] != DUNGEON_X - 2) current[dim_x]++;
-        break;
-      case '3':
-      case 'n':
-      case KEY_NPAGE:
-        if (current[dim_y] != DUNGEON_Y - 2) current[dim_y]++;
-        if (current[dim_x] != DUNGEON_X - 2) current[dim_x]++;
-        break;
-      case '2':
-      case 'j':
-      case KEY_DOWN:
-        if (current[dim_y] != DUNGEON_Y - 2) current[dim_y]++;
-        break;
-      case '1':
-      case 'b':
-      case KEY_END:
-        if (current[dim_y] != DUNGEON_Y - 2) current[dim_y]++;
-        if (current[dim_x] != 1) current[dim_x]--;
-        break;
-      case '4':
-      case 'h':
-      case KEY_LEFT:
-        if (current[dim_x] != 1) current[dim_x]--;
-        break;
-
-      //print out description
-      case 't':
-        //would it be null if there is no character in certain spot?
-        if (charpair(current) == NULL) mvprintw(0, 5, "%s", "No monster here, pick another spot.");
-
-        else {
-          snprintf(output1, 80, "%s: (speed: %d, damage: %d+%dd%d, hp: %d)",
-                   charpair(current)->name, charpair(current)->speed,
-                   charpair(current)->damage->get_base(), charpair(current)->damage->get_number(), charpair(current)->damage->get_sides(), charpair(current)->get_hp());
-
-          mvprintw(7, 5, "%s", output1);
-          mvprintw(8, 5, "%s", ((npc *)charpair(current))->description);
-          mvprintw(9, 5, "%s", "");
-          mvprintw(10, 5, "%s", "Hit any key to continue.");
-        }
-
-        refresh();
-        getch();
-        break;
-
-      //ESC button to exit out
-      case 27:
-        out = 1;
-        break;
-
-      default:
-        mvprintw(0, 5, "%s", "Invalid key.");
-        break;
-    }
+    
+    current[dim_y] += y;
+    current[dim_x] += x;
+    
+    io_display(d);
+    mvaddch(current[dim_y] + 1, current[dim_x], '*');
+    refresh();
   }
 
   refresh();
-  getch();
   io_display(d);
 }
