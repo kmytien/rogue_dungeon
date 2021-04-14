@@ -1095,48 +1095,49 @@ void io_convertObject(object *o, char *c, uint32_t size) {
 uint32_t io_wear_item(dungeon *d){
     uint32_t i, pressKey;
     char c[80];
+    int out = 0;
 
     //assuming it goes up to 10? was *inventory before
     //putItem is not a member in class pc**
+    
+    clear();
     for (i = 0; i < 10; i++) {
-      io_convertObject(d->PC->inventory[i], c, 80); //need to add size**
-      mvprintw(i + 5, 8, " %c) %s ", '0' + i, c);
+      io_convertObject(d->PC->inventory[i], c, 80);
+      mvprintw(i + 5, 8, "%c) %s ", '0' + i, c);
     }
 
-    mvprintw(17, 15, " %-60s ", "\n");
-    mvprintw(18, 15, " %-60s ", "Select an item");
-    mvprintw(19, 15, " %-60s ", "\n");
-
+    mvprintw(17, 8, " %-60s ", "");
+    mvprintw(18, 8, " %-60s ", "Select an item to wear. Press ESC to exit.");
+    mvprintw(19, 8, " %-60s ", "");
     refresh();
 
-    while (1){
-      // have to use getch()
+    while (!out){
       if ((pressKey = getch()) == 27){
         io_display(d);
-        return 1;
+        out = 1;
       }
 
       if (pressKey < '0' || pressKey > '9') {
-        mvprintw(20, 15, " %-60s ", "Numbers have to be between 0 and 9 (ESC to leave)");
-        refresh();
+        mvprintw(18, 8, "%s ", "Numbers have to be between 0 and 9 (ESC to leave)");
       }
       
       if (!d->PC->inventory[pressKey - '0']){
-      	mvprintw(20, 0, "Inventory is empty. Go pick something up first.");
+      	mvprintw(18, 8, "Slot is empty. Please choose another slot.								");
       	continue;
-    }
-
-      if (!d->PC->pc_wear_item(d, pressKey - '0')){
-        return 0;
       }
 
-      mvprintw(17, 15, "Cannot use item %s, please try again!", d->PC->inventory[pressKey - '0']->get_name());
-      mvprintw(18, 15, " %-60s ", c);
+      if (!d->PC->pc_wear_item(d, pressKey - '0')){
+        out = 1;
+      }
+			
       refresh();
     }
-
     
+    clear();
+    io_display(d);
     pc_stat_refresh(d);
+    refresh();
+    
     return 1;
 }
 
@@ -1149,30 +1150,24 @@ uint32_t io_remove_item(dungeon* d){
     char p[80];
 
 		clear();
-		
     for(i = 0; i < 12; i++) {
-      //sprintf(ch, "[%s]", d->PC->equipment[i]->get_description());
       io_convertObject(d->PC->equipment[i], p, 80);
       mvprintw(i + 5, 8, "%c [%s]\t) %s ", 'a' + i, item_slot[i], p);
     }
 
-    //brings up inventory for equiptment
-    //item goes to empty slot
-
-    mvprintw(17, 15, " %-60s ", "\n");
-    mvprintw(19, 5, " %-60s ", "Which item do you want taken out?");
-    mvprintw(19, 15, " %-60s ", "\n");
+    mvprintw(17, 8, " %-60s ", "\n");
+    mvprintw(18, 8, " %-60s ", "Which item do you want taken out? Press ESC to exit.");
+    mvprintw(19, 8, " %-60s ", "\n");
     refresh();
 
     while (1) {
-      // have to use getch()
       if ((pressKey = getch()) == 27) {
         io_display(d);
         return 1;
       }
 
       if (pressKey < 'a' || pressKey > 'l') {
-        mvprintw(20, 15, " %-60s ", "Letters have to be between a and l");
+        mvprintw(18, 15, " %-60s ", "Letters have to be between a and l");
         refresh();
       }
 
@@ -1180,13 +1175,15 @@ uint32_t io_remove_item(dungeon* d){
         return 0;
       }
 
-      mvprintw(17, 15, "Cannot remove item %s, please try again!", d->PC->equipment[pressKey - 'a']->get_name());
+      mvprintw(18, 8, "Cannot remove item %s, please try again!", d->PC->equipment[pressKey - 'a']->get_name());
       refresh();
     }
 
-    return 1;
-
+		clear();
+    io_display(d);
     pc_stat_refresh(d);
+    refresh();
+    return 1;
 }
 
 
@@ -1196,12 +1193,12 @@ uint32_t io_drop_item(dungeon *d) {
     char foo[80];
 
     for (i = 0; i < 10; i++) {
-      mvprintw(i + 6, 18, " %c) %-60s ", '0' + i, d->PC->inventory[i] ? d->PC->inventory[i]->get_name() : "");
+      mvprintw(i + 5, 8, " %c) %-60s ", '0' + i, d->PC->inventory[i] ? d->PC->inventory[i]->get_name() : "");
     }
 
-    mvprintw(17, 15, " %-60s ", "");
-    mvprintw(18, 15, " %-60s ", "Which item do you want dropped?");
-    mvprintw(19, 15, " %-60s ", "");
+    mvprintw(17, 8, " %-60s ", "");
+    mvprintw(18, 8, " %-60s ", "Which item do you want dropped? Press ESC to exit.");
+    mvprintw(19, 8, " %-60s ", "");
     refresh();
 
     while (1) {
@@ -1212,8 +1209,8 @@ uint32_t io_drop_item(dungeon *d) {
       }
 
       if (pressKey < '0' || pressKey > '9') {
-      	snprintf(foo, 80, "Invalid input: '%c'.  Enter 0-9 or ESC to cancel.", pressKey);
-        mvprintw(20, 15, " %-60s ", "Invalid entry. Must be keys 0-9.");
+      	snprintf(foo, 80, "Invalid input: '%c'. Enter 0-9 or ESC to cancel.", pressKey);
+        mvprintw(18, 8, " %-60s ", "Invalid entry. Must be keys 0-9.");
         refresh();
       }
 
@@ -1222,13 +1219,16 @@ uint32_t io_drop_item(dungeon *d) {
         return 1;
       }
 
-      mvprintw(17, 15, "Cannot drop item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
-      mvprintw(18, 15, " %-60s ", "");
+      mvprintw(17, 8, "Cannot drop item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
+      mvprintw(18, 8, " %-60s ", "");
       refresh();
     }
 
+		clear();
+		io_display(d);
+		pc_stat_refresh(d);
+		refresh();
     return 1;
-    pc_stat_refresh(d);
 }
 
 
@@ -1237,14 +1237,15 @@ uint32_t io_permanent_itemRemoval(dungeon *d){
 
     uint32_t i, pressKey;
 
+		clear();
     for(i = 0; i < 10; i++) {
-      mvprintw(i, 0, " %c) %-60s ", '0' + i, d->PC->inventory[i] ? d->PC->inventory[i]->get_name() : "");
+      mvprintw(i + 5, 8, " %c) %-60s ", '0' + i, d->PC->inventory[i] ? d->PC->inventory[i]->get_name() : "");
     }
 
-    mvprintw(18, 15, " %-60s ", "\n");
-    mvprintw(19, 15, " %-60s ", "Which item do you want destroyed?");
-    mvprintw(19, 15, " %-60s ", "\n");
-    mvprintw(20, 15, " %-60s ", "\n");
+    mvprintw(17, 8, " %-60s ", "\n");
+    mvprintw(18, 8, " %-60s ", "Which item do you want destroyed? Press ESC to exit.");
+    mvprintw(19, 8, " %-60s ", "\n");
+    mvprintw(20, 8, " %-60s ", "\n");
     refresh();
 
     while(1){
@@ -1254,13 +1255,13 @@ uint32_t io_permanent_itemRemoval(dungeon *d){
       }
 
       if (pressKey < '0' || pressKey > '9') {
-        mvprintw(20, 15, " %-60s ", "Numbers have to be between 0 and 9");
+        mvprintw(18, 8, " %-60s ", "Numbers have to be between 0 and 9");
         refresh();
         continue;
       }
       
       if (!d->PC->inventory[pressKey - '0']) {
-        mvprintw(20, 15, "Numbers have to be between 0-9, ESC to cancel.");
+        mvprintw(18, 8, "Numbers have to be between 0-9, ESC to cancel.");
         refresh();
         continue;
       }
@@ -1270,12 +1271,14 @@ uint32_t io_permanent_itemRemoval(dungeon *d){
         return 1;
       }
 
-      mvprintw(17, 15, "Cannot destroy the item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
-      //mvprintw(18, 15, " %-60s ", "");
+      mvprintw(18, 8, "Cannot destroy the item %s, please try again!", d->PC->equipment[pressKey - '0']->get_name());
       refresh();
 
     }
-
+    
+    clear();
+    io_display(d);
+    refresh();
     return 1;
 }
 
@@ -1284,21 +1287,23 @@ void io_display_inventory(dungeon *d) {
 
   int i;
   char foo[80]; //prob can't use a char pointer? need to look into this
-
+	
+	clear();
   for (i = 0; i < 10; i++) {
     //need to display item name, speed, and damage
     io_convertObject(d->PC->inventory[i], foo, 80);
-    mvprintw(i + 5, 15, "%d) %s", i, foo);
+    mvprintw(i + 5, 8, "%d) %s", i, foo);
   }
 
-  mvprintw(17, 15, " %s ", "");
-  mvprintw(18, 15, "Hit any key to continue.        ");
-  mvprintw(19, 15, " %s ", "");
-  mvprintw(20, 15, " %s ", "");
-
+  mvprintw(17, 8, " %s ", "");
+  mvprintw(18, 8, "Hit any key to continue.        ");
+  mvprintw(19, 8, " %s ", "");
+  mvprintw(20, 8, " %s ", "");
   refresh();
+  
   getch();
   io_display(d);
+  refresh();
 }
 
 //displays what pc is wearing rn
@@ -1308,20 +1313,22 @@ void io_display_equip(dungeon *d) {
   char foo[100]; //prob can't use a char pointer? need to look into this
   char alpha[] = "abcdefghijkl";
 
+	clear();
   for (i = 0; i < 12; i++) {
     //need to display item name, speed, and damage
     io_convertObject(d->PC->equipment[i], foo, 100);
-    mvprintw(i + 5, 15, "%c [%s]\t) %s", alpha[i], item_slot[i], foo);
+    mvprintw(i + 5, 8, "%c [%s]\t) %s", alpha[i], item_slot[i], foo);
   }
 
-  mvprintw(17, 5, " %s", "");
-  mvprintw(18, 5, "Hit any key to continue.        ");
-  mvprintw(19, 5, " %s", "");
-  mvprintw(20, 5, " %s", "");
-
+  mvprintw(17, 8, " %s", "");
+  mvprintw(18, 8, "Hit any key to continue.        ");
+  mvprintw(19, 8, " %s", "");
+  mvprintw(20, 8, " %s", "");
   refresh();
+  
   getch();
   io_display(d);
+  refresh();
 }
 
 
@@ -1340,7 +1347,7 @@ void io_inspect_item(dungeon *d) {
 		  mvprintw(i + 5, 8, "%d) %s", i, foo);
   	}
 
-		mvprintw(17, 8, "%s", "What item would you like to inspect (0-9)? Press ESC to go back.");
+		mvprintw(18, 8, "%s", "What item would you like to inspect (0-9)? Press ESC to go back.");
 		refresh();
   	
     switch (key = getch()) {
@@ -1366,11 +1373,11 @@ void io_inspect_item(dungeon *d) {
         	clear();
           //might need to make get_description for object
           io_convertObject(d->PC->inventory[key - '0'], output, 80);
-          mvprintw(3, 2, "%s", output);
-          mvprintw(4, 2, "%s", "");
-          mvprintw(5, 2, "%s", d->PC->inventory[key - '0']->get_description());
-          mvprintw(6, 2, "%s", "");
-          mvprintw(12, 2, "%s", "Hit any key to continue.");
+          mvprintw(3, 0, "%s", output);
+          mvprintw(4, 0, "%s", "");
+          mvprintw(5, 0, "%s", d->PC->inventory[key - '0']->get_description());
+          mvprintw(6, 0, "%s", "");
+          mvprintw(15, 0, "%s", "Hit any key to continue.");
           refresh();
           getch();
           clear();
@@ -1414,7 +1421,7 @@ void io_look_monster(dungeon *d) {
   refresh();
 
   while (!out) {
-    mvprintw(1, 3, "%s", "Use the keys to find a monster. Press 't' to inspect the monster.");
+    mvprintw(1, 3, "%s", "Use the keys to find a monster. Press 't' to inspect and ESC to exit.");
 		x = 0;
 		y = 0;
 		
@@ -1472,7 +1479,7 @@ void io_look_monster(dungeon *d) {
       case 't':
         //would it be null if there is no character in certain spot?
         if (charpair(current) == NULL) {
-        	mvprintw(1, 3, "%s", "No monster here, pick another spot.                                           "); 
+        	mvprintw(1, 5, "%s", "No monster here, pick another spot.                                           "); 
         }
 
         else {
