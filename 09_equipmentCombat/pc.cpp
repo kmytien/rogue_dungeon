@@ -293,14 +293,17 @@ bool isEmpty(dungeon *d){
 uint32_t pc::pc_remove_equipment(dungeon *d, uint32_t empty_slot){
   // at given index make equipment = NULL
   //d->PC->equipment[i] = NULL;
-
-  if (!d->PC->inventory[empty_slot] || !isEmpty(d)){
+  object* tempArray;
+  
+  if (!d->PC->equipment[empty_slot] || !isEmpty(d)){
       io_queue_message("Cannot be removed, nowhere to place it  %s", d->PC->equipment[empty_slot]->get_name());
       return 1;
   }
 
   io_queue_message("You have removed  %s.", d->PC->equipment[empty_slot]->get_name());
 
+  tempArray = d->PC->equipment[empty_slot];
+  pc_take(d, tempArray);
   d->PC->equipment[empty_slot] = NULL;
 
   return 0;
