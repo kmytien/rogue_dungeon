@@ -54,7 +54,7 @@ void do_combat(dungeon *d, character *atk, character *def)
     };
     if (def->alive)
     {
-      pc_stat_refresh(d);
+      //pc_stat_refresh(d);
       dam = atk->damage->roll();
       //if attacker not pc then give diff message
       if (atk != d->PC) io_queue_message("The %s %s your %s for %d damage.",atk->name, "stabs", 
