@@ -458,7 +458,7 @@ int32_t pc_take(dungeon *d, object *o) {
 
 void pc_stat_refresh(dungeon *d) { // called when picking up DONE an item and equipping NOT DONE or dequipping NOT DONE
   int i;
-  int32_t sp = 0;
+  int32_t sp = PC_SPEED;
   int32_t ba = 0;
   uint32_t nu = 0, si = 0;
 
