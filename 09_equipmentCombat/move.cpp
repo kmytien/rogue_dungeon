@@ -19,7 +19,7 @@
 
 void do_combat(dungeon *d, character *atk, character *def)
 {
-    uint32_t dam;
+    uint32_t dam, i;
     const char *organs[] = {
       "liver",                   /*  0 */
       "pancreas",                /*  1 */
@@ -54,13 +54,27 @@ void do_combat(dungeon *d, character *atk, character *def)
     };
     if (def->alive)
     {
-      //pc_stat_refresh(d);
-      dam = atk->damage->roll();
       //if attacker not pc then give diff message
-      if (atk != d->PC) io_queue_message("The %s %s your %s for %d damage.",atk->name, "stabs", 
+      if (atk != d->PC) {
+        dam = atk->damage->roll();
+        io_queue_message("The %s %s your %s for %d damage.",atk->name, "stabs", 
                              organs[rand() % (sizeof(organs) / sizeof(organs[0]))], dam);
+      }
       // since attacker is the pc, give pc dam message
-      else io_queue_message("You hit the %s for %d damage.", def->name, dam);
+      else {
+        // get orig damage
+        dam = atk->damage->roll();
+        
+        // get added damage bonuses for equipment
+        for (i = 0; i < 12; i++) {
+          if (d->PC->equipment[i] != NULL) {
+            dam += d->PC->equipment[i]->roll_dice();
+          }
+        }
+      
+        io_queue_message("You hit the %s for %d damage.", def->name, dam);
+        //if(atk == d->PC) dam = 1000;  // TESTING PURPOSES
+      }
 	
       // if the hit kills def (old combat code)
       if (dam >= def->hp) {
