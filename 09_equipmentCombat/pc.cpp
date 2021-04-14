@@ -456,27 +456,17 @@ int32_t pc_take(dungeon *d, object *o) {
   return 1;
 }
 
-void pc_stat_refresh(dungeon *d) { // called when picking up DONE an item and equipping NOT DONE or dequipping NOT DONE
+void pc_stat_refresh(dungeon *d) { // called when picking up
   int i;
   int32_t sp = PC_SPEED;
-  int32_t ba = 0;
-  uint32_t nu = 0, si = 0;
-
+  
   // take all speed in equipment and add them together
-  // take all dice for damage and add them together
   for(i = 0; i < 12; i++) {
     if(d->PC->equipment[i] != NULL) {
       // update sp
       sp += d->PC->equipment[i]->get_speed();
-      //update ba nu si
-      ba += d->PC->equipment[i]->get_damage_base();
-      nu += d->PC->equipment[i]->get_damage_number();
-      si += d->PC->equipment[i]->get_damage_sides();
     }
   }
   // update speed number
   d->PC->speed = sp;
-  // update damage dice
-  static dice pc_dice(ba, nu, si);
-  d->PC->damage = &pc_dice;
 }
