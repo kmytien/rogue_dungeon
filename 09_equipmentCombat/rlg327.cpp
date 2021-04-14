@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
   if (!do_load && !do_image) {
     io_queue_message("Seed is %u.", seed);
   }
-  while (pc_is_alive(&d) && dungeon_has_npcs(&d) && !d.quit) {
+  while (pc_is_alive(&d) && /*dungeon_has_npcs(&d) AND SPONGEBOB IS STILL ALIVE*/ !d.boss_dead && !d.quit) {
     do_moves(&d);
   }
   io_display(&d);
@@ -261,10 +261,8 @@ int main(int argc, char *argv[])
   }
 
   printf("%s", pc_is_alive(&d) ? victory : tombstone);
-  printf("You defended your life in the face of %u deadly beasts.\n"
-         "You avenged the cruel and untimely murders of %u "
-         "peaceful dungeon residents.\n",
-         d.PC->kills[kill_direct], d.PC->kills[kill_avenged]);
+  printf("You defended your life in the face of %u deadly beasts.\n",
+         d.PC->kills[kill_direct]);
 
   if (pc_is_alive(&d)) {
     /* If the PC is dead, it's in the move heap and will get automatically *
