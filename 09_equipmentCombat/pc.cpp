@@ -256,8 +256,8 @@ void pc_see_object(character *the_pc, object *o)
 }
 
 uint32_t pc::pc_wear_item(dungeon *d, uint32_t empty_slot){
-	int x;
-	object* tempArray;
+  int x;
+  object* tempArray;
 
   if(!d->PC->inventory[empty_slot] || !d->PC->inventory[empty_slot]->wearable()){
         return 1;
@@ -271,7 +271,6 @@ uint32_t pc::pc_wear_item(dungeon *d, uint32_t empty_slot){
   tempArray = d->PC->inventory[empty_slot];
   d->PC->inventory[empty_slot] = d->PC->equipment[x];
   d->PC->equipment[x] = tempArray;
-  printf("%d", x);
   
   io_queue_message("You're wearing %s.", d->PC->equipment[x]->get_name());
 
@@ -319,6 +318,7 @@ uint32_t pc::pc_drop_equipment(dungeon *d, uint32_t empty_slot){
   io_queue_message("You dropped %s.", d->PC->inventory[empty_slot]->get_name());
 
   //d->PC->inventory[empty_slot] = /*current pos of the pc*/;
+  d->objmap[d->PC->position[dim_y]][d->PC->position[dim_x]] = d->PC->inventory[empty_slot];
   d->PC->inventory[empty_slot] = NULL;
 
 	return 0;
