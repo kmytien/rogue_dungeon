@@ -7,7 +7,6 @@
   - Picked up items go to the inventory where you have to press w to wear them (doesn't automatically equip)
 - Bugs
   - Occasionally a monster will stand on the character
-  - You have to press a slot number twice to equip an item in wear
 
 ## Project Team Members:
 - MyTien Kien *(kmytien)*
