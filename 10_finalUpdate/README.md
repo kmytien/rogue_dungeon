@@ -5,7 +5,7 @@
   - Health potions randomly generate on the floor and can heal 25%-100% of a players health (H)
      - Potions generate as the symbol ^
      - Potions are automatically taken and drunk when walked over UNLESS the player is at full health
-  - Use the --hp command to input a custom hp level for the PC (H)
+  - Use the --sethp command to input a custom hp level for the PC (H)
   
   
   (Ideas if you guys are stuck)
