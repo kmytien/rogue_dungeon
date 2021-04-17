@@ -65,7 +65,7 @@ class dungeon {
  public:
   dungeon() : num_rooms(0), rooms(0), map{ter_wall}, hardness{0},
               pc_distance{0}, pc_tunnel{0}, character_map{0}, PC(0),
-              num_monsters(0), max_monsters(0), character_sequence_number(0),
+              num_monsters(0), max_monsters(0), pc_health(0), character_sequence_number(0),
               time(0), is_new(0), quit(0), monster_descriptions(),
               object_descriptions() {}
   uint32_t num_rooms;
@@ -90,6 +90,7 @@ class dungeon {
   uint16_t max_monsters;
   uint16_t num_objects;
   uint16_t max_objects;
+  uint16_t pc_health;
    uint32_t character_sequence_number;
   /* Game time isn't strictly necessary.  It's implicit in the turn number *
    * of the most recent thing removed from the event queue; however,       *
