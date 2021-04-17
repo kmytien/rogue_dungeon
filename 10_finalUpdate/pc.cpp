@@ -37,7 +37,7 @@ pc::pc()
     in[i] = 0;
   }
 
-  hp = 1000;
+ // hp = 1000;
 }
 
 pc::~pc()
@@ -98,6 +98,10 @@ void config_pc(dungeon *d)
   d->PC->name = "Isabella Garcia-Shapiro";
 
   d->character_map[d->PC->position[dim_y]][d->PC->position[dim_x]] = d->PC;
+
+  // new code
+  if(!(d->pc_health)) d->PC->hp = 1000;
+  else d->PC->hp = d->pc_health;
 
   dijkstra(d);
   dijkstra_tunnel(d);
