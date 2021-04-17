@@ -69,7 +69,8 @@ void usage(char *name)
   fprintf(stderr,
           "Usage: %s [-r|--rand <seed>] [-l|--load [<file>]]\n"
           "          [-s|--save [<file>]] [-i|--image <pgm file>]\n"
-          "          [-n|--nummon <count>] [-o|--objcount <oject count>]\n",
+          "          [-n|--nummon <count>] [-o|--objcount <oject count>]\n"
+          "          [-h|--hpset <count>]\n",
           name);
 
   exit(-1);
@@ -188,6 +189,14 @@ int main(int argc, char *argv[])
             usage(argv[0]);
           }
           break;
+        case 'h':
+          if ((!long_arg && argv[i][2]) ||
+              (long_arg && strcmp(argv[i], "-hpset")) ||
+              argc < ++i + 1 /* No more arguments */ ||
+              !sscanf(argv[i], "%hu", &d.pc_health)) {
+            usage(argv[0]);
+          }
+          break;
         default:
           usage(argv[0]);
         }
@@ -223,6 +232,10 @@ int main(int argc, char *argv[])
   gen_monsters(&d);
   gen_objects(&d);
   pc_observe_terrain(d.PC, &d);
+  
+  // NEW FOR TESTING
+  //std::cout<< d.PC->hp << std::endl;
+  //return 0;
   
   io_display(&d);
   if (!do_load && !do_image) {
