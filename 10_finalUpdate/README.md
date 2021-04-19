@@ -6,6 +6,9 @@
      - Potions generate as the symbol ^
      - Potions are automatically taken and drunk when walked over UNLESS the player is at full health
   - Use the --hpset command to input a custom hp level for the PC (H)
+  - PC will be able to pick up grenades that will only target monsters nearby PC in a 3x3 radius (M)
+     - Can use bombs with the symbol *
+     - Will be able to kill monsters regardless on how high their HP is
   
   
   (Ideas if you guys are stuck)
