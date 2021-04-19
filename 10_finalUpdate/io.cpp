@@ -1477,6 +1477,19 @@ uint32_t io_expunge_in(dungeon *d)
   return 1;
 }
 
+
+//for throwing a grenade
+static uint32_t io_throw_grenade(dungeon *d) {
+	//if pc doesn't have grenade
+		//return 1 and print message
+		
+	//else pc does have grenade
+		//was thinking either pc can pick where grenade lands or grenade just kills in 3x3 radius near pc
+	
+	return 0;
+}
+
+
 void io_handle_input(dungeon *d)
 {
   uint32_t fail_code;
@@ -1646,6 +1659,12 @@ void io_handle_input(dungeon *d)
       io_queue_message("Have fun!  And happy printing!");
       fail_code = 0;
       break;
+      
+    case '*':
+    	io_throw_grenade(d);
+    	fail_code = 1;
+    	break;
+    	
     default:
       /* Also not in the spec.  It's not always easy to figure out what *
        * key code corresponds with a given keystroke.  Print out any    *
