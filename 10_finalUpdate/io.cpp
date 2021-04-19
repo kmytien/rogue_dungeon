@@ -949,15 +949,21 @@ uint32_t io_wear_eq(dungeon *d)
 void io_display_in(dungeon *d)
 {
   uint32_t i;
+  int grenades = d->PC->grenades;
   char s[61];
-
+	
   for (i = 0; i < MAX_INVENTORY; i++) {
     io_object_to_string(d->PC->in[i], s, 61);
     mvprintw(i + 7, 10, " %c) %-55s ", '0' + i, s);
   }
 
-  mvprintw(17, 10, " %-58s ", "");
-  mvprintw(18, 10, " %-58s ", "Hit any key to continue.");
+  mvprintw(16, 10, " %-58s ", "");
+  attron(COLOR_PAIR(COLOR_RED));
+  mvprintw(17, 10, " You have [ %d ] grenades left. ", grenades);
+  attroff(COLOR_PAIR(COLOR_RED));
+  mvprintw(18, 10, " %-58s ", "");
+  mvprintw(19, 10, " %-58s ", "Hit any key to continue.");
+  
 
   refresh();
 
@@ -1478,13 +1484,27 @@ uint32_t io_expunge_in(dungeon *d)
 }
 
 
+//new code - M
 //for throwing a grenade
 static uint32_t io_throw_grenade(dungeon *d) {
-	//if pc doesn't have grenade
-		//return 1 and print message
+	int i;
+	
+	for (i = 0; i < 3; i++) {
+		//if pc has grenade
+		if (d->PC->grenades) {
+			//was thinking either pc can pick where grenade lands or grenade just kills in 3x3 radius near pc
+			//similar code to inspect/look monster
+			
+			d->PC->grenades -= 1;
+		}
 		
-	//else pc does have grenade
-		//was thinking either pc can pick where grenade lands or grenade just kills in 3x3 radius near pc
+		//else pc doesn't have grenade
+		else {
+			//return 1 and print msg
+			io_queue_message("You're out of luck - you used all your grenades!");
+			return 1;
+		}
+	}
 	
 	return 0;
 }
