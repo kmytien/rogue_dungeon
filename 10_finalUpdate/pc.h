@@ -37,6 +37,7 @@ class pc : public character {
   object *eq[num_eq_slots];
   object *in[MAX_INVENTORY];
 
+  uint32_t grenades[3];
   uint32_t wear_in(uint32_t slot);
   uint32_t remove_eq(uint32_t slot);
   uint32_t drop_in(dungeon *d, uint32_t slot);
