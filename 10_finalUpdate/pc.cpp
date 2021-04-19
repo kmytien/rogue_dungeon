@@ -81,6 +81,7 @@ void place_pc(dungeon *d)
 
 void config_pc(dungeon *d)
 {
+	int i;
   static dice pc_dice(0, 1, 4);
   
   d->PC = new pc;
@@ -99,10 +100,16 @@ void config_pc(dungeon *d)
 
   d->character_map[d->PC->position[dim_y]][d->PC->position[dim_x]] = d->PC;
 
-  // new code
+	// new code - M
+	//initializaing grenades array
+	for (i = 0; i < 3; i++) {
+		d->PC->grenades[i] = 1;
+	}	
+	
+  // new code - H
   if(!(d->pc_health)) d->PC->hp = 1000;
   else d->PC->hp = d->pc_health;
-
+	
   dijkstra(d);
   dijkstra_tunnel(d);
 }
