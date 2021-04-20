@@ -1487,7 +1487,7 @@ uint32_t io_expunge_in(dungeon *d)
 //new code - M
 //for throwing a grenade
 static uint32_t io_throw_grenade(dungeon *d) {
-	int c, x, y, out = 0;
+	int c, x, y, i, j, out = 0;
   pair_t current;
   current[dim_x] = d->PC->position[dim_x];
   current[dim_y] = d->PC->position[dim_y];
@@ -1501,7 +1501,7 @@ static uint32_t io_throw_grenade(dungeon *d) {
 		refresh();
 
 		while (!out) {
-		  mvprintw(1, 3, "%s", "Use the keys to find a place to put a grebade. Press '*' to explode and ESC to exit.");
+		  mvprintw(1, 0, "%s", "Use the keys to find a place for a grenade. Press '*' to explode and ESC to exit");
 			x = 0;
 			y = 0;
 			
@@ -1557,8 +1557,24 @@ static uint32_t io_throw_grenade(dungeon *d) {
 
 		    //bomb 3x3 area
 		    case '*':
+		    	//delete objects and monsters in 3x3 area with cursor in the middle
+		    	for (i = current[dim_y] - 1; i <= current[dim_y] + 1; i++) {
+		    		for (j = current[dim_x] - 1; j <= current[dim_x] + 1; j++) {
+		    		
+		    			if (mapxy(j, i) == ter_wall_immutable) continue;
+		    			else {
+		    				if (objxy(j, i) || (charxy(j, i) != d->PC && charxy(j, i))) {
+		    					objxy(j, i) = NULL;
+		    					charxy(j, i) = NULL;
+		    				} 
+		    			}
+		    		
+		    		}
+		    	}
+		    	
 		      refresh();
-		      getch();
+		      out = 1;
+		      //getch();
 		      break;
 
 		    //ESC button to exit out
