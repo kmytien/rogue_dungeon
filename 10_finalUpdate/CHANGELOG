@@ -1,3 +1,4 @@
+4/20/21 14:30 MK: Implemented a method so that PC can use a cursor to locate where bomb/grenade should be thrown
 4/19/21 15:25 MK: Implemented grenades in pc.h, and its initialization, added command in io.cpp, started io_throw_grenade
 4/18/21 12:00 HL: Started implementing potions
 4/17/21 15:35 HL: Implemented --hpset
