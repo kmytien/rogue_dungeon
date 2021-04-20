@@ -1487,23 +1487,132 @@ uint32_t io_expunge_in(dungeon *d)
 //new code - M
 //for throwing a grenade
 static uint32_t io_throw_grenade(dungeon *d) {
-	int i;
-	
-	for (i = 0; i < 3; i++) {
-		//if pc has grenade
-		if (d->PC->grenades) {
-			//was thinking either pc can pick where grenade lands or grenade just kills in 3x3 radius near pc
-			//similar code to inspect/look monster
+	int c, x, y, out = 0;
+  pair_t current;
+  current[dim_x] = d->PC->position[dim_x];
+  current[dim_y] = d->PC->position[dim_y];
+  
+	//if pc has grenade
+	if (d->PC->grenades) {
+		//was thinking either pc can pick where grenade lands or grenade just kills in 3x3 radius near pc
+		//similar code to inspect/look monster
+		//can only look at what is visible, can't open up no fog
+		mvaddch(current[dim_y] + 1, current[dim_x], '*');
+		refresh();
+
+		while (!out) {
+		  mvprintw(1, 3, "%s", "Use the keys to find a place to put a grebade. Press '*' to explode and ESC to exit.");
+			x = 0;
+			y = 0;
 			
-			d->PC->grenades -= 1;
+		  switch(c = getch()) {
+		    case '7':
+		    case 'y':
+		    case KEY_HOME:
+		      if (current[dim_y] != 1) y = -1;;
+		      if (current[dim_x] != 1) x = -1;;
+		      break;
+		    case '8':
+		    case 'k':
+		    case KEY_UP:
+		      if (current[dim_y] != 1) y = -1;
+		      x = 0;
+		      break;
+		    case '9':
+		    case 'u':
+		    case KEY_PPAGE:
+		      if (current[dim_y] != 1) y = -1;
+		      if (current[dim_x] != DUNGEON_X - 2) x = 1;
+		      break;
+		    case '6':
+		    case 'l':
+		    case KEY_RIGHT:
+		      if (current[dim_x] != DUNGEON_X - 2) x = 1;
+		      y = 0;
+		      break;
+		    case '3':
+		    case 'n':
+		    case KEY_NPAGE:
+		      if (current[dim_y] != DUNGEON_Y - 2) y = 1;
+		      if (current[dim_x] != DUNGEON_X - 2) x = 1;
+		      break;
+		    case '2':
+		    case 'j':
+		    case KEY_DOWN:
+		      if (current[dim_y] != DUNGEON_Y - 2) y = 1;
+		      x = 0;
+		      break;
+		    case '1':
+		    case 'b':
+		    case KEY_END:
+		      if (current[dim_y] != DUNGEON_Y - 2) y = 1;
+		      if (current[dim_x] != 1) x = -1;
+		      break;
+		    case '4':
+		    case 'h':
+		    case KEY_LEFT:
+		      if (current[dim_x] != 1) x = -1;
+		      y = 0;
+		      break;
+
+		    //bomb 3x3 area
+		    case '*':
+		      refresh();
+		      getch();
+		      break;
+
+		    //ESC button to exit out
+		    case 27:
+		      out = 1;
+		      break;
+
+		    default:
+		      mvprintw(0, 5, "%s", "Invalid key.");
+		      break;
+		  }
+		  
+		  switch (mappair(current)) {
+		    case ter_wall:
+		    case ter_wall_immutable:
+		    case ter_unknown:
+		      mvaddch(current[dim_y] + 1, current[dim_x], ' ');
+		      break;
+		    case ter_floor:
+		    case ter_floor_room:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '.');
+		      break;
+		    case ter_floor_hall:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '#');
+		      break;
+		    case ter_debug:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '*');
+		      break;
+		    case ter_stairs_up:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '<');
+		      break;
+		    case ter_stairs_down:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '>');
+		      break;
+		    default:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '0');
+		  }
+		  
+		  current[dim_y] += y;
+		  current[dim_x] += x;
+		  
+		  io_display(d);
+		  mvaddch(current[dim_y] + 1, current[dim_x], '*');
+		  refresh();
 		}
 		
-		//else pc doesn't have grenade
-		else {
-			//return 1 and print msg
-			io_queue_message("You're out of luck - you used all your grenades!");
-			return 1;
-		}
+		d->PC->grenades -= 1;
+	}
+		
+	//else pc doesn't have grenade
+	else {
+		//return 1 and print msg
+		io_queue_message("You're out of luck - you used all your grenades!");
+		return 1;
 	}
 	
 	return 0;
