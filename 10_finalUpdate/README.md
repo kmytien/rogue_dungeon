@@ -1,7 +1,7 @@
 # Assignment 1.10 | Choose Your Own Assignment
 - This assignment is for CS 327 Spring 2021
 - We used Prof. Schaeffer's solution code for 1.09
-- New features
+- New features ** FOR THE NEW FEATURES TO WORK PROPERLY, USE THE UPDATED OBJECT_DESC.TXT PROVIDED
   - Health potions randomly generate on the floor and can heal 25%-100% of a players health (H)
      - Potions generate as the symbol ^
      - Potions are automatically taken and drunk when walked over UNLESS the player is at full health
