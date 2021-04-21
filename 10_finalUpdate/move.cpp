@@ -235,6 +235,14 @@ void move_character(dungeon *d, character *c, pair_t next)
     pc_reset_visibility((pc *) c);
     pc_observe_terrain((pc *) c, d);
   }
+  
+  // NEW, IF CHARACTER NPC AND NEXT OBJECT MAP ITEM IS A POTION (^) THEN QUEUE A MESSAGE
+  if (c == d->PC && d->objmap[next[dim_y]][next[dim_x]]) {
+    if (d->objmap[next[dim_y]][next[dim_x]]->get_symbol() == '^' && !(d->PC->fullhp(d))){
+      d->PC->pick_up(d);
+      d->objmap[next[dim_y]][next[dim_x]] = 0;
+    }
+  }
 }
 
 void do_moves(dungeon *d)
