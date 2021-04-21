@@ -92,6 +92,7 @@ static const struct {
   type_lu_entry(FOOD),
   type_lu_entry(WAND),
   type_lu_entry(CONTAINER),
+  type_lu_entry(POTION),
   { 0, objtype_no_type }
 };
 
@@ -116,6 +117,7 @@ const char object_symbol[] = {
   ',', /* objtype_FOOD */
   '-', /* objtype_WAND */
   '%', /* objtype_CONTAINER */
+  '^', /* objtype_POTION */
 };
 
 static inline void eat_whitespace(std::ifstream &f)
