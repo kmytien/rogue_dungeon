@@ -367,3 +367,85 @@ ATTR 0+0d1
 RRTY 80
 ART TRUE
 END
+
+BEGIN OBJECT
+NAME weak health potion
+TYPE POTION
+WEIGHT 0+0d0
+COLOR RED
+DODGE 0+0d0
+VAL 0+0d0
+DAM 0+0d0
+DEF 0+0d0
+HIT 0+0d0
+SPEED 0+0d0
+DESC
+This is a homemade potion that you made before visiting the dungeon.
+Unfortunately you arent that great at brewing so it kinda sucks.
+.
+ATTR 0+0d0
+RRTY 90
+ART FALSE
+END
+
+BEGIN OBJECT
+NAME decent health potion
+TYPE POTION
+WEIGHT 0+0d0
+COLOR RED
+DODGE 0+0d0
+VAL 0+0d0
+DAM 0+0d0
+DEF 0+0d0
+HIT 0+0d0
+SPEED 0+0d0
+DESC
+You found this random potion on the floor. Probably belonged to 
+another adventurer. Clearly, it didnt help them...
+.
+ATTR 0+0d0
+RRTY 60
+ART FALSE
+END
+
+BEGIN OBJECT
+NAME excelent health potion
+TYPE POTION
+WEIGHT 0+0d0
+COLOR RED
+DODGE 0+0d0
+VAL 0+0d0
+DAM 0+0d0
+DEF 0+0d0
+HIT 0+0d0
+SPEED 0+0d0
+DESC
+This mysterious potion actually looks really nice! Apparently
+whoever this originally belonged to was either rich or talented!
+Hopefully they are okay...
+.
+ATTR 0+0d0
+RRTY 45
+ART FALSE
+END
+
+BEGIN OBJECT
+NAME godly health potion
+TYPE POTION
+WEIGHT 0+0d0
+COLOR RED
+DODGE 0+0d0
+VAL 0+0d0
+DAM 0+0d0
+DEF 0+0d0
+HIT 0+0d0
+SPEED 0+0d0
+DESC
+This mysterious potion glows with energy in your hand. You have the strong
+urge to drink it... despite all common sense which says not to ingest
+mysterious substances found in dungeons...
+.
+ATTR 0+0d0
+RRTY 30
+ART FALSE
+END
