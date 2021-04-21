@@ -435,7 +435,33 @@ uint32_t pc::destroy_in(uint32_t slot)
 uint32_t pc::pick_up(dungeon *d)
 {
   object *o;
+  //NEW
+  pair_t next;
+  next[dim_y] = d->PC->position[dim_y];
+  next[dim_x] = d->PC->position[dim_x];
+  
+  if(d->objmap[position[dim_y]][position[dim_x]]) {
+    if (d->objmap[position[dim_y]][position[dim_x]]->get_symbol() == '^' && !(d->PC->fullhp(d))){
+      std::string name;
+      int i;
+      name = d->objmap[next[dim_y]][next[dim_x]]->get_name();
 
+      // for printing
+      if (name == "godly health potion") i = 100;
+      else if (name == "spicy health potion") i = 50;
+      else if (name == "good sized health potion") i = 75;
+      else i = 25;
+      
+      drink_potion(d, next);
+      io_queue_message("You pick up a potion and are healed %d percent to %d hp.",i, d->PC->hp);
+      return 0;
+    }
+    else if (d->objmap[position[dim_y]][position[dim_x]]->get_symbol() == '^' && d->PC->fullhp(d)) {
+      io_queue_message("Your health is full, come back later.");
+      return 0;
+    }
+  }
+  
   while (has_open_inventory_slot() &&
          d->objmap[position[dim_y]][position[dim_x]]) {
     io_queue_message("You pick up %s.",
@@ -464,4 +490,11 @@ object *pc::from_pile(dungeon *d, pair_t pos)
   }
 
   return o;
+}
+
+//new
+bool pc::fullhp(dungeon *d) { 
+    if(!(d->pc_health) && d->PC->hp == 1000) return true;
+    if ((d->pc_health) && d->PC->hp == d->pc_health) return true;
+    return false;
 }
