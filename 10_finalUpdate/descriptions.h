@@ -34,7 +34,8 @@ typedef enum object_type {
   objtype_AMMUNITION,
   objtype_FOOD,
   objtype_WAND,
-  objtype_CONTAINER
+  objtype_CONTAINER,
+  objtype_POTION //NEW
 } object_type_t;
 
 extern const char object_symbol[];
