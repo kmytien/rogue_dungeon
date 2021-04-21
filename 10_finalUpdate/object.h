@@ -52,10 +52,17 @@ class object {
   inline object *get_next() { return next; }
   inline void set_next(object *n) { next = n; }
   const char *get_description() { return description.c_str(); }
+ 
+ //new 
+  int32_t get_hit() { return hit; }
 };
 
 void gen_objects(dungeon *d);
 char object_get_symbol(object *o);
 void destroy_objects(dungeon *d);
+
+// NEW
+void drink_potion(dungeon *d, pair_t next);
+void gen_potions(dungeon *d);
 
 #endif
