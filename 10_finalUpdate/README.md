@@ -11,12 +11,8 @@
      - PC can be able to throw it wherever terrain has been spotted
      - Will be able to kill monsters regardless on how high their HP is
      - Will destroy any objects in area of explosion
-  
-  
-  (Ideas if you guys are stuck)
-  - Have an input that allows the player to name the pc and all dialogue is then changed
-  - Insert friendly npcs that give the character stuff when talked to 
-  - Have a laser vision command/power that kills everything in a straight line
+  - (S)
+
 
 ## Project Team Members:
 - MyTien Kien *(kmytien)*
