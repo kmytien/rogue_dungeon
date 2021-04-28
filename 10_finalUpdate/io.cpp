@@ -1748,6 +1748,7 @@ static uint32_t io_range(dungeon *d){
 						//use do combat
 						do_combat(d, d->PC, charpair(current));
 						out = 1;
+						io_queue_message("YEET");
 					}
 					
 					else {
