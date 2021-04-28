@@ -1637,18 +1637,21 @@ static uint32_t io_throw_grenade(dungeon *d) {
 }
 
 static uint32_t io_range(dungeon *d){
-		int c, x, y, i, out = 0, have_ranged = 0;
+		int c, x, y, i, out = 0;
 		pair_t current;
 		current[dim_x] = d->PC->position[dim_x];
 		current[dim_y] = d->PC->position[dim_y];
+		object *o;
+		int key;
+		char s[61];
 
 		//need to check if user has any weapons - TODO
 		for (i = 0; i < MAX_INVENTORY; i++) {
-    	io_object_to_string(d->PC->in[i], s, 61);
-    	mvprintw(i + 7, 10, " %c) %-55s ", '0' + i, s);
-  	}
+    		  io_object_to_string(d->PC->in[i], s, 61);
+    		  mvprintw(i + 7, 10, " %c) %-55s ", '0' + i, s);
+  		}
 		
-		/*
+		
 		while (1) {
 		  if ((key = getch()) == 27) {
 		    io_display(d);
@@ -1672,23 +1675,23 @@ static uint32_t io_range(dungeon *d){
 		    mvprintw(18, 10, " %-58s ", "Empty inventory slot.  Try again.");
 		    continue;
 		  }
-
-		  if (!d->PC->wear_in(key - '0')) {
-		    return 0;
+		  else {
+		     o = d->PC->in[key - '0'];
+		     d->PC->in[key - '0'] = NULL;
+		     break;
 		  }
 
-		  snprintf(s, 61, "Can't wear %s.  Try again.",
+		  snprintf(s, 61, "Can't throw %s.  Try again.",
 		           d->PC->in[key - '0']->get_name());
 		  mvprintw(18, 10, " %-58s ", s);
 		  refresh();
-  	}
-  	*/
+  		}
   	
 		mvaddch(current[dim_y] + 1, current[dim_x], '*');
 		refresh();
 
 		while (!out) {
-		  mvprintw(1, 0, "%s", "Use the keys to find a monster and throw a weapon at it.");
+		  mvprintw(1, 0, "%s", "Use the keys to find a monster and press W to throw. Press esc to exit");
 			x = 0;
 			y = 0;
 
@@ -1744,18 +1747,19 @@ static uint32_t io_range(dungeon *d){
 
 		    //ranged - can pick any monster that is visible
 		    case 'W':
-					if (charpair(current) != d->PC && charpair(current)) {
-						//use do combat
-						do_combat(d, d->PC, charpair(current));
-						out = 1;
-						io_queue_message("YEET");
-					}
-					
-					else {
-						io_queue_message("There is no monster there... pick another spot.");
-						refresh();
-						getch();
-					}
+		      if (charpair(current) != d->PC && charpair(current)) {
+			//use do combat
+			io_queue_message("You bravely chuck a %s at %s",
+					 o->get_name(), charpair(current)->name);
+			do_combat(d, d->PC, charpair(current));
+			out = 1;
+			io_queue_message("~YEET~");
+		      }
+		      else {
+			io_queue_message("There is no monster there... pick another spot.");
+			refresh();
+			getch();
+		      }
 					
 		      refresh();
 		      break;
