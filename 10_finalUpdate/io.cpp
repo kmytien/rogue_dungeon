@@ -688,7 +688,7 @@ uint32_t io_teleport_pc(dungeon *d)
 
   if (charpair(dest) && charpair(dest) != d->PC) {
     io_queue_message("Teleport failed.  Destination occupied.");
-  } else {  
+  } else {
     d->character_map[d->PC->position[dim_y]][d->PC->position[dim_x]] = NULL;
     d->character_map[dest[dim_y]][dest[dim_x]] = d->PC;
 
@@ -951,7 +951,7 @@ void io_display_in(dungeon *d)
   uint32_t i;
   int grenades = d->PC->grenades;
   char s[61];
-	
+
   for (i = 0; i < MAX_INVENTORY; i++) {
     io_object_to_string(d->PC->in[i], s, 61);
     mvprintw(i + 7, 10, " %c) %-55s ", '0' + i, s);
@@ -961,9 +961,10 @@ void io_display_in(dungeon *d)
   attron(COLOR_PAIR(COLOR_RED));
   mvprintw(17, 10, " You have [ %d ] grenades left. ", grenades);
   attroff(COLOR_PAIR(COLOR_RED));
+  
   mvprintw(18, 10, " %-58s ", "");
   mvprintw(19, 10, " %-58s ", "Hit any key to continue.");
-  
+
 
   refresh();
 
@@ -1092,6 +1093,7 @@ uint32_t io_drop_in(dungeon *d)
   return 1;
 }
 
+
 static uint32_t io_display_obj_info(object *o)
 {
   char s[80];
@@ -1123,7 +1125,7 @@ static uint32_t io_display_obj_info(object *o)
   refresh();
   getch();
 
-  return 0;  
+  return 0;
 }
 
 static uint32_t io_inspect_eq(dungeon *d);
@@ -1366,12 +1368,12 @@ static uint32_t io_inspect_monster(dungeon *d)
   mvprintw(n + 4, 0, "Hit any key to continue. ");
 
   refresh();
-  
+
   getch();
 
   io_display(d);
 
-  return 0;  
+  return 0;
 }
 
 static uint32_t io_inspect_eq(dungeon *d)
@@ -1491,7 +1493,7 @@ static uint32_t io_throw_grenade(dungeon *d) {
   pair_t current;
   current[dim_x] = d->PC->position[dim_x];
   current[dim_y] = d->PC->position[dim_y];
-  
+
 	//if pc has grenade
 	if (d->PC->grenades) {
 		//was thinking either pc can pick where grenade lands or grenade just kills in 3x3 radius near pc
@@ -1504,7 +1506,7 @@ static uint32_t io_throw_grenade(dungeon *d) {
 		  mvprintw(1, 0, "%s", "Use the keys to find a place for a grenade. Press '*' to explode and ESC to exit");
 			x = 0;
 			y = 0;
-			
+
 		  switch(c = getch()) {
 		    case '7':
 		    case 'y':
@@ -1560,18 +1562,18 @@ static uint32_t io_throw_grenade(dungeon *d) {
 		    	//delete objects and monsters in 3x3 area with cursor in the middle
 		    	for (i = current[dim_y] - 1; i <= current[dim_y] + 1; i++) {
 		    		for (j = current[dim_x] - 1; j <= current[dim_x] + 1; j++) {
-		    		
+
 		    			if (mapxy(j, i) == ter_wall_immutable) continue;
 		    			else {
 		    				if (objxy(j, i) || (charxy(j, i) != d->PC && charxy(j, i))) {
 		    					objxy(j, i) = NULL;
 		    					charxy(j, i) = NULL;
-		    				} 
+		    				}
 		    			}
-		    		
+
 		    		}
 		    	}
-		    	
+
 		      refresh();
 		      out = 1;
 		      //getch();
@@ -1586,7 +1588,7 @@ static uint32_t io_throw_grenade(dungeon *d) {
 		      mvprintw(0, 5, "%s", "Invalid key.");
 		      break;
 		  }
-		  
+
 		  switch (mappair(current)) {
 		    case ter_wall:
 		    case ter_wall_immutable:
@@ -1612,27 +1614,152 @@ static uint32_t io_throw_grenade(dungeon *d) {
 		    default:
 		      mvaddch(current[dim_y] + 1, current[dim_x], '0');
 		  }
-		  
+
 		  current[dim_y] += y;
 		  current[dim_x] += x;
-		  
+
 		  io_display(d);
 		  mvaddch(current[dim_y] + 1, current[dim_x], '*');
 		  refresh();
 		}
-		
+
 		d->PC->grenades -= 1;
 	}
-		
+
 	//else pc doesn't have grenade
 	else {
 		//return 1 and print msg
 		io_queue_message("You're out of luck - you used all your grenades!");
 		return 1;
 	}
-	
+
 	return 0;
 }
+
+static uint32_t io_range(dungeon *d){
+	
+	if(d->PC->eq[2] == NULL){
+           io_queue_message("You don't have a ranged object.");
+           return 1;
+        } else {
+        
+        int x = 0, y = 0, i, j, key, out = 0;
+                      
+        pair_t current;
+        current[dim_x] = d->PC->position[dim_x];
+        current[dim_y] = d->PC->position[dim_y];
+        character *c = d->character_map[i][j];
+        uint dam = d->PC->eq[2]->roll_dice();
+                      
+                    switch(key = getch()) {
+		    case '7':
+		    case 'y':
+		    case KEY_HOME:
+		      if (current[dim_y] != 1) y = -1;;
+		      if (current[dim_x] != 1) x = -1;;
+		      break;
+		    case '8':
+		    case 'k':
+		    case KEY_UP:
+		      if (current[dim_y] != 1) y = -1;
+		      x = 0;
+		      break;
+		    case '9':
+		    case 'u':
+		    case KEY_PPAGE:
+		      if (current[dim_y] != 1) y = -1;
+		      if (current[dim_x] != DUNGEON_X - 2) x = 1;
+		      break;
+		    case '6':
+		    case 'l':
+		    case KEY_RIGHT:
+		      if (current[dim_x] != DUNGEON_X - 2) x = 1;
+		      y = 0;
+		      break;
+		    case '3':
+		    case 'n':
+		    case KEY_NPAGE:
+		      if (current[dim_y] != DUNGEON_Y - 2) y = 1;
+		      if (current[dim_x] != DUNGEON_X - 2) x = 1;
+		      break;
+		    case '2':
+		    case 'j':
+		    case KEY_DOWN:
+		      if (current[dim_y] != DUNGEON_Y - 2) y = 1;
+		      x = 0;
+		      break;
+		    case '1':
+		    case 'b':
+		    case KEY_END:
+		      if (current[dim_y] != DUNGEON_Y - 2) y = 1;
+		      if (current[dim_x] != 1) x = -1;
+		      break;
+		    case '4':
+		    case 'h':
+		    case KEY_LEFT:
+		      if (current[dim_x] != 1) x = -1;
+		      y = 0;
+		      break;
+
+		    //bomb 3x3 area
+		    case '*':
+		    	//delete objects and monsters in 3x3 area with cursor in the middle
+		    	for (i = current[dim_y] - 1; i <= current[dim_y] + 1; i++) {
+		    		for (j = current[dim_x] - 1; j <= current[dim_x] + 1; j++) {
+
+		    			if (mapxy(j, i) == ter_wall_immutable) continue;
+		    			else {
+		    				if (objxy(j, i) || (charxy(j, i) != d->PC && charxy(j, i))) {
+		    					objxy(j, i) = NULL;
+		    					charxy(j, i) = NULL;
+		    				}
+		    			}
+
+		    		}
+		    	}
+
+		      refresh();
+		      out = 1;
+		      //getch();
+		      break;
+
+		    //ESC button to exit out
+		    case 27:
+		      out = 1;
+		      break;
+
+		    default:
+		      mvprintw(0, 5, "%s", "Invalid key.");
+		      break;
+		  }
+		  
+		  
+		      if (d->character_map[i][j]->hp <= dam) {
+		      
+		      	//from do_combat
+                         io_queue_message("The %s dies.", c->name);
+                         c->hp = 0;
+                         c->alive = 0;
+                         character_increment_dkills(d->PC);
+                         character_increment_ikills(d->PC, (character_get_dkills(c) +
+                                                                           character_get_ikills(c)));
+                         if (c != d->PC) {
+                            d->num_monsters--;
+                     	 }
+                         charpair(c->position) = NULL;
+                         return 0;
+                         } else {
+                           io_queue_message("You deal %d damage to the %s", dam, c->name);
+                           d->character_map[i][j]->hp = d->character_map[i][j]->hp - dam;
+                           return 0;
+                         }
+                       	out = 1;
+		     }
+
+       			return 0;                  
+           
+}
+
 
 
 void io_handle_input(dungeon *d)
@@ -1805,11 +1932,15 @@ void io_handle_input(dungeon *d)
       fail_code = 0;
       break;
       
+    case '!':
+    	io_range(d);
+    	fail_code = 1;
+    	break;
     case '*':
     	io_throw_grenade(d);
     	fail_code = 1;
     	break;
-    	
+
     default:
       /* Also not in the spec.  It's not always easy to figure out what *
        * key code corresponds with a given keystroke.  Print out any    *
