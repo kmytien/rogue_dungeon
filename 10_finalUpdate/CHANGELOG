@@ -1,3 +1,7 @@
+4/28/21 13:00 SA, HL, MK: Fixed bugs in io_range, it now works!
+4/23/21 16:30 SA: Added to the method so pc can combat any monster on map
+4/22/21 15:00 SA: Started implementing io_range
+4/20/21 20:00 HL: Implented health potions
 4/20/21 16:30 MK: Finished implementing bombs in io.cpp
 4/20/21 14:30 MK: Implemented a method so that PC can use a cursor to locate where bomb/grenade should be thrown
 4/19/21 15:25 MK: Implemented grenades in pc.h, and its initialization, added command in io.cpp, started io_throw_grenade
