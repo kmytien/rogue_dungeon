@@ -1637,13 +1637,53 @@ static uint32_t io_throw_grenade(dungeon *d) {
 }
 
 static uint32_t io_range(dungeon *d){
-		int c, x, y, out = 0;
+		int c, x, y, i, out = 0, have_ranged = 0;
 		pair_t current;
 		current[dim_x] = d->PC->position[dim_x];
 		current[dim_y] = d->PC->position[dim_y];
 
 		//need to check if user has any weapons - TODO
+		for (i = 0; i < MAX_INVENTORY; i++) {
+    	io_object_to_string(d->PC->in[i], s, 61);
+    	mvprintw(i + 7, 10, " %c) %-55s ", '0' + i, s);
+  	}
 		
+		/*
+		while (1) {
+		  if ((key = getch()) == 27) {
+		    io_display(d);
+		    return 1;
+		  }
+
+		  if (key < '0' || key > '9') {
+		    if (isprint(key)) {
+		      snprintf(s, 61, "Invalid input: '%c'.  Enter 0-9 or ESC to cancel.",
+		               key);
+		      mvprintw(18, 10, " %-58s ", s);
+		    } else {
+		      mvprintw(18, 10, " %-58s ",
+		               "Invalid input.  Enter 0-9 or ESC to cancel.");
+		    }
+		    refresh();
+		    continue;
+		  }
+
+		  if (!d->PC->in[key - '0']) {
+		    mvprintw(18, 10, " %-58s ", "Empty inventory slot.  Try again.");
+		    continue;
+		  }
+
+		  if (!d->PC->wear_in(key - '0')) {
+		    return 0;
+		  }
+
+		  snprintf(s, 61, "Can't wear %s.  Try again.",
+		           d->PC->in[key - '0']->get_name());
+		  mvprintw(18, 10, " %-58s ", s);
+		  refresh();
+  	}
+  	*/
+  	
 		mvaddch(current[dim_y] + 1, current[dim_x], '*');
 		refresh();
 
@@ -1704,11 +1744,19 @@ static uint32_t io_range(dungeon *d){
 
 		    //ranged - can pick any monster that is visible
 		    case 'W':
+					if (charpair(current) != d->PC && charpair(current)) {
+						//use do combat
+						do_combat(d, d->PC, charpair(current));
+						out = 1;
+					}
 					
-
+					else {
+						io_queue_message("There is no monster there... pick another spot.");
+						refresh();
+						getch();
+					}
+					
 		      refresh();
-		      out = 1;
-		      //getch();
 		      break;
 
 		    //ESC button to exit out
@@ -1754,31 +1802,6 @@ static uint32_t io_range(dungeon *d){
 		  mvaddch(current[dim_y] + 1, current[dim_x], '*');
 		  refresh();
 		}
-					
-		/*
-		if (d->character_map[i][j]->hp <= dam) {
-						  
-		  //from do_combat
-			io_queue_message("The %s dies.", c->name);
-			c->hp = 0;
-			c->alive = 0;
-			character_increment_dkills(d->PC);
-			character_increment_ikills(d->PC, (character_get_dkills(c) + character_get_ikills(c)));
-			
-			if (c != d->PC) {
-				d->num_monsters--;
-			}
-				                     
-			charpair(c->position) = NULL;
-			return 0;
-		} 
-		
-		else {
-			io_queue_message("You dealt %d damage to the %s", dam, c->name);
-			d->character_map[i][j]->hp = d->character_map[i][j]->hp - dam;
-			return 0;
-		}
-		*/
 
  return 0;                  
            
