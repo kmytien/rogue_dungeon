@@ -1637,21 +1637,22 @@ static uint32_t io_throw_grenade(dungeon *d) {
 }
 
 static uint32_t io_range(dungeon *d){
-	
-	if(d->PC->eq[2] == NULL){
-           io_queue_message("You don't have a ranged object.");
-           return 1;
-        } else {
-        
-        int x = 0, y = 0, i, j, key, out = 0;
-                      
-        pair_t current;
-        current[dim_x] = d->PC->position[dim_x];
-        current[dim_y] = d->PC->position[dim_y];
-        character *c = d->character_map[i][j];
-        uint dam = d->PC->eq[2]->roll_dice();
-                      
-                    switch(key = getch()) {
+		int c, x, y, out = 0;
+		pair_t current;
+		current[dim_x] = d->PC->position[dim_x];
+		current[dim_y] = d->PC->position[dim_y];
+
+		//need to check if user has any weapons - TODO
+		
+		mvaddch(current[dim_y] + 1, current[dim_x], '*');
+		refresh();
+
+		while (!out) {
+		  mvprintw(1, 0, "%s", "Use the keys to find a monster and throw a weapon at it.");
+			x = 0;
+			y = 0;
+
+		  switch(c = getch()) {
 		    case '7':
 		    case 'y':
 		    case KEY_HOME:
@@ -1701,22 +1702,9 @@ static uint32_t io_range(dungeon *d){
 		      y = 0;
 		      break;
 
-		    //bomb 3x3 area
-		    case '*':
-		    	//delete objects and monsters in 3x3 area with cursor in the middle
-		    	for (i = current[dim_y] - 1; i <= current[dim_y] + 1; i++) {
-		    		for (j = current[dim_x] - 1; j <= current[dim_x] + 1; j++) {
-
-		    			if (mapxy(j, i) == ter_wall_immutable) continue;
-		    			else {
-		    				if (objxy(j, i) || (charxy(j, i) != d->PC && charxy(j, i))) {
-		    					objxy(j, i) = NULL;
-		    					charxy(j, i) = NULL;
-		    				}
-		    			}
-
-		    		}
-		    	}
+		    //ranged - can pick any monster that is visible
+		    case 'W':
+					
 
 		      refresh();
 		      out = 1;
@@ -1732,31 +1720,67 @@ static uint32_t io_range(dungeon *d){
 		      mvprintw(0, 5, "%s", "Invalid key.");
 		      break;
 		  }
-		  
-		  
-		      if (d->character_map[i][j]->hp <= dam) {
-		      
-		      	//from do_combat
-                         io_queue_message("The %s dies.", c->name);
-                         c->hp = 0;
-                         c->alive = 0;
-                         character_increment_dkills(d->PC);
-                         character_increment_ikills(d->PC, (character_get_dkills(c) +
-                                                                           character_get_ikills(c)));
-                         if (c != d->PC) {
-                            d->num_monsters--;
-                     	 }
-                         charpair(c->position) = NULL;
-                         return 0;
-                         } else {
-                           io_queue_message("You deal %d damage to the %s", dam, c->name);
-                           d->character_map[i][j]->hp = d->character_map[i][j]->hp - dam;
-                           return 0;
-                         }
-                       	out = 1;
-		     }
 
-       			return 0;                  
+		  switch (mappair(current)) {
+		    case ter_wall:
+		    case ter_wall_immutable:
+		    case ter_unknown:
+		      mvaddch(current[dim_y] + 1, current[dim_x], ' ');
+		      break;
+		    case ter_floor:
+		    case ter_floor_room:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '.');
+		      break;
+		    case ter_floor_hall:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '#');
+		      break;
+		    case ter_debug:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '*');
+		      break;
+		    case ter_stairs_up:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '<');
+		      break;
+		    case ter_stairs_down:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '>');
+		      break;
+		    default:
+		      mvaddch(current[dim_y] + 1, current[dim_x], '0');
+		  }
+
+		  current[dim_y] += y;
+		  current[dim_x] += x;
+
+		  io_display(d);
+		  mvaddch(current[dim_y] + 1, current[dim_x], '*');
+		  refresh();
+		}
+					
+		/*
+		if (d->character_map[i][j]->hp <= dam) {
+						  
+		  //from do_combat
+			io_queue_message("The %s dies.", c->name);
+			c->hp = 0;
+			c->alive = 0;
+			character_increment_dkills(d->PC);
+			character_increment_ikills(d->PC, (character_get_dkills(c) + character_get_ikills(c)));
+			
+			if (c != d->PC) {
+				d->num_monsters--;
+			}
+				                     
+			charpair(c->position) = NULL;
+			return 0;
+		} 
+		
+		else {
+			io_queue_message("You dealt %d damage to the %s", dam, c->name);
+			d->character_map[i][j]->hp = d->character_map[i][j]->hp - dam;
+			return 0;
+		}
+		*/
+
+ return 0;                  
            
 }
 
@@ -1938,6 +1962,11 @@ void io_handle_input(dungeon *d)
     	break;
     case '*':
     	io_throw_grenade(d);
+    	fail_code = 1;
+    	break;
+    	
+    case 'W':
+    	io_range(d);
     	fail_code = 1;
     	break;
 
